@@ -1,3 +1,184 @@
-body { font-family:Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 1rem; }
-h1 { font-size: 2rem; margin-bottom: 0.5rem; }
-p { color: #333; }
+:root {
+    color-scheme: light;
+    --color-primary: #1d4ed8;
+    --color-secondary: #334155;
+    --color-accent: #c2410c;
+    --color-background: #f8fafc;
+    --color-surface: #ffffff;
+    --color-text: #172033;
+    --color-text-secondary: #475569;
+    --color-border: #cbd5e1;
+    --color-success: #166534;
+    --color-warning: #92400e;
+    --color-error: #b91c1c;
+    --color-info: #075985;
+    --color-focus: #1d4ed8;
+    --font-sans: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --font-mono: "Cascadia Code", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    --text-base: 1rem;
+    --text-small: 0.875rem;
+    --text-title: clamp(1.875rem, 4vw, 2.5rem);
+    --leading-body: 1.6;
+    --leading-heading: 1.2;
+    --tracking-tight: -0.015em;
+    --space-page: clamp(1rem, 3vw, 2rem);
+    --content-width: 72rem;
+    --radius-small: 0.375rem;
+    --radius-medium: 0.75rem;
+    --radius-large: 1rem;
+    --shadow-surface: 0 0.5rem 1.5rem rgb(15 23 42 / 0.08);
+    --transition-standard: 160ms ease;
+}
+
+html[data-theme="dark"] {
+    color-scheme: dark;
+    --color-primary: #93c5fd;
+    --color-secondary: #cbd5e1;
+    --color-accent: #fdba74;
+    --color-background: #0f172a;
+    --color-surface: #1e293b;
+    --color-text: #f8fafc;
+    --color-text-secondary: #cbd5e1;
+    --color-border: #475569;
+    --color-success: #86efac;
+    --color-warning: #fcd34d;
+    --color-error: #fca5a5;
+    --color-info: #7dd3fc;
+    --color-focus: #93c5fd;
+    --shadow-surface: 0 0.5rem 1.5rem rgb(2 6 23 / 0.35);
+}
+
+@media (prefers-color-scheme: dark) {
+    html:not([data-theme="light"]),
+    html[data-theme="system"] {
+        color-scheme: dark;
+        --color-primary: #93c5fd;
+        --color-secondary: #cbd5e1;
+        --color-accent: #fdba74;
+        --color-background: #0f172a;
+        --color-surface: #1e293b;
+        --color-text: #f8fafc;
+        --color-text-secondary: #cbd5e1;
+        --color-border: #475569;
+        --color-success: #86efac;
+        --color-warning: #fcd34d;
+        --color-error: #fca5a5;
+        --color-info: #7dd3fc;
+        --color-focus: #93c5fd;
+        --shadow-surface: 0 0.5rem 1.5rem rgb(2 6 23 / 0.35);
+    }
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    min-width: 18rem;
+    scroll-behavior: smooth;
+}
+
+body {
+    min-width: 18rem;
+    min-height: 100vh;
+    margin: 0;
+    background-color: var(--color-background);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: var(--leading-body);
+    text-rendering: optimizeLegibility;
+    transition: background-color var(--transition-standard), color var(--transition-standard);
+}
+
+a {
+    color: var(--color-primary);
+    text-decoration-thickness: 0.08em;
+    text-underline-offset: 0.16em;
+    transition: color var(--transition-standard);
+}
+
+a:hover {
+    color: var(--color-accent);
+}
+
+:focus-visible {
+    outline: 0.1875rem solid var(--color-focus);
+    outline-offset: 0.1875rem;
+}
+
+::selection {
+    background-color: var(--color-primary);
+    color: var(--color-background);
+}
+
+img,
+svg,
+video {
+    max-width: 100%;
+    height: auto;
+}
+
+button,
+input,
+textarea,
+select {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+    margin-top: 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+    color: var(--color-text);
+    line-height: var(--leading-heading);
+    letter-spacing: var(--tracking-tight);
+}
+
+h1 {
+    font-size: var(--text-title);
+}
+
+p {
+    color: var(--color-text-secondary);
+}
+
+.page {
+    width: min(100% - (var(--space-page) * 2), var(--content-width));
+    margin-inline: auto;
+}
+
+.surface {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-medium);
+    box-shadow: var(--shadow-surface);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}

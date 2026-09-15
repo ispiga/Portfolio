@@ -1,4 +1,6 @@
 @page "/"
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> Localizer
 
-<h1>Portfolio</h1>
-<p>Aplicación en construcción</p>
+<h1>@Localizer["HomeTitle"]</h1>
+<p>@Localizer["HomeDescription"]</p>
