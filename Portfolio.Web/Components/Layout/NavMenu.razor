@@ -1,5 +1,71 @@
-<nav>
-    <ul>
-        <li><a href="/">Inicio</a></li>
-    </ul>
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> Localizer
+@inject NavigationManager Navigation
+
+<nav class="portfolio-navbar" aria-label="@Localizer["MainNavigation"]">
+    <div class="portfolio-shell portfolio-navbar__content">
+        <a class="portfolio-logo" href="/" @onclick="GoHome">
+            <span class="portfolio-logo__mark" aria-hidden="true">[ LOGO ]</span>
+            <span>@Localizer["PortfolioName"]</span>
+        </a>
+
+        <button class="portfolio-menu-toggle" type="button" aria-controls="portfolio-navigation" aria-expanded="@isMenuOpen" @onclick="ToggleMenu">
+            <span class="portfolio-menu-toggle__icon" aria-hidden="true">☰</span>
+            <span>@Localizer[isMenuOpen ? "CloseMenu" : "OpenMenu"]</span>
+        </button>
+
+        <div id="portfolio-navigation" class="portfolio-navbar__panel @(isMenuOpen ? "is-open" : string.Empty)">
+            <ul class="portfolio-navigation__list">
+                <li><a class="@(IsCurrent("about") ? "is-active" : string.Empty)" href="/#about" @onclick="SelectAbout">@Localizer["About"]</a></li>
+                <li><a class="@(IsCurrent("projects") ? "is-active" : string.Empty)" href="/#projects" @onclick="SelectProjects">@Localizer["Projects"]</a></li>
+                <li><a class="@(IsCurrent("certificates") ? "is-active" : string.Empty)" href="/#certificates" @onclick="SelectCertificates">@Localizer["Certificates"]</a></li>
+                <li><a class="@(IsCurrent("blog") ? "is-active" : string.Empty)" href="/#blog" @onclick="SelectBlog">@Localizer["Blog"]</a></li>
+                <li><a class="@(IsCurrent("contact") ? "is-active" : string.Empty)" href="/#contact" @onclick="SelectContact">@Localizer["Contact"]</a></li>
+            </ul>
+            <ThemeSelector />
+        </div>
+    </div>
 </nav>
+
+@code {
+    private bool isMenuOpen;
+    private string? activeSection;
+
+    private void ToggleMenu() => isMenuOpen = !isMenuOpen;
+
+    private void CloseMenu() => isMenuOpen = false;
+
+    private void GoHome()
+    {
+        activeSection = null;
+        CloseMenu();
+    }
+
+    private void SelectAbout() => SelectSection("about");
+
+    private void SelectProjects() => SelectSection("projects");
+
+    private void SelectCertificates() => SelectSection("certificates");
+
+    private void SelectBlog() => SelectSection("blog");
+
+    private void SelectContact() => SelectSection("contact");
+
+    private void SelectSection(string section)
+    {
+        activeSection = section;
+        CloseMenu();
+    }
+
+    private bool IsCurrent(string section)
+    {
+        if (activeSection is not null)
+        {
+            return string.Equals(activeSection, section, StringComparison.OrdinalIgnoreCase);
+        }
+
+        var relativeUri = Navigation.ToBaseRelativePath(Navigation.Uri);
+        var fragment = relativeUri.Split('#', 2).ElementAtOrDefault(1);
+        return string.Equals(fragment, section, StringComparison.OrdinalIgnoreCase);
+    }
+}

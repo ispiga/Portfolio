@@ -6,4 +6,18 @@
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <data name="HomeTitle" xml:space="preserve"><value>Portfolio</value></data>
   <data name="HomeDescription" xml:space="preserve"><value>Aplicación en construcción</value></data>
+  <data name="PortfolioName" xml:space="preserve"><value>Portfolio</value></data>
+  <data name="MainNavigation" xml:space="preserve"><value>Navegación principal</value></data>
+  <data name="About" xml:space="preserve"><value>Sobre mí</value></data>
+  <data name="Projects" xml:space="preserve"><value>Proyectos</value></data>
+  <data name="Certificates" xml:space="preserve"><value>Certificados</value></data>
+  <data name="Blog" xml:space="preserve"><value>Blog</value></data>
+  <data name="Contact" xml:space="preserve"><value>Contacto</value></data>
+  <data name="OpenMenu" xml:space="preserve"><value>Abrir menú</value></data>
+  <data name="CloseMenu" xml:space="preserve"><value>Cerrar menú</value></data>
+  <data name="Theme" xml:space="preserve"><value>Tema</value></data>
+  <data name="ThemeSystem" xml:space="preserve"><value>Sistema</value></data>
+  <data name="ThemeLight" xml:space="preserve"><value>Claro</value></data>
+  <data name="ThemeDark" xml:space="preserve"><value>Oscuro</value></data>
+  <data name="Copyright" xml:space="preserve"><value>© {0} — Todos los derechos reservados.</value></data>
 </root>

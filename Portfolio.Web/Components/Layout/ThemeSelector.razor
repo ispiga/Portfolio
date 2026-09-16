@@ -1,0 +1,31 @@
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> Localizer
+@inject IJSRuntime JS
+
+<div class="theme-selector">
+    <label for="theme-select">@Localizer["Theme"]</label>
+    <select id="theme-select" class="theme-selector__control" value="@selectedTheme" @onchange="OnThemeChanged">
+        <option value="system">@Localizer["ThemeSystem"]</option>
+        <option value="light">@Localizer["ThemeLight"]</option>
+        <option value="dark">@Localizer["ThemeDark"]</option>
+    </select>
+</div>
+
+@code {
+    private string selectedTheme = "system";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            selectedTheme = await JS.InvokeAsync<string>("portfolioTheme.get");
+            StateHasChanged();
+        }
+    }
+
+    private async Task OnThemeChanged(ChangeEventArgs args)
+    {
+        var theme = args.Value?.ToString() ?? "system";
+        selectedTheme = await JS.InvokeAsync<string>("portfolioTheme.set", theme);
+    }
+}

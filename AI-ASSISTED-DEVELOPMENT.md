@@ -358,3 +358,286 @@ Al finalizar:
 - Explica cómo queda preparada la localización.
 - Indica el resultado de la compilación y de las comprobaciones realizadas.
 - No crees un commit automáticamente, pero indica como commit recomendado:
+
+
+# ******************************
+# PROMPT PARA REALIZAR LA FASE 3
+# ******************************
+
+Quiero implementar la FASE 3 — Layout, Navbar, Footer y navegación del proyecto Portfolio.
+
+Lee primero PORTFOLIO_PROJECT.md y respeta todas las decisiones arquitectónicas y visuales definidas en él.
+
+Contexto actual:
+- Proyecto .NET 10.
+- ASP.NET Core con Blazor Web App.
+- Renderizado basado en Razor Components.
+- Portfolio.Web es el proyecto frontend.
+- Tailwind CSS ya está configurado y se utiliza junto con CSS propio.
+- Los estilos propios están en Portfolio.Web/wwwroot/css/app.css.
+- La entrada de Tailwind está en Portfolio.Web/Styles/tailwind.css.
+- El CSS compilado está en Portfolio.Web/wwwroot/css/tailwind.css.
+- La tipografía utiliza únicamente fuentes del sistema o locales.
+- Los tokens semánticos de color están definidos mediante variables CSS.
+- El sistema de temas ya dispone de los estados Sistema, Claro y Oscuro.
+- La API JavaScript del tema está en Portfolio.Web/wwwroot/js/theme.js.
+- La preferencia de tema se almacena en localStorage.
+- La localización está configurada con español como cultura predeterminada y recursos preparados para inglés.
+- La Home temporal sigue mostrando:
+  - Portfolio
+  - Aplicación en construcción
+
+Objetivo de esta fase:
+
+Implementar únicamente la estructura visual general de la parte pública:
+
+1. Navbar
+2. Footer
+3. Navegación principal
+4. Comportamiento responsive del layout
+5. Control visual reutilizable para cambiar entre Sistema, Claro y Oscuro
+
+No implementes todavía el Hero ni las secciones definitivas de la Home.
+
+Antes de editar:
+
+1. Inspecciona la solución y los archivos existentes.
+2. Lee PORTFOLIO_PROJECT.md, especialmente las secciones de:
+   - sistema visual;
+   - internacionalización;
+   - tema visual;
+   - estructura pública;
+   - orden de implementación;
+   - reglas de accesibilidad.
+3. Comprueba cómo están implementados actualmente:
+   - MainLayout.razor;
+   - NavMenu.razor;
+   - App.razor;
+   - Routes.razor;
+   - Home.razor;
+   - app.css;
+   - theme.js;
+   - recursos de localización.
+4. Comprueba si existe ya algún layout, componente o estilo reutilizable que deba conservarse.
+5. No dupliques configuraciones ni crees una arquitectura paralela.
+6. Si encuentras una decisión arquitectónica ambigua que afecte al layout o a la navegación, detente y pregunta antes de implementarla.
+
+Alcance obligatorio:
+
+1. Implementar Navbar
+
+Crea una Navbar propia para la parte pública utilizando Blazor, Tailwind CSS y CSS propio cuando sea necesario.
+
+La Navbar debe incluir:
+
+- Espacio reservado para el logo del portfolio.
+- El logo debe enlazar a `/`.
+- Enlaces localizados para:
+  - Sobre mí
+  - Proyectos
+  - Certificados
+  - Blog
+  - Contacto
+- Estado visual del enlace activo.
+- Navegación accesible mediante teclado.
+- Uso correcto de elementos semánticos HTML.
+- Atributos ARIA únicamente cuando sean necesarios.
+- Diseño responsive.
+- En escritorio, navegación visible.
+- En móvil, navegación adaptada mediante un menú desplegable o hamburguesa accesible.
+- El menú móvil debe poder abrirse y cerrarse mediante teclado.
+- El foco no debe perderse de forma inesperada.
+- El botón del menú debe indicar correctamente su estado mediante `aria-expanded`.
+- El menú debe cerrarse cuando corresponda al navegar.
+
+No implementes todavía páginas reales para las secciones si no existen. Los enlaces pueden apuntar a anchors o rutas preparadas, pero no crees contenido definitivo de fases posteriores.
+
+2. Implementar Footer
+
+Crea un Footer propio para la parte pública.
+
+Debe incluir únicamente una estructura inicial y preparada para crecer, por ejemplo:
+
+- Nombre o identidad textual del portfolio.
+- Año actual.
+- Texto breve de derechos.
+- Enlaces externos solo si ya existen en el proyecto.
+- Enlaces básicos accesibles.
+
+No añadas todavía contenido definitivo de redes sociales, proyectos, blog ni datos personales que no existan.
+
+3. Integrar el layout
+
+Actualiza MainLayout.razor para que la estructura general sea:
+
+- Navbar
+- Contenido principal
+- Footer
+
+Usa elementos semánticos como:
+
+- `<header>`
+- `<nav>`
+- `<main>`
+- `<footer>`
+
+El contenido de las páginas debe seguir funcionando mediante `@Body`.
+
+No rompas la Home temporal.
+
+No conviertas toda la aplicación en una SPA ni implementes navegación innecesaria en JavaScript.
+
+4. Integrar el selector de tema
+
+Aprovecha la API existente de `theme.js`.
+
+Crea un componente reutilizable para el selector de tema, por ejemplo:
+
+- ThemeSelector.razor
+
+Debe permitir elegir:
+
+- Sistema
+- Claro
+- Oscuro
+
+Requisitos:
+
+- Utilizar la API existente de JavaScript mediante JS interop.
+- No duplicar la lógica de localStorage en C#.
+- Mantener la preferencia entre visitas.
+- Reflejar visualmente el estado actual.
+- Ser accesible mediante teclado.
+- Utilizar textos localizados.
+- No cargar librerías externas.
+- No implementar una segunda API de temas.
+- No modificar los tokens CSS salvo que sea estrictamente necesario.
+
+El selector puede formar parte de la Navbar, pero no crees todavía un diseño definitivo de identidad visual o logo.
+
+5. Localización
+
+Todos los textos visibles nuevos deben proceder de recursos.
+
+Añade recursos en español para:
+
+- Sobre mí
+- Proyectos
+- Certificados
+- Blog
+- Contacto
+- Abrir menú
+- Cerrar menú
+- Tema
+- Sistema
+- Claro
+- Oscuro
+- Derechos reservados
+- Nombre o descripción básica del portfolio si se necesita
+
+Prepara también las claves equivalentes en inglés.
+
+No dupliques páginas por idioma.
+
+No hardcodees textos visibles que deban formar parte de la interfaz.
+
+6. Responsive y accesibilidad
+
+El layout debe funcionar correctamente en:
+
+- móvil;
+- tablet;
+- escritorio;
+- anchos reducidos;
+- zoom del navegador.
+
+Respeta:
+
+- contraste suficiente;
+- focus-visible;
+- navegación completa mediante teclado;
+- `prefers-reduced-motion`;
+- tamaños táctiles razonables;
+- textos legibles;
+- no depender únicamente del color para comunicar estados;
+- no ocultar contenido importante en móvil;
+- no utilizar fuentes externas.
+
+7. Estilos
+
+Utiliza las variables semánticas ya existentes:
+
+- colores;
+- superficies;
+- bordes;
+- focus;
+- radios;
+- sombras;
+- transiciones;
+- espaciados.
+
+No introduzcas colores acoplados a nombres como `blue-500` o `gray-900`.
+
+No utilices Bootstrap.
+
+No dependas de la tipografía predeterminada de Bootstrap.
+
+No añadas estilos del Hero, proyectos, experiencia, certificaciones, blog ni contacto.
+
+8. Mantener el alcance
+
+No implementes:
+
+- Hero;
+- diseño definitivo del Home;
+- secciones de Sobre mí;
+- experiencia;
+- proyectos;
+- certificaciones;
+- blog;
+- contacto;
+- base de datos;
+- Identity;
+- administración;
+- TinyMCE;
+- Docker;
+- despliegue;
+- MudBlazor;
+- logo definitivo.
+
+Validación obligatoria:
+
+1. Ejecuta `npm run css:build`.
+2. Ejecuta `dotnet build` sobre la solución.
+3. Comprueba que no hay errores ni warnings nuevos relacionados con los cambios.
+4. Inicia la aplicación.
+5. Comprueba que la Home temporal sigue mostrando:
+   - Portfolio
+   - Aplicación en construcción
+6. Comprueba que:
+   - la Navbar aparece;
+   - el Footer aparece;
+   - el logo enlaza a `/`;
+   - los enlaces se muestran correctamente;
+   - el menú móvil se abre y cierra;
+   - el menú es usable con teclado;
+   - el selector de tema cambia entre Sistema, Claro y Oscuro;
+   - la preferencia se conserva en localStorage;
+   - los textos visibles nuevos proceden de recursos;
+   - no se cargan fuentes externas;
+   - el layout no introduce trabajo de la Fase 4.
+7. Revisa que `node_modules` no aparezca como archivo pendiente de Git.
+8. No crees un commit automáticamente.
+
+Al finalizar:
+
+- Resume los archivos modificados.
+- Explica cómo se ha integrado Navbar, Footer y navegación.
+- Explica cómo funciona el menú responsive.
+- Explica cómo se ha integrado el selector de tema existente.
+- Indica qué recursos de localización se han añadido.
+- Indica las comprobaciones realizadas.
+- Indica el resultado de `npm run css:build`.
+- Indica el resultado de `dotnet build`.
+- Confirma que la Home temporal sigue funcionando.
+- Confirma que no se han implementado elementos de la Fase 4.

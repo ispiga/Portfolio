@@ -1,0 +1,9 @@
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> Localizer
+
+<footer class="portfolio-footer">
+    <div class="portfolio-shell portfolio-footer__content">
+        <p class="portfolio-footer__identity">@Localizer["PortfolioName"]</p>
+        <p>@string.Format(Localizer["Copyright"].Value, DateTime.Now.Year)</p>
+    </div>
+</footer>

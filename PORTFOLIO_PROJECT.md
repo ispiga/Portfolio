@@ -84,6 +84,12 @@ La aplicación debe aprovechar las capacidades de **Blazor Web App**, priorizand
 
 La parte pública tendrá prioridad por rendimiento e indexación, mientras que el área administrativa podrá utilizar componentes altamente interactivos.
 
+### Implementación inicial
+
+La aplicación utiliza el modelo **Blazor Web App con Razor Components** y renderizado interactivo **Interactive Server**. La interactividad se habilita en `Routes.razor`; no se convierte la aplicación en una SPA pura ni se utiliza JavaScript para sustituir la navegación de Blazor.
+
+La aplicación usa `MapRazorComponents<App>()` y `AddInteractiveServerRenderMode()`.
+
 ---
 
 # 4. Sistema visual
@@ -103,6 +109,10 @@ No se utilizará Bootstrap como base visual.
 Bootstrap es excelente como framework general, pero para este proyecto se busca una identidad visual propia y evitar el aspecto de portfolio genérico basado en componentes predeterminados.
 
 Tailwind permite construir un sistema visual personalizado manteniendo un desarrollo rápido y consistente.
+
+### Implementación actual del sistema visual
+
+Tailwind CSS se mantiene como dependencia local de `Portfolio.Web` mediante `@tailwindcss/cli` y los scripts npm `css:build` y `css:watch`. La entrada es `Styles/tailwind.css`, el análisis incluye `Components` y el resultado se genera en `wwwroot/css/tailwind.css`. Los estilos propios están en `wwwroot/css/app.css` e incluyen tokens semánticos, tipografía local o del sistema, temas, foco visible, layout responsive y `prefers-reduced-motion`. `App.razor` referencia `css/tailwind.css` y `css/app.css`.
 
 Se crearán componentes reutilizables propios, por ejemplo:
 
@@ -418,7 +428,7 @@ La aplicación se diseñará desde el principio preparada para múltiples idioma
 Inicialmente:
 
 ```text
-Español
+Español (`es-ES`)
 ```
 
 Posteriormente:
@@ -437,7 +447,7 @@ HomeSpanish.razor
 HomeEnglish.razor
 ```
 
-Se utilizará el sistema de recursos/localización.
+Se utilizará el sistema de recursos/localización. La configuración actual admite `es-ES` y `en-US`, con `es-ES` como cultura y UI culture predeterminada. Los recursos se organizan mediante `SharedResource` y los archivos `SharedResource.resx`, `SharedResource.es.resx` y `SharedResource.en.resx`.
 
 Desde el principio, incluso aunque solo exista español, los textos de interfaz deben utilizar recursos.
 
@@ -451,7 +461,7 @@ Blog = "Blog"
 Contact = "Contacto"
 ```
 
-Cuando se añada inglés se incorporarán los recursos correspondientes sin duplicar las pantallas.
+Los recursos en inglés ya están preparados para los textos existentes, pero todavía no existe un selector de idioma visible en la navbar ni una preferencia de idioma persistida. Cuando se implemente el cambio de cultura se mantendrá el sistema de recursos sin duplicar las pantallas.
 
 ---
 
@@ -498,6 +508,8 @@ El usuario podrá seleccionar:
 La preferencia elegida se guardará en **localStorage** para mantenerla entre visitas.
 
 El sistema de colores estará centralizado para poder cambiar la identidad visual posteriormente sin rehacer todos los componentes.
+
+La implementación actual mantiene esta lógica en `wwwroot/js/theme.js`, sin duplicar `localStorage` en C#. La API `portfolioTheme` expone `get`, `set`, `apply` y `options`, y `ThemeSelector.razor` la consume mediante JS interop.
 
 ---
 
@@ -561,6 +573,10 @@ El logo llevará a:
 No es necesario añadir una opción explícita llamada "Inicio" si el logo ya cumple esa función.
 
 En móvil se utilizará una navegación adaptada, previsiblemente mediante menú desplegable/hamburguesa.
+
+### Implementación de la Fase 3
+
+`MainLayout.razor` usa `header`, `main`, `footer` y `@Body`; `NavMenu.razor` implementa la navbar y el espacio provisional `[ LOGO ]`; `PortfolioFooter.razor` muestra identidad, año y derechos reservados; y `ThemeSelector.razor` se integra en la navbar. Los enlaces apuntan provisionalmente a anchors de la Home. En escritorio se muestran horizontalmente y el selector de tema se alinea a la derecha. En móvil, por debajo de `48rem`, el botón usa `aria-expanded`, el panel permanece oculto hasta abrirlo y se cierra al seleccionar un enlace.
 
 ---
 
@@ -1084,6 +1100,8 @@ Incluirá:
 - preparación de temas
 - recursos/localización
 
+La implementación incorpora además `theme.js` como API JavaScript mínima para aplicar el tema y conservarlo en `localStorage`, recursos compartidos en español e inglés y configuración de `es-ES`/`en-US` en el pipeline de ASP.NET Core.
+
 ---
 
 ## Commit 3
@@ -1100,6 +1118,10 @@ Incluirá:
 - navegación
 - responsive inicial
 - espacio reservado para logo
+- menú móvil accesible con estado `aria-expanded`
+- selector reutilizable de tema Sistema/Claro/Oscuro
+- navegación interactiva mediante Blazor Server
+- enlaces provisionales a anchors de la Home
 
 ---
 
@@ -1193,7 +1215,8 @@ FASE 3 — Layout
 ├── Navbar
 ├── Footer
 ├── Responsive
-└── Navegación
+├── Navegación
+└── Selector de tema integrado
 │
 ▼
 FASE 4 — Home
@@ -1331,10 +1354,14 @@ Antes de empezar la implementación visual, las decisiones principales están ce
 - [x] TinyMCE 8 para blog
 - [x] QNAP/Docker como destino de despliegue
 - [x] Recursos de idioma desde el inicio
-- [x] Español inicialmente
-- [x] Inglés preparado para una fase posterior
+- [x] Español (`es-ES`) como cultura predeterminada
+- [x] Inglés (`en-US`) preparado mediante recursos
 - [x] Tema Sistema/Claro/Oscuro
 - [x] localStorage para preferencia de tema
+- [x] API JavaScript de tema reutilizada mediante JS interop
+- [x] Layout público responsive con navbar y footer iniciales
+- [x] Menú móvil accesible con teclado y `aria-expanded`
+- [x] Pipeline local de Tailwind mediante npm
 - [x] `/admin` como punto de acceso administrativo
 - [x] Rueda de administración visible solo tras login
 - [x] Logo propio pendiente de diseño

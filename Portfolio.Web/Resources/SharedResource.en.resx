@@ -6,4 +6,18 @@
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <data name="HomeTitle" xml:space="preserve"><value>Portfolio</value></data>
   <data name="HomeDescription" xml:space="preserve"><value>Application under construction</value></data>
+  <data name="PortfolioName" xml:space="preserve"><value>Portfolio</value></data>
+  <data name="MainNavigation" xml:space="preserve"><value>Main navigation</value></data>
+  <data name="About" xml:space="preserve"><value>About me</value></data>
+  <data name="Projects" xml:space="preserve"><value>Projects</value></data>
+  <data name="Certificates" xml:space="preserve"><value>Certificates</value></data>
+  <data name="Blog" xml:space="preserve"><value>Blog</value></data>
+  <data name="Contact" xml:space="preserve"><value>Contact</value></data>
+  <data name="OpenMenu" xml:space="preserve"><value>Open menu</value></data>
+  <data name="CloseMenu" xml:space="preserve"><value>Close menu</value></data>
+  <data name="Theme" xml:space="preserve"><value>Theme</value></data>
+  <data name="ThemeSystem" xml:space="preserve"><value>System</value></data>
+  <data name="ThemeLight" xml:space="preserve"><value>Light</value></data>
+  <data name="ThemeDark" xml:space="preserve"><value>Dark</value></data>
+  <data name="Copyright" xml:space="preserve"><value>© {0} — All rights reserved.</value></data>
 </root>
