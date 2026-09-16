@@ -20,4 +20,54 @@
   <data name="ThemeLight" xml:space="preserve"><value>Light</value></data>
   <data name="ThemeDark" xml:space="preserve"><value>Dark</value></data>
   <data name="Copyright" xml:space="preserve"><value>© {0} — All rights reserved.</value></data>
+  <data name="HeroEyebrow" xml:space="preserve"><value>Professional portfolio</value></data>
+  <data name="HeroTitle" xml:space="preserve"><value>Building digital solutions with .NET</value></data>
+  <data name="HeroDescription" xml:space="preserve"><value>An initial structure to present experience, projects and technical knowledge.</value></data>
+  <data name="HeroCta" xml:space="preserve"><value>Let's talk</value></data>
+  <data name="TechnologyVisualLabel" xml:space="preserve"><value>Technology visual composition</value></data>
+  <data name="TechnologyCore" xml:space="preserve"><value>&lt;/&gt;</value></data>
+  <data name="TechnologyDotNet" xml:space="preserve"><value>.NET</value></data>
+  <data name="TechnologyCSharp" xml:space="preserve"><value>C#</value></data>
+  <data name="TechnologySql" xml:space="preserve"><value>SQL</value></data>
+  <data name="TechnologyWeb" xml:space="preserve"><value>Web</value></data>
+  <data name="AboutEyebrow" xml:space="preserve"><value>Profile</value></data>
+  <data name="AboutTitle" xml:space="preserve"><value>About me</value></data>
+  <data name="AboutPlaceholder" xml:space="preserve"><value>This section will be completed with the definitive professional profile, specialisation and technical approach.</value></data>
+  <data name="AboutAreasLabel" xml:space="preserve"><value>Main areas of work</value></data>
+  <data name="AreaBackend" xml:space="preserve"><value>Backend</value></data>
+  <data name="AreaBackendDescription" xml:space="preserve"><value>C# and .NET development</value></data>
+  <data name="AreaFrontend" xml:space="preserve"><value>Frontend</value></data>
+  <data name="AreaFrontendDescription" xml:space="preserve"><value>Blazor, HTML and CSS</value></data>
+  <data name="AreaData" xml:space="preserve"><value>Data</value></data>
+  <data name="AreaDataDescription" xml:space="preserve"><value>Data and analytics</value></data>
+  <data name="AreaDevOps" xml:space="preserve"><value>DevOps</value></data>
+  <data name="AreaDevOpsDescription" xml:space="preserve"><value>Automation and delivery</value></data>
+  <data name="ExperienceEyebrow" xml:space="preserve"><value>Career</value></data>
+  <data name="ExperienceTitle" xml:space="preserve"><value>Experience</value></data>
+  <data name="ExperienceEmpty" xml:space="preserve"><value>Professional experience will be added when the definitive information is available.</value></data>
+  <data name="ProjectsEyebrow" xml:space="preserve"><value>Selected work</value></data>
+  <data name="ProjectsTitle" xml:space="preserve"><value>Projects</value></data>
+  <data name="ProjectsIntro" xml:space="preserve"><value>A selection of projects will be available soon.</value></data>
+  <data name="ProjectPlaceholderTitle" xml:space="preserve"><value>Project to be published</value></data>
+  <data name="ProjectPlaceholderDescription" xml:space="preserve"><value>The card will show its purpose, technologies and links when real content is available.</value></data>
+  <data name="TechnologiesLabel" xml:space="preserve"><value>Project technologies</value></data>
+  <data name="ProjectTechnologyPlaceholder" xml:space="preserve"><value>Technologies to be defined</value></data>
+  <data name="ProjectStatusPlaceholder" xml:space="preserve"><value>Coming soon</value></data>
+  <data name="ProjectVisualPlaceholder" xml:space="preserve"><value>Project preview</value></data>
+  <data name="CertificatesEyebrow" xml:space="preserve"><value>Learning</value></data>
+  <data name="CertificatesTitle" xml:space="preserve"><value>Certifications</value></data>
+  <data name="CertificationPlaceholderTitle" xml:space="preserve"><value>Certification to be published</value></data>
+  <data name="CertificationPlaceholderDescription" xml:space="preserve"><value>Certification details will be shown when available.</value></data>
+  <data name="BlogEyebrow" xml:space="preserve"><value>Ideas and learning</value></data>
+  <data name="BlogTitle" xml:space="preserve"><value>Latest published article</value></data>
+  <data name="BlogPlaceholderVisual" xml:space="preserve"><value>Featured article</value></data>
+  <data name="BlogEmpty" xml:space="preserve"><value>There are no published articles to feature yet.</value></data>
+  <data name="ContactEyebrow" xml:space="preserve"><value>Let's connect</value></data>
+  <data name="ContactTitle" xml:space="preserve"><value>Contact</value></data>
+  <data name="ContactIntro" xml:space="preserve"><value>This form is an initial visual structure and does not send messages yet.</value></data>
+  <data name="ContactPlaceholder" xml:space="preserve"><value>Submission and validation will be implemented in a later phase.</value></data>
+  <data name="ContactName" xml:space="preserve"><value>Name</value></data>
+  <data name="ContactEmail" xml:space="preserve"><value>Email</value></data>
+  <data name="ContactMessage" xml:space="preserve"><value>Message</value></data>
+  <data name="ContactSubmit" xml:space="preserve"><value>Prepare message</value></data>
 </root>

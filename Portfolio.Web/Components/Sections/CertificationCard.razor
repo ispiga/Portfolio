@@ -1,0 +1,7 @@
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> Localizer
+
+<article class="surface certification-card">
+    <div class="certification-card__badge" aria-hidden="true">+</div>
+    <div><h3>@Localizer["CertificationPlaceholderTitle"]</h3><p>@Localizer["CertificationPlaceholderDescription"]</p></div>
+</article>

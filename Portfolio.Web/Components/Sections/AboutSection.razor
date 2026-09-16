@@ -1,0 +1,20 @@
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> Localizer
+
+<section id="about" class="home-section" aria-labelledby="about-title">
+    <div class="section-heading">
+        <p class="eyebrow">@Localizer["AboutEyebrow"]</p>
+        <h2 id="about-title">@Localizer["AboutTitle"]</h2>
+    </div>
+    <div class="about-grid">
+        <div class="surface content-card">
+            <p>@Localizer["AboutPlaceholder"]</p>
+        </div>
+        <div class="areas-grid" aria-label="@Localizer["AboutAreasLabel"]">
+            <div class="surface area-card"><h3>@Localizer["AreaBackend"]</h3><p>@Localizer["AreaBackendDescription"]</p></div>
+            <div class="surface area-card"><h3>@Localizer["AreaFrontend"]</h3><p>@Localizer["AreaFrontendDescription"]</p></div>
+            <div class="surface area-card"><h3>@Localizer["AreaData"]</h3><p>@Localizer["AreaDataDescription"]</p></div>
+            <div class="surface area-card"><h3>@Localizer["AreaDevOps"]</h3><p>@Localizer["AreaDevOpsDescription"]</p></div>
+        </div>
+    </div>
+</section>

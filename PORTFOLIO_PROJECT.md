@@ -1128,10 +1128,24 @@ Incluirá:
 ## Commit 4
 
 ```text
-feat: create home hero section
+feat: build public home structure
 ```
 
-Se empezará a construir visualmente el Hero.
+Incluye la estructura visual inicial de la Home pública:
+
+- Hero con composición tecnológica provisional
+- Sobre mí
+- timeline visual de experiencia
+- tarjetas iniciales de proyectos
+- tarjetas iniciales de certificaciones
+- estado inicial del último artículo publicado
+- formulario visual de contacto sin envío real
+- anchors compatibles con la navegación pública existente
+- componentes Razor reutilizables en `Components/Sections`
+- estilos responsive en `wwwroot/css/app.css`
+- textos localizados en español e inglés
+
+Mientras no existan datos personales definitivos, la Home utiliza placeholders y estados vacíos localizados. No se han creado entidades, persistencia, consultas dinámicas ni URLs ficticias.
 
 ---
 
@@ -1140,12 +1154,6 @@ Se empezará a construir visualmente el Hero.
 Se seguirá una estructura similar:
 
 ```text
-feat: add about section
-feat: add experience timeline
-feat: add project carousel
-feat: add certifications section
-feat: add blog preview
-feat: add contact section
 feat: add identity authentication
 feat: add admin dashboard
 feat: add project management
@@ -1365,33 +1373,29 @@ Antes de empezar la implementación visual, las decisiones principales están ce
 - [x] `/admin` como punto de acceso administrativo
 - [x] Rueda de administración visible solo tras login
 - [x] Logo propio pendiente de diseño
-- [x] Home definido conceptualmente
-- [x] Formulario de contacto
+- [x] Home pública con estructura visual inicial
+- [x] Componentes reutilizables para las secciones de la Home
+- [x] Formulario de contacto visual sin envío real
+- [x] Estados vacíos localizados para contenido aún no disponible
+- [x] Composición tecnológica provisional sin recursos externos
 - [x] Desarrollo incremental mediante Git
 
 ---
 
 # 30. Próximo paso
 
-El primer objetivo es crear la **solución base funcional** y realizar el primer commit:
+El siguiente objetivo es preparar la **Fase 5 — Datos**, manteniendo la Home visual sin introducir contenido inventado:
 
 ```text
-chore: initialize portfolio solution
+feat: design portfolio content model
 ```
 
-La aplicación debe compilar y ejecutarse correctamente, pero la Home solo tendrá una presentación temporal:
-
-```text
-Portfolio
-Aplicación en construcción
-```
-
-A partir del siguiente commit se comenzará a construir el sistema visual y posteriormente el **Navbar + Hero**, avanzando desde ahí por las distintas secciones del Home.
+Antes de crear entidades definitivas se deben concretar las necesidades reales de proyectos, certificaciones, experiencia y artículos. La persistencia y el contenido dinámico se implementarán únicamente en las fases previstas.
 
 > **No comenzar creando todas las entidades de base de datos.**
 >
 > **No implementar toda la administración antes de necesitarla.**
 >
-> **No diseñar todo el Home de una sola vez.**
+> **La Fase 4 establece la estructura visual, pero no implementa contenido dinámico.**
 >
 > El proyecto debe evolucionar mediante módulos y commits pequeños siguiendo el flujo definido anteriormente.

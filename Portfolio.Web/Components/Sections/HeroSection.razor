@@ -1,0 +1,18 @@
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> Localizer
+
+<section class="home-hero" aria-labelledby="hero-title">
+    <div class="home-hero__content">
+        <p class="eyebrow">@Localizer["HeroEyebrow"]</p>
+        <h1 id="hero-title">@Localizer["HeroTitle"]</h1>
+        <p class="home-hero__description">@Localizer["HeroDescription"]</p>
+        <a class="button button--primary" href="#contact">@Localizer["HeroCta"]</a>
+    </div>
+    <div class="technology-orbit" aria-label="@Localizer["TechnologyVisualLabel"]">
+        <span class="technology-orbit__core" aria-hidden="true">@Localizer["TechnologyCore"]</span>
+        <span class="technology-orbit__item technology-orbit__item--one">@Localizer["TechnologyDotNet"]</span>
+        <span class="technology-orbit__item technology-orbit__item--two">@Localizer["TechnologyCSharp"]</span>
+        <span class="technology-orbit__item technology-orbit__item--three">@Localizer["TechnologySql"]</span>
+        <span class="technology-orbit__item technology-orbit__item--four">@Localizer["TechnologyWeb"]</span>
+    </div>
+</section>

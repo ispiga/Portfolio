@@ -1,0 +1,7 @@
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> Localizer
+
+<section id="certificates" class="home-section" aria-labelledby="certificates-title">
+    <div class="section-heading"><p class="eyebrow">@Localizer["CertificatesEyebrow"]</p><h2 id="certificates-title">@Localizer["CertificatesTitle"]</h2></div>
+    <div class="card-grid"><CertificationCard /></div>
+</section>

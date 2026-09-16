@@ -1,0 +1,14 @@
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> Localizer
+
+<article class="surface project-card">
+    <div class="project-card__visual" aria-hidden="true">@Localizer["ProjectVisualPlaceholder"]</div>
+    <div class="project-card__content">
+        <h3>@Localizer["ProjectPlaceholderTitle"]</h3>
+        <p>@Localizer["ProjectPlaceholderDescription"]</p>
+        <ul class="tag-list" aria-label="@Localizer["TechnologiesLabel"]">
+            <li>@Localizer["ProjectTechnologyPlaceholder"]</li>
+            <li>@Localizer["ProjectStatusPlaceholder"]</li>
+        </ul>
+    </div>
+</article>

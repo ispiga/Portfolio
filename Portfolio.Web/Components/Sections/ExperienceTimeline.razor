@@ -1,0 +1,13 @@
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> Localizer
+
+<section class="home-section" aria-labelledby="experience-title">
+    <div class="section-heading">
+        <p class="eyebrow">@Localizer["ExperienceEyebrow"]</p>
+        <h2 id="experience-title">@Localizer["ExperienceTitle"]</h2>
+    </div>
+    <div class="timeline-empty surface">
+        <span class="timeline-empty__marker" aria-hidden="true"></span>
+        <p>@Localizer["ExperienceEmpty"]</p>
+    </div>
+</section>

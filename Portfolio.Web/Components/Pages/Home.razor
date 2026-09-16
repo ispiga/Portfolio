@@ -1,6 +1,18 @@
 @page "/"
 @using Microsoft.Extensions.Localization
+@using Portfolio.Web.Components.Sections
 @inject IStringLocalizer<SharedResource> Localizer
 
-<h1>@Localizer["HomeTitle"]</h1>
-<p>@Localizer["HomeDescription"]</p>
+<HeroSection />
+
+<AboutSection />
+
+<ExperienceTimeline />
+
+<ProjectSection />
+
+<CertificationsSection />
+
+<FeaturedPost />
+
+<ContactSection />

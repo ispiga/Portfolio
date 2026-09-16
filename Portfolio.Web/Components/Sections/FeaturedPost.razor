@@ -1,0 +1,7 @@
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> Localizer
+
+<section id="blog" class="home-section" aria-labelledby="blog-title">
+    <div class="section-heading"><p class="eyebrow">@Localizer["BlogEyebrow"]</p><h2 id="blog-title">@Localizer["BlogTitle"]</h2></div>
+    <article class="surface featured-post"><div class="featured-post__visual" aria-hidden="true">@Localizer["BlogPlaceholderVisual"]</div><div><p>@Localizer["BlogEmpty"]</p></div></article>
+</section>

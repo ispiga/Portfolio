@@ -1,0 +1,15 @@
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> Localizer
+
+<section id="contact" class="home-section" aria-labelledby="contact-title">
+    <div class="section-heading"><p class="eyebrow">@Localizer["ContactEyebrow"]</p><h2 id="contact-title">@Localizer["ContactTitle"]</h2><p>@Localizer["ContactIntro"]</p></div>
+    <form class="surface contact-form" @onsubmit:preventDefault>
+        <p class="form-note">@Localizer["ContactPlaceholder"]</p>
+        <div class="form-grid">
+            <div class="form-field"><label for="contact-name">@Localizer["ContactName"]</label><input id="contact-name" name="name" type="text" autocomplete="name" /></div>
+            <div class="form-field"><label for="contact-email">@Localizer["ContactEmail"]</label><input id="contact-email" name="email" type="email" autocomplete="email" /></div>
+        </div>
+        <div class="form-field"><label for="contact-message">@Localizer["ContactMessage"]</label><textarea id="contact-message" name="message" rows="5"></textarea></div>
+        <button class="button button--primary" type="submit">@Localizer["ContactSubmit"]</button>
+    </form>
+</section>

@@ -641,3 +641,517 @@ Al finalizar:
 - Indica el resultado de `dotnet build`.
 - Confirma que la Home temporal sigue funcionando.
 - Confirma que no se han implementado elementos de la Fase 4.
+
+
+# ******************************
+# PROMPT PARA REALIZAR LA FASE 4
+# ******************************
+
+Quiero implementar la FASE 4 — Home del proyecto Portfolio.
+
+Lee primero y respeta obligatoriamente:
+
+1. PORTFOLIO_PROJECT.md
+2. .github/copilot-instructions.md
+
+Ten en cuenta todo el desarrollo ya realizado en las fases 1, 2 y 3. No sustituyas decisiones existentes ni crees una arquitectura paralela.
+
+## Contexto actual
+
+- Proyecto .NET 10.
+- Solución Portfolio.sln.
+- Aplicación frontend en Portfolio.Web.
+- ASP.NET Core Blazor Web App.
+- Razor Components.
+- Renderizado Interactive Server únicamente donde aporta interactividad.
+- No es una SPA pura.
+- Tailwind CSS local.
+- Estilos propios en:
+  - Portfolio.Web/wwwroot/css/app.css
+- Entrada de Tailwind:
+  - Portfolio.Web/Styles/tailwind.css
+- CSS compilado:
+  - Portfolio.Web/wwwroot/css/tailwind.css
+- Tema visual existente:
+  - Portfolio.Web/wwwroot/js/theme.js
+- API global existente:
+  - portfolioTheme
+- Estados de tema:
+  - Sistema
+  - Claro
+  - Oscuro
+- La preferencia de tema se guarda mediante la API JavaScript existente en localStorage.
+- Localización configurada con:
+  - es-ES como cultura predeterminada.
+  - en-US como cultura soportada.
+- Recursos existentes:
+  - Portfolio.Web/Resources/SharedResource.resx
+  - Portfolio.Web/Resources/SharedResource.es.resx
+  - Portfolio.Web/Resources/SharedResource.en.resx
+- Layout público actual:
+  - Portfolio.Web/Components/Layout/MainLayout.razor
+- Navbar actual:
+  - Portfolio.Web/Components/Layout/NavMenu.razor
+- Footer actual:
+  - Portfolio.Web/Components/Layout/PortfolioFooter.razor
+- Selector de tema actual:
+  - Portfolio.Web/Components/Layout/ThemeSelector.razor
+- Rutas actuales:
+  - Portfolio.Web/Components/Routes.razor
+- Home temporal actual:
+  - Portfolio.Web/Components/Pages/Home.razor
+
+La Home temporal actualmente muestra:
+
+- Portfolio
+- Aplicación en construcción
+
+La Fase 3 ya implementó:
+
+- Navbar pública.
+- Footer.
+- Menú móvil responsive.
+- Enlaces provisionales a anchors.
+- Selector de tema.
+- Layout con header, main y footer.
+- Interactividad mediante Blazor Interactive Server.
+- Recursos localizados para la navegación y el tema.
+
+Debes conservar todo ese funcionamiento.
+
+## Objetivo de la Fase 4
+
+Sustituir la Home temporal por la estructura inicial de la Home pública del portfolio.
+
+La Home debe seguir esta estructura:
+
+1. Navbar
+2. Hero
+3. Sobre mí
+4. Experiencia
+5. Proyectos
+6. Certificaciones
+7. Último artículo publicado
+8. Contacto
+9. Footer
+
+La Navbar y el Footer ya existen y deben conservarse. No los reemplaces por una arquitectura distinta salvo que sea estrictamente necesario.
+
+## Alcance funcional de esta fase
+
+Implementa únicamente la parte visual y estructural inicial de la Home:
+
+- Hero.
+- Sección Sobre mí.
+- Sección Experiencia.
+- Sección Proyectos.
+- Sección Certificaciones.
+- Sección de último artículo publicado.
+- Sección Contacto.
+
+En esta fase no implementes todavía:
+
+- Base de datos.
+- Entity Framework.
+- Entidades definitivas.
+- Repositorios.
+- Servicios de persistencia.
+- CRUD.
+- Administración.
+- ASP.NET Core Identity.
+- Login.
+- Autorización.
+- TinyMCE.
+- Gestión real de proyectos.
+- Gestión real de certificaciones.
+- Gestión real del blog.
+- Envío real de formularios.
+- Docker.
+- Despliegue.
+- Integraciones externas.
+- Redes sociales si no existen actualmente en el proyecto.
+- Hero definitivo basado en información personal no proporcionada.
+- Logo definitivo.
+
+## Regla sobre contenido personal
+
+Antes de inventar datos personales, experiencia profesional, empresas, proyectos, certificaciones, enlaces, fechas o artículos:
+
+1. Comprueba si esos datos ya existen en el repositorio.
+2. Si no existen y son necesarios para construir una sección real, detente y pregunta.
+3. No inventes información personal para rellenar la interfaz.
+4. Mientras no existan datos definitivos, utiliza una estructura visual inicial y textos provisionales localizados claramente identificables como placeholders, o solicita la información necesaria antes de continuar.
+
+No conviertas la Home en una biografía inventada.
+
+## Hero
+
+Crea un componente reutilizable propio para el Hero, por ejemplo:
+
+- Portfolio.Web/Components/Sections/HeroSection.razor
+
+El Hero debe respetar las decisiones de PORTFOLIO_PROJECT.md:
+
+- Fotografía personal solo si existe una imagen local válida.
+- Nombre solo si existe en el proyecto o se proporciona explícitamente.
+- Titular profesional.
+- Descripción breve.
+- CTA.
+- Elemento visual relacionado con tecnologías.
+
+El texto debe ser breve:
+
+- Una frase o titular principal.
+- Dos o tres líneas como máximo para la descripción.
+- No crear una biografía extensa en el Hero.
+
+El elemento visual de tecnologías debe:
+
+- Ser propio mediante HTML, CSS o Blazor.
+- Ser sutil y profesional.
+- Ser responsive.
+- Funcionar con tema claro y oscuro.
+- Respetar prefers-reduced-motion.
+- No depender de GIFs pesados.
+- No cargar imágenes, iconos, fuentes o recursos desde CDN.
+- No saturar visualmente el Hero.
+
+Si no existen datos o imágenes personales, crea una composición visual provisional sin inventar identidad personal.
+
+## Sección Sobre mí
+
+Crea una sección reutilizable, por ejemplo:
+
+- AboutSection.razor
+
+Debe prever:
+
+- Perfil profesional.
+- Especialización.
+- Áreas de interés.
+- Enfoque tecnológico.
+- Áreas principales de trabajo.
+
+La estructura puede contemplar inicialmente:
+
+- Backend.
+- Frontend.
+- Datos.
+- DevOps.
+
+No añadas una biografía personal inventada. Utiliza recursos localizados y contenido provisional solo cuando sea necesario.
+
+## Sección Experiencia
+
+Crea un componente reutilizable, por ejemplo:
+
+- ExperienceTimeline.razor
+
+Debe crear únicamente la estructura visual inicial de una timeline:
+
+- Periodo.
+- Puesto.
+- Organización.
+- Descripción.
+- Tecnologías.
+
+No inventes empleos ni fechas. Si no hay datos reales, utiliza un estado vacío o contenido provisional localizado.
+
+## Sección Proyectos
+
+Crea componentes reutilizables iniciales, por ejemplo:
+
+- ProjectSection.razor
+- ProjectCard.razor
+
+La tarjeta de proyecto puede prever:
+
+- Imagen.
+- Nombre.
+- Descripción.
+- Tecnologías.
+- Enlace a GitHub.
+- Demo.
+- Enlace de detalle.
+
+No crees todavía entidades ni consultas a base de datos.
+
+No inventes proyectos reales ni URLs. Si no hay proyectos disponibles, muestra una estructura inicial o un estado vacío localizado.
+
+La ruta futura prevista para detalles es:
+
+- /projects/{slug}
+
+Pero no es necesario crear todavía páginas de detalle ni navegación funcional a ellas.
+
+## Sección Certificaciones
+
+Crea un componente reutilizable, por ejemplo:
+
+- CertificationsSection.razor
+- CertificationCard.razor
+
+Debe prever:
+
+- Nombre.
+- Organización.
+- Fecha.
+- Duración u horas.
+- Descripción.
+- Imagen.
+- Documento si corresponde.
+
+No inventes certificaciones ni documentos.
+
+No crees todavía entidades ni persistencia.
+
+## Sección de último artículo publicado
+
+Crea un componente inicial, por ejemplo:
+
+- FeaturedPost.razor
+
+Debe representar visualmente el último artículo publicado, no el último artículo creado.
+
+Puede prever:
+
+- Imagen destacada.
+- Título.
+- Fecha.
+- Extracto.
+- Enlace de lectura.
+
+No implementes todavía:
+
+- Blog dinámico.
+- Editor TinyMCE.
+- Consultas a base de datos.
+- Publicación real.
+- Gestión administrativa.
+
+Si no hay artículos, utiliza un estado vacío o placeholder localizado.
+
+## Sección Contacto
+
+Crea un componente inicial, por ejemplo:
+
+- ContactSection.razor
+
+Debe incluir únicamente la estructura visual inicial.
+
+Puede prever:
+
+- Título.
+- Texto introductorio.
+- Nombre.
+- Email.
+- Mensaje.
+- Botón de envío.
+
+No implementes todavía:
+
+- Envío real de emails.
+- Persistencia.
+- Validación de backend.
+- Antispam.
+- Base de datos.
+- Integraciones externas.
+
+Si se muestra un formulario, debe quedar claramente como estructura visual inicial y todos los textos deben estar localizados.
+
+## Arquitectura de componentes
+
+Mantén los componentes organizados dentro de Portfolio.Web/Components.
+
+Puedes crear una estructura como:
+
+- Components/Sections/HeroSection.razor
+- Components/Sections/AboutSection.razor
+- Components/Sections/ExperienceTimeline.razor
+- Components/Sections/ProjectSection.razor
+- Components/Sections/ProjectCard.razor
+- Components/Sections/CertificationsSection.razor
+- Components/Sections/CertificationCard.razor
+- Components/Sections/FeaturedPost.razor
+- Components/Sections/ContactSection.razor
+
+La estructura final debe seguir las convenciones reales del repositorio. No crees capas innecesarias ni servicios que todavía no sean necesarios.
+
+## Localización
+
+Todos los textos visibles nuevos deben proceder de recursos.
+
+Añade las claves necesarias a:
+
+- SharedResource.es.resx
+- SharedResource.en.resx
+
+Incluye, como mínimo, los textos de:
+
+- Hero.
+- CTA.
+- Sobre mí.
+- Experiencia.
+- Proyectos.
+- Certificaciones.
+- Blog o último artículo.
+- Contacto.
+- Campos del formulario.
+- Botón de contacto.
+- Estados vacíos.
+- Textos provisionales si se utilizan.
+
+No hardcodees textos visibles nuevos en los componentes.
+
+No crees:
+
+- HomeSpanish.razor
+- HomeEnglish.razor
+
+No implementes todavía un selector de idioma visible si no está contemplado expresamente por la fase actual.
+
+## Estilos
+
+Utiliza:
+
+- Tailwind CSS local.
+- Portfolio.Web/wwwroot/css/app.css.
+- Variables y tokens semánticos existentes.
+
+No utilices:
+
+- Bootstrap.
+- Fuentes externas.
+- CDN.
+- Colores acoplados a nombres como blue-500 o gray-900.
+- Una segunda paleta paralela.
+- Estilos aislados que contradigan los tokens existentes.
+
+Los estilos deben funcionar correctamente con:
+
+- Tema claro.
+- Tema oscuro.
+- Tema sistema.
+- Anchos móviles.
+- Tablet.
+- Escritorio.
+- Zoom del navegador.
+- Anchos reducidos.
+
+No modifiques la API de tema existente salvo que sea estrictamente necesario.
+
+## Accesibilidad
+
+La Home debe respetar:
+
+- HTML semántico.
+- Jerarquía correcta de encabezados.
+- Navegación mediante teclado.
+- `focus-visible`.
+- Contraste suficiente.
+- Tamaños táctiles razonables.
+- No depender únicamente del color.
+- `prefers-reduced-motion`.
+- Atributos ARIA solo cuando sean necesarios.
+- Imágenes con texto alternativo cuando existan.
+- Formularios con labels correctamente asociados.
+- Estados vacíos comprensibles.
+- Enlaces y botones con nombres accesibles.
+
+No añadas ARIA redundante.
+
+## Navegación desde la Navbar
+
+Conserva los anchors existentes:
+
+- `/#about`
+- `/#projects`
+- `/#certificates`
+- `/#blog`
+- `/#contact`
+
+Añade los `id` correspondientes a las secciones de la Home para que la navegación actual funcione.
+
+Si se añade un anchor para Experiencia, actualiza la navegación únicamente si existe una decisión explícita y se mantienen todos los textos localizados.
+
+No dupliques la navegación mediante JavaScript.
+
+## Animaciones
+
+Las animaciones deben ser:
+
+- Sutiles.
+- Profesionales.
+- CSS o Blazor.
+- Compatibles con tema claro y oscuro.
+- Desactivables o reducidas mediante `prefers-reduced-motion`.
+
+No añadas animaciones decorativas excesivas.
+
+## Revisión previa obligatoria
+
+Antes de editar:
+
+1. Inspecciona la solución.
+2. Lee `PORTFOLIO_PROJECT.md`.
+3. Lee `.github/copilot-instructions.md`.
+4. Revisa:
+   - Home.razor.
+   - MainLayout.razor.
+   - NavMenu.razor.
+   - PortfolioFooter.razor.
+   - ThemeSelector.razor.
+   - Routes.razor.
+   - app.css.
+   - theme.js.
+   - recursos de localización.
+5. Comprueba si ya existen componentes reutilizables.
+6. Comprueba si existen imágenes o contenidos personales locales.
+7. Si falta información personal necesaria y no puede resolverse con un estado vacío o placeholder localizado, detente y pregunta antes de implementar contenido inventado.
+
+## Validación obligatoria
+
+Ejecuta:
+
+1. `npm run css:build` desde `Portfolio.Web`.
+2. `dotnet build Portfolio.sln`.
+3. Comprueba que no hay errores ni warnings nuevos relacionados con los cambios.
+4. Inicia la aplicación.
+5. Comprueba que:
+   - La Navbar sigue funcionando.
+   - El Footer sigue funcionando.
+   - El selector de tema sigue funcionando.
+   - La Home ya no muestra únicamente la presentación temporal.
+   - Los anchors navegan a las secciones correspondientes.
+   - La Home funciona en móvil, tablet y escritorio.
+   - No se cargan fuentes externas.
+   - Los textos nuevos proceden de recursos.
+   - El tema claro, oscuro y sistema siguen funcionando.
+   - `prefers-reduced-motion` se respeta.
+   - No se ha introducido trabajo de las fases 5, 6 o 7.
+6. Comprueba que `node_modules` no aparece como archivo pendiente de Git.
+7. No crees un commit automáticamente.
+
+## Documentación
+
+Si durante la Fase 4 se toma una decisión nueva y permanente:
+
+- Actualiza `PORTFOLIO_PROJECT.md` si afecta a la arquitectura, alcance, diseño o planificación.
+- Actualiza `.github/copilot-instructions.md` solo si se trata de una directriz reutilizable para futuras modificaciones.
+- No conviertas decisiones puntuales de una sección en reglas globales sin justificación.
+
+## Resultado final esperado
+
+Al finalizar:
+
+1. Resume los archivos creados y modificados.
+2. Explica cómo se ha estructurado la Home.
+3. Explica cómo se han reutilizado Navbar, Footer y selector de tema.
+4. Indica qué recursos de localización se han añadido.
+5. Indica si se ha utilizado contenido provisional o contenido real.
+6. Explica las decisiones de responsive y accesibilidad.
+7. Indica el resultado de `npm run css:build`.
+8. Indica el resultado de `dotnet build`.
+9. Confirma que la navegación y el tema siguen funcionando.
+10. Confirma que no se han implementado base de datos, administración, Identity, TinyMCE ni funcionalidades dinámicas de fases posteriores.
+11. Confirma que no se ha creado ningún commit.
