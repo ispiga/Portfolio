@@ -1,10 +1,12 @@
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
+using Portfolio.Infrastructure;
 using Portfolio.Web.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddLocalization();
+builder.Services.AddPortfolioPersistence(builder.Configuration);
 
 // Add services for modern Blazor Web App (Interactive Server)
 builder.Services.AddRazorComponents()

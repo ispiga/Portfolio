@@ -5,10 +5,16 @@
 	<Nullable>enable</Nullable>
 	<ImplicitUsings>enable</ImplicitUsings>
 	<BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
+	<UserSecretsId>Portfolio.Web-Development</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
 	<ProjectReference Include="..\Portfolio.Application\Portfolio.Application.csproj" />
+	<ProjectReference Include="..\Portfolio.Infrastructure\Portfolio.Infrastructure.csproj" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.2">
+	  <PrivateAssets>all</PrivateAssets>
+	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	</PackageReference>
   </ItemGroup>
 
 </Project>

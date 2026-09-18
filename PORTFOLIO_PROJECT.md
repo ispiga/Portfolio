@@ -461,7 +461,37 @@ Blog = "Blog"
 Contact = "Contacto"
 ```
 
-Los recursos en inglés ya están preparados para los textos existentes, pero todavía no existe un selector de idioma visible en la navbar ni una preferencia de idioma persistida. Cuando se implemente el cambio de cultura se mantendrá el sistema de recursos sin duplicar las pantallas.
+Los recursos en inglés ya están preparados para los textos existentes, pero todavía no existe un selector de idioma visible en la navbar ni una preferencia de idioma persistida. El selector se implementará en la Fase 6, junto al selector de tema y a su derecha, manteniendo el sistema de recursos sin duplicar las pantallas.
+
+### Culturas y contenido localizado
+
+Mientras el portfolio mantenga únicamente español e inglés, las culturas soportadas permanecerán definidas en el código (`es-ES` y `en-US`). Los textos estructurales de la interfaz continuarán utilizando recursos RESX (`SharedResource.es.resx` y `SharedResource.en.resx`).
+
+El contenido dinámico del portfolio se almacenará en SQL Server y se localizará mediante una entidad principal y una tabla de traducciones, evitando duplicar tablas por idioma o añadir columnas como `TitleEn` y `DescriptionEn`.
+
+Ejemplo conceptual:
+
+```text
+Projects
+    Id
+    RepositoryUrl
+    DemoUrl
+    IsFeatured
+    DisplayOrder
+
+ProjectTranslations
+    Id
+    ProjectId
+    LanguageCode
+    Title
+    Summary
+    Description
+    Slug
+```
+
+Se aplicará el mismo patrón a experiencias, certificaciones y artículos. Cada traducción utilizará los códigos culturales `es-ES` o `en-US`, con una restricción única sobre la combinación de la entidad y el código de idioma. Los datos comunes permanecerán en la entidad principal y los campos traducibles en su tabla de traducciones.
+
+Si en el futuro se necesitan más idiomas, se podrá evolucionar la lista de culturas a una entidad `Language` administrable sin duplicar las tablas de contenido. Esta evolución requerirá valorar también un proveedor de localización para los textos estructurales; añadir un idioma a SQL Server no crea por sí solo los recursos RESX ni sus traducciones.
 
 ---
 
@@ -1149,6 +1179,87 @@ Mientras no existan datos personales definitivos, la Home utiliza placeholders y
 
 ---
 
+## Fase 5 — Persistencia inicial
+
+La persistencia se ha preparado de forma incremental a partir de las secciones que ya existen visualmente en la Home. Se utiliza **Entity Framework Core 10 + SQL Server + Code First + Migrations**.
+
+### Decisiones de arquitectura
+
+- Las entidades iniciales `Project`, `Experience`, `Certification` y `BlogPost` están en `Portfolio.Domain/Entities`.
+- Las entidades no contienen referencias a EF Core, SQL Server, Blazor ni Infrastructure.
+- `Portfolio.Infrastructure/PortfolioDbContext.cs` es el único `DbContext` y contiene un `DbSet` para cada entidad inicial.
+- Los mapeos están separados en `IEntityTypeConfiguration<T>` dentro de `Portfolio.Infrastructure/Configurations`.
+- No se han creado todavía `Category`, `Tag`, tecnologías de proyectos, relaciones, repositorios, casos de uso ni servicios de contenido.
+- Los identificadores son `Guid`; los slugs de proyectos y artículos tienen índices únicos; las fechas de experiencia y certificación se almacenan como `date`.
+
+### Configuración y migraciones
+
+La conexión se obtiene de `ConnectionStrings:Portfolio`. `Portfolio.Web/appsettings.json` y `appsettings.Development.json` no contienen nombres de servidores ni credenciales específicas de una máquina. El proyecto Web utiliza `UserSecretsId` para que cada entorno de desarrollo configure su propia instancia SQL Server mediante User Secrets. En otros entornos, especialmente producción, la cadena debe suministrarse mediante variables de entorno, secretos de Docker u otro mecanismo seguro de configuración.
+
+La primera migración es `InitialPortfolioContent`. Crea únicamente las tablas `Projects`, `Experiences`, `Certifications` y `BlogPosts`, sin datos iniciales. La migración se ha aplicado en la base de datos `PortfolioDb` del entorno local de desarrollo. Las migraciones permanecen en `Portfolio.Infrastructure/Migrations` y `dotnet ef` utiliza la configuración del proyecto Web, incluido el User Secret de desarrollo.
+
+La configuración local no se versiona con valores específicos. El procedimiento para inicializar, consultar o modificar `ConnectionStrings:Portfolio` mediante `dotnet user-secrets` está documentado en el `README.md` raíz.
+
+### Catálogo inicial de entidades y columnas
+
+El modelo inicial de la Fase 5 se documenta a continuación. Estos campos son la base actual de persistencia y podrán evolucionar mediante nuevas migraciones cuando una sección concreta revele necesidades adicionales.
+
+#### `Projects`
+
+| Columna | Explicación |
+| --- | --- |
+| `Id` | Identificador interno único del proyecto. |
+| `Title` | Nombre o título del proyecto. |
+| `Slug` | Identificador textual para una posible URL legible, por ejemplo `mi-proyecto`. |
+| `Summary` | Resumen breve para tarjetas o listados. |
+| `Description` | Descripción ampliada para una futura vista de detalle. |
+| `RepositoryUrl` | URL del repositorio del proyecto, si existe. |
+| `DemoUrl` | URL de una demo pública, si existe. |
+| `IsFeatured` | Indica si el proyecto debe mostrarse como destacado. |
+| `DisplayOrder` | Orden manual de presentación. |
+
+#### `Experiences`
+
+| Columna | Explicación |
+| --- | --- |
+| `Id` | Identificador interno único de la experiencia. |
+| `RoleTitle` | Nombre del puesto o rol desempeñado. |
+| `CompanyName` | Nombre de la empresa u organización. |
+| `Summary` | Resumen de las funciones o responsabilidades. |
+| `StartDate` | Fecha de inicio de la experiencia. |
+| `EndDate` | Fecha de finalización; puede quedar vacía si continúa activa. |
+| `DisplayOrder` | Orden manual dentro de la línea temporal. |
+
+#### `Certifications`
+
+| Columna | Explicación |
+| --- | --- |
+| `Id` | Identificador interno único de la certificación. |
+| `Name` | Nombre de la certificación. |
+| `Issuer` | Organización que la concede. |
+| `IssuedOn` | Fecha de obtención, si se conoce. |
+| `CredentialUrl` | URL de verificación o credencial, si existe. |
+| `DisplayOrder` | Orden manual de presentación. |
+
+#### `BlogPosts`
+
+| Columna | Explicación |
+| --- | --- |
+| `Id` | Identificador interno único del artículo. |
+| `Title` | Título del artículo. |
+| `Slug` | Identificador textual para una posible URL legible. |
+| `Excerpt` | Extracto o resumen breve del artículo. |
+| `Content` | Contenido completo del artículo. |
+| `PublishedOn` | Fecha y hora de publicación, si se ha publicado. |
+| `IsPublished` | Indica si el artículo está publicado. |
+| `IsFeatured` | Indica si el artículo debe mostrarse como destacado. |
+
+En la Fase 6, cuando se implemente cada sección, estos campos se revisarán contra las necesidades reales de la interfaz y del contenido. Los campos traducibles se separarán progresivamente en tablas de traducciones, por ejemplo `ProjectTranslations`, con `ProjectId`, `LanguageCode`, `Title`, `Summary`, `Description` y `Slug`. No se crearán columnas como `TitleEn` ni tablas duplicadas por idioma.
+
+Esta fase no conecta la Home con la base de datos ni implementa contenido dinámico, CRUD, Identity, administración, carga de imágenes, correo o envío real de formularios. El modelo se ampliará mediante nuevas migraciones cuando cada módulo tenga necesidades concretas.
+
+---
+
 ## Commits posteriores
 
 Se seguirá una estructura similar:
@@ -1249,12 +1360,43 @@ FASE 5 — Datos
 ▼
 FASE 6 — Funcionalidades
 │
+├── Selector de idioma en la Navbar
+├── Cambio de cultura y persistencia de preferencia
+├── Modelo de traducciones del contenido
 ├── Contenido dinámico
 ├── Proyectos
 ├── Certificaciones
 ├── Experiencia
 ├── Blog
 └── Contacto
+
+La Fase 6 se ejecutará de forma incremental por secciones, no como una implementación monolítica de todos los módulos. El orden será orientativo y cada sección se tratará como un ciclo independiente:
+
+```text
+Seleccionar una sección
+        ↓
+Revisar su diseño y necesidades de contenido
+        ↓
+Revisar o ajustar sus entidades y traducciones
+        ↓
+Crear la migración necesaria
+        ↓
+Implementar consulta y caso de uso
+        ↓
+Conectar la sección de la Home
+        ↓
+Probar la sección
+        ↓
+Detener el desarrollo para revisión
+        ↓
+Incorporar las observaciones y cambios acordados
+        ↓
+Validar de nuevo la sección
+        ↓
+Continuar con la siguiente sección
+```
+
+Después de cada sección implementada se realizará una pausa explícita para que el resultado pueda revisarse visual y funcionalmente. Durante esa pausa podrán ajustarse los campos, las traducciones, las reglas de publicación, la experiencia responsive o la composición del componente antes de reanudar el desarrollo. No se continuará con la siguiente sección hasta cerrar la revisión de la sección actual.
 │
 ▼
 FASE 7 — Administración
@@ -1264,6 +1406,8 @@ FASE 7 — Administración
 ├── Autorización
 ├── Dashboard
 ├── CRUD
+├── Edición localizada por idioma
+├── Estado de traducciones
 ├── Media
 └── TinyMCE
 │
@@ -1379,18 +1523,25 @@ Antes de empezar la implementación visual, las decisiones principales están ce
 - [x] Estados vacíos localizados para contenido aún no disponible
 - [x] Composición tecnológica provisional sin recursos externos
 - [x] Desarrollo incremental mediante Git
+- [x] Entidades iniciales de persistencia para proyectos, experiencia, certificaciones y artículos
+- [x] `PortfolioDbContext` y configuraciones EF Core en Infrastructure
+- [x] Migración inicial aplicada en la base de datos local de desarrollo
 
 ---
 
 # 30. Próximo paso
 
-El siguiente objetivo es preparar la **Fase 5 — Datos**, manteniendo la Home visual sin introducir contenido inventado:
+El siguiente objetivo es preparar la **Fase 6 — Funcionalidades**, manteniendo la Home visual sin introducir contenido inventado:
 
 ```text
-feat: design portfolio content model
+feat: connect portfolio content
 ```
 
-Antes de crear entidades definitivas se deben concretar las necesidades reales de proyectos, certificaciones, experiencia y artículos. La persistencia y el contenido dinámico se implementarán únicamente en las fases previstas.
+La Fase 5 ha dejado preparada y aplicada la persistencia inicial. En la Fase 6 se podrán implementar progresivamente las consultas y la conexión de las secciones públicas con el contenido, sin adelantar todavía la administración ni el CRUD.
+
+La administración futura gestionará las traducciones desde el mismo formulario mediante pestañas o botones de idioma, inicialmente `Español` y `English`. El idioma seleccionado en la Navbar pública no determinará el idioma de edición del panel. Cada traducción podrá tener un estado independiente, por ejemplo `Completo`, `Pendiente` o `Publicado`, permitiendo publicar un idioma aunque el otro todavía esté pendiente.
+
+Al guardar un contenido se actualizarán la entidad principal y sus traducciones dentro de una única transacción. La eliminación de la entidad principal deberá eliminar sus traducciones relacionadas de forma controlada. La validación de traducciones obligatorias, el fallback a `es-ES` y la publicación independiente se concretarán al diseñar el panel administrativo.
 
 > **No comenzar creando todas las entidades de base de datos.**
 >

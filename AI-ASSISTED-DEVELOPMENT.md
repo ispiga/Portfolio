@@ -1155,3 +1155,292 @@ Al finalizar:
 9. Confirma que la navegación y el tema siguen funcionando.
 10. Confirma que no se han implementado base de datos, administración, Identity, TinyMCE ni funcionalidades dinámicas de fases posteriores.
 11. Confirma que no se ha creado ningún commit.
+
+
+# ******************************
+# PROMPT PARA REALIZAR LA FASE 5
+# ******************************
+
+Quiero implementar la FASE 5 — Datos del proyecto Portfolio.
+
+Lee primero y respeta obligatoriamente:
+
+1. PORTFOLIO_PROJECT.md
+2. .github/copilot-instructions.md
+
+Ten en cuenta todo el desarrollo realizado en las fases 1, 2, 3 y 4. No sustituyas decisiones existentes, no crees una arquitectura paralela y no reviertas los cambios actuales.
+
+## Contexto del proyecto
+
+- Solución: Portfolio.sln
+- Framework: .NET 10
+- Aplicación pública: Portfolio.Web
+- Frontend: Blazor Web App con Razor Components
+- Renderizado: Interactive Server únicamente donde aporte interactividad
+- Capas existentes:
+  - Portfolio.Web
+  - Portfolio.Application
+  - Portfolio.Domain
+  - Portfolio.Infrastructure
+  - Portfolio.Tests
+- Base de datos prevista:
+  - SQL Server
+  - Entity Framework Core
+  - Code First
+  - Migrations
+- Arquitectura prevista:
+
+  Portfolio.Web
+        ↓
+  Portfolio.Application
+        ↓
+  Portfolio.Domain
+        ↑
+  Portfolio.Infrastructure
+
+## Estado actual
+
+La Fase 4 ya implementó la estructura visual inicial de la Home pública:
+
+- Hero.
+- Sobre mí.
+- Experiencia.
+- Proyectos.
+- Certificaciones.
+- Último artículo publicado.
+- Contacto.
+- Componentes Razor reutilizables.
+- Estados vacíos y placeholders localizados.
+- Estilos responsive en `Portfolio.Web/wwwroot/css/app.css`.
+- Localización es-ES y en-US.
+- Navbar, Footer y selector de tema existentes.
+- API de tema existente en `Portfolio.Web/wwwroot/js/theme.js`.
+
+La Home todavía no utiliza contenido dinámico ni base de datos.
+
+## Objetivo de la Fase 5
+
+Preparar la base de datos y la estructura de persistencia del proyecto utilizando:
+
+- Entity Framework Core.
+- SQL Server.
+- Code First.
+- Migrations.
+
+La implementación debe ser incremental y derivarse de las necesidades reales de la Home y de las fases futuras. No se debe intentar diseñar todo el sistema definitivo de una sola vez.
+
+## Alcance obligatorio
+
+Antes de editar:
+
+1. Inspecciona la solución completa.
+2. Revisa los archivos `.csproj`.
+3. Revisa las referencias entre proyectos.
+4. Comprueba los paquetes NuGet existentes.
+5. Revisa el contenido actual de:
+   - Portfolio.Domain
+   - Portfolio.Application
+   - Portfolio.Infrastructure
+   - Portfolio.Web/Program.cs
+   - Portfolio.Web/appsettings*.json
+   - Portfolio.Tests
+6. Comprueba si ya existen entidades, DbContext, configuraciones, migraciones o servicios de persistencia.
+7. Comprueba si existe alguna configuración de conexión a SQL Server.
+8. Comprueba si existe algún contenido personal o modelo previo que deba conservarse.
+
+Después de la inspección, implementa únicamente la base de datos mínima necesaria para esta fase.
+
+## Modelo de dominio
+
+No crees automáticamente todas las entidades posibles.
+
+Las entidades futuras orientativas son:
+
+- Project.
+- Experience.
+- Certification.
+- BlogPost.
+- Category.
+- Tag.
+
+El modelo debe derivarse de las necesidades reales del proyecto y mantenerse mínimo.
+
+Si no existe información suficiente para decidir una entidad, sus propiedades, relaciones o reglas de negocio:
+
+- No inventes datos personales.
+- No inventes proyectos, empresas, fechas, certificaciones ni artículos.
+- No inventes relaciones innecesarias.
+- Utiliza nombres técnicos provisionales únicamente cuando sean imprescindibles.
+- Documenta la decisión.
+- Si la decisión afecta significativamente a la arquitectura, detente y pregunta antes de continuar.
+
+Como mínimo, analiza qué estructura de persistencia será necesaria para soportar posteriormente:
+
+- Proyectos.
+- Experiencia.
+- Certificaciones.
+- Artículos publicados.
+
+No es necesario implementar todavía la funcionalidad pública dinámica de estas secciones.
+
+## Portfolio.Domain
+
+Las entidades y reglas de dominio deben permanecer en `Portfolio.Domain`.
+
+Respeta estas reglas:
+
+- El dominio no debe depender de Entity Framework Core.
+- El dominio no debe depender de SQL Server.
+- El dominio no debe depender de Blazor.
+- El dominio no debe depender de `Portfolio.Web`.
+- No añadas atributos de persistencia al dominio salvo que exista una razón justificada.
+- Utiliza tipos y reglas de dominio coherentes con el proyecto.
+- Evita crear value objects o abstracciones innecesarias.
+
+## Portfolio.Application
+
+No implementes todavía casos de uso completos ni servicios dinámicos de la Home.
+
+Solo crea interfaces, contratos o DTOs si son necesarios para mantener la separación entre Application e Infrastructure.
+
+No añadas repositorios genéricos por defecto.
+
+No crees servicios vacíos sin una necesidad real.
+
+## Portfolio.Infrastructure
+
+Implementa aquí la integración con Entity Framework Core:
+
+- DbContext.
+- Configuraciones de entidades.
+- Registro de persistencia.
+- Migraciones.
+- Configuración de SQL Server.
+
+El DbContext debe permanecer en `Portfolio.Infrastructure`.
+
+Utiliza configuraciones separadas mediante `IEntityTypeConfiguration<T>` cuando mejore la claridad y sea coherente con el tamaño real del modelo.
+
+No acoples la capa pública directamente a detalles internos de EF Core.
+
+## SQL Server y configuración
+
+Añade la configuración necesaria para SQL Server siguiendo las convenciones actuales del proyecto.
+
+Considera:
+
+- `appsettings.json`.
+- `appsettings.Development.json`.
+- Variables de configuración.
+- No incluir contraseñas reales.
+- No incluir secretos en Git.
+- No sobrescribir configuraciones existentes sin revisarlas.
+- No crear una base de datos remota ni conectarte a servicios externos sin autorización explícita.
+
+Si se necesita una cadena de conexión de ejemplo, utiliza un placeholder seguro y documentado.
+
+La aplicación debe poder compilar aunque SQL Server no esté disponible localmente, salvo que la configuración actual del proyecto establezca otra cosa.
+
+## Migraciones
+
+Crea la primera migración únicamente después de revisar el modelo.
+
+La migración debe:
+
+- Ser reproducible.
+- Corresponder exactamente al modelo implementado.
+- Mantener nombres claros.
+- No incluir datos personales inventados.
+- No insertar proyectos, certificaciones, artículos ni experiencias ficticias.
+- No crear tablas que no estén justificadas.
+
+Si no es posible generar una migración correctamente por falta de configuración de SQL Server, documenta el bloqueo y no lo ocultes mediante soluciones improvisadas.
+
+## Lo que no se debe implementar en esta fase
+
+No implementes:
+
+- Contenido dinámico de la Home.
+- CRUD.
+- Panel de administración.
+- ASP.NET Core Identity.
+- Login.
+- Autorización.
+- Roles.
+- Dashboard.
+- TinyMCE.
+- Gestión de proyectos.
+- Gestión de certificaciones.
+- Gestión de experiencia.
+- Gestión de artículos.
+- Envío real de formularios.
+- Servicios de correo.
+- Almacenamiento de imágenes.
+- Docker.
+- Despliegue en QNAP.
+- Integraciones externas.
+- Redes sociales.
+- Datos personales inventados.
+- Seeders con información ficticia.
+
+Identity, administración, CRUD y TinyMCE pertenecen a fases posteriores.
+
+## Pruebas
+
+Añade únicamente pruebas útiles para el modelo o la configuración creada.
+
+No generes una cantidad artificial de tests.
+
+Si el proyecto de pruebas no tiene todavía infraestructura suficiente, crea solo las pruebas que puedan ejecutarse de forma fiable sin depender de un SQL Server externo.
+
+Puedes utilizar una base de datos aislada para pruebas únicamente si encaja con los paquetes y convenciones existentes. No añadas dependencias innecesarias.
+
+## Documentación
+
+Si tomas una decisión permanente sobre:
+
+- ubicación del DbContext;
+- estrategia de configuraciones;
+- convenciones de nombres;
+- conexión a SQL Server;
+- migraciones;
+- entidades iniciales;
+- separación entre Domain, Application e Infrastructure;
+
+actualiza `PORTFOLIO_PROJECT.md`.
+
+No modifiques `.github/copilot-instructions.md` salvo que aparezca una directriz reutilizable para futuras tareas.
+
+## Validación obligatoria
+
+Ejecuta y documenta:
+
+1. `dotnet restore` si es necesario.
+2. `dotnet build Portfolio.sln`.
+3. Las pruebas disponibles.
+4. La generación de la migración, si procede.
+5. `dotnet ef migrations list`, si la herramienta está disponible.
+6. Comprobación de que no existen secretos en los archivos modificados.
+7. Comprobación de que no se ha modificado la Home pública de forma innecesaria.
+8. Comprobación de que la Navbar, Footer, selector de tema y localización siguen intactos.
+9. Comprobación de que no se han implementado funcionalidades de las fases 6, 7, 8 o 9.
+10. Comprobación del estado de Git.
+
+No crees ningún commit automáticamente.
+
+## Resultado final esperado
+
+Al finalizar:
+
+1. Resume las entidades creadas y justifica por qué son necesarias.
+2. Resume los cambios realizados por proyecto.
+3. Explica dónde está el DbContext.
+4. Explica cómo se configura SQL Server.
+5. Indica qué migraciones se han creado.
+6. Indica si se han añadido configuraciones de entidades.
+7. Indica las pruebas ejecutadas.
+8. Indica el resultado de `dotnet build Portfolio.sln`.
+9. Indica si existe alguna limitación por no disponer de SQL Server local.
+10. Confirma que no se han creado datos ficticios.
+11. Confirma que no se ha implementado CRUD, Identity, administración ni contenido dinámico.
+12. Confirma que no se ha creado ningún commit.
