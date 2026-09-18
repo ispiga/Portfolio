@@ -1,0 +1,32 @@
+@using System.Globalization
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> Localizer
+@inject NavigationManager Navigation
+
+<div class="language-selector">
+    <label for="language-select">@Localizer["Language"]</label>
+    <select id="language-select" class="language-selector__control" value="@currentCulture" @onchange="OnLanguageChanged">
+        <option value="es-ES">@Localizer["LanguageSpanish"]</option>
+        <option value="en-US">@Localizer["LanguageEnglish"]</option>
+    </select>
+</div>
+
+@code {
+    private string currentCulture = CultureInfo.CurrentUICulture.Name;
+
+    private void OnLanguageChanged(ChangeEventArgs args)
+    {
+        var culture = args.Value?.ToString();
+        if (culture is not ("es-ES" or "en-US"))
+        {
+            return;
+        }
+
+        var relativeUri = Navigation.ToBaseRelativePath(Navigation.Uri);
+        var redirectUri = string.IsNullOrEmpty(relativeUri) ? "/" : $"/{relativeUri}";
+        var cultureParameter = Uri.EscapeDataString(culture);
+        var redirectParameter = Uri.EscapeDataString(redirectUri);
+
+        Navigation.NavigateTo($"/culture/set?culture={cultureParameter}&redirectUri={redirectParameter}", forceLoad: true);
+    }
+}

@@ -31,6 +31,32 @@ var localizationOptions = new RequestLocalizationOptions()
     .AddSupportedUICultures(supportedCultures);
 app.UseRequestLocalization(localizationOptions);
 
+app.MapGet("/culture/set", (HttpContext context, string culture, string? redirectUri) =>
+{
+    if (!supportedCultures.Contains(culture, StringComparer.OrdinalIgnoreCase))
+    {
+        return Results.BadRequest();
+    }
+
+    context.Response.Cookies.Append(
+        CookieRequestCultureProvider.DefaultCookieName,
+        CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
+        new CookieOptions
+        {
+            IsEssential = true,
+            SameSite = SameSiteMode.Lax,
+            Expires = DateTimeOffset.UtcNow.AddYears(1)
+        });
+
+    var localRedirectUri = redirectUri is not null
+        && redirectUri.StartsWith("/", StringComparison.Ordinal)
+        && !redirectUri.StartsWith("//", StringComparison.Ordinal)
+        ? redirectUri
+        : "/";
+
+    return Results.LocalRedirect(localRedirectUri);
+});
+
 app.UseAntiforgery();
 
 app.MapStaticAssets();

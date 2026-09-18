@@ -56,4 +56,7 @@
   <data name="ContactEmail" xml:space="preserve"><value>Email</value></data>
   <data name="ContactMessage" xml:space="preserve"><value>Mensaje</value></data>
   <data name="ContactSubmit" xml:space="preserve"><value>Preparar mensaje</value></data>
+  <data name="Language" xml:space="preserve"><value>Idioma</value></data>
+  <data name="LanguageSpanish" xml:space="preserve"><value>Español</value></data>
+  <data name="LanguageEnglish" xml:space="preserve"><value>English</value></data>
 </root>

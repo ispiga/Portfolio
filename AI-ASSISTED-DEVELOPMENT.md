@@ -1444,3 +1444,151 @@ Al finalizar:
 10. Confirma que no se han creado datos ficticios.
 11. Confirma que no se ha implementado CRUD, Identity, administración ni contenido dinámico.
 12. Confirma que no se ha creado ningún commit.
+
+
+# ****************************************
+# PROMPT PARA REALIZAR LA FASE 6 - PARTE 1
+# ****************************************
+
+Quiero comenzar la FASE 6 — Funcionalidades del proyecto Portfolio.
+
+Lee primero y respeta obligatoriamente:
+
+1. PORTFOLIO_PROJECT.md
+2. .github/copilot-instructions.md
+3. README.md
+
+Ten en cuenta todo el desarrollo realizado en las fases 1, 2, 3, 4 y 5. No sustituyas decisiones existentes, no crees una arquitectura paralela y no reviertas cambios actuales.
+
+## Contexto actual
+
+- Solución: Portfolio.sln
+- Framework: .NET 10
+- Aplicación: Portfolio.Web
+- Frontend: Blazor Web App con Razor Components
+- Renderizado: Interactive Server únicamente donde aporte interactividad
+- Persistencia: EF Core 10 + SQL Server + Code First + Migrations
+- DbContext: Portfolio.Infrastructure/PortfolioDbContext.cs
+- Base de datos de desarrollo: PortfolioDb
+- User Secrets configurado para la conexión local
+- Culturas actuales:
+  - es-ES
+  - en-US
+- Cultura predeterminada: es-ES
+- Recursos existentes:
+  - SharedResource.resx
+  - SharedResource.es.resx
+  - SharedResource.en.resx
+- La Home pública todavía utiliza contenido estático, placeholders y estados vacíos.
+- La Fase 5 no conectó todavía la Home con contenido dinámico.
+
+## Forma de trabajo obligatoria
+
+La Fase 6 debe desarrollarse de forma incremental por secciones.
+
+En esta primera intervención implementa únicamente:
+
+# Selector de idioma en la Navbar
+
+No implementes todavía:
+
+- Contenido dinámico de proyectos.
+- Experiencia dinámica.
+- Certificaciones dinámicas.
+- Blog dinámico.
+- CRUD.
+- Panel de administración.
+- Identity.
+- Traducciones almacenadas en SQL Server.
+- Tablas de traducciones.
+- Nuevas entidades de dominio.
+- Funcionalidades de fases posteriores.
+
+Después de implementar el selector de idioma, detén el desarrollo para que pueda revisar visual y funcionalmente el resultado antes de continuar con la siguiente sección.
+
+## Objetivo funcional
+
+Añadir un selector de idioma en la Navbar:
+
+- Debe aparecer a la derecha del selector de tema.
+- Debe permitir seleccionar:
+  - Español
+  - English
+- Debe utilizar las culturas existentes:
+  - es-ES
+  - en-US
+- Debe cambiar la cultura actual de ASP.NET Core.
+- Debe utilizar la localización existente y los recursos RESX actuales.
+- Debe persistir la cultura seleccionada mediante el mecanismo adecuado de localización de ASP.NET Core.
+- Debe mantener es-ES como valor predeterminado.
+- No debe duplicar páginas por idioma.
+- No debe crear una segunda infraestructura de localización.
+
+## Requisitos técnicos
+
+Antes de editar:
+
+1. Inspecciona la Navbar actual.
+2. Inspecciona el selector de tema actual.
+3. Revisa cómo está configurada la localización en Program.cs.
+4. Revisa Routes.razor, App.razor y los componentes relacionados.
+5. Revisa los recursos actuales es-ES y en-US.
+6. Comprueba si existe ya algún mecanismo de cultura o persistencia de idioma.
+7. Revisa los estilos existentes en wwwroot/css/app.css.
+
+Implementa el selector reutilizando la arquitectura actual.
+
+El selector debe:
+
+- Ser accesible mediante teclado.
+- Tener focus-visible.
+- Mantener buen contraste.
+- Ser responsive.
+- Integrarse correctamente en el menú móvil.
+- Reflejar el idioma actual.
+- Utilizar textos localizados.
+- No introducir Bootstrap.
+- No cargar fuentes externas.
+- No duplicar la lógica del selector de tema.
+- No utilizar localStorage para la cultura si ASP.NET Core puede resolverlo mediante cookie.
+- No cambiar la API portfolioTheme existente.
+
+## Localización
+
+Todos los textos visibles del selector deben utilizar los recursos compartidos.
+
+Si faltan recursos para el selector:
+
+- Añádelos en español e inglés.
+- No escribas textos visibles directamente en el componente.
+- Mantén es-ES como cultura predeterminada.
+
+## Pruebas y validación
+
+Añade únicamente las pruebas útiles y posibles para esta funcionalidad.
+
+Valida:
+
+1. `dotnet build Portfolio.sln`.
+2. Las pruebas disponibles.
+3. Cambio entre es-ES y en-US.
+4. Persistencia de la cultura tras recargar.
+5. Funcionamiento en escritorio.
+6. Funcionamiento en móvil.
+7. Accesibilidad básica mediante teclado.
+8. Integración con el selector de tema.
+9. Que Navbar, Footer, Home y tema no se rompen.
+10. Que no se han implementado funcionalidades posteriores.
+11. Estado final de Git.
+
+No crees ningún commit automáticamente.
+
+Al finalizar:
+
+- Resume los archivos modificados.
+- Explica cómo funciona el cambio de cultura.
+- Indica cómo se persiste el idioma.
+- Indica las pruebas ejecutadas.
+- Indica el resultado de la compilación.
+- Confirma que no se ha implementado contenido dinámico ni administración.
+- Detén el trabajo para revisión antes de continuar con otra sección.
