@@ -51,12 +51,16 @@
   <data name="ProjectsEyebrow" xml:space="preserve"><value>Selected work</value></data>
   <data name="ProjectsTitle" xml:space="preserve"><value>Projects</value></data>
   <data name="ProjectsIntro" xml:space="preserve"><value>A selection of projects will be available soon.</value></data>
+	<data name="ProjectsEmpty" xml:space="preserve"><value>There are no projects available to show yet.</value></data>
   <data name="ProjectPlaceholderTitle" xml:space="preserve"><value>Project to be published</value></data>
   <data name="ProjectPlaceholderDescription" xml:space="preserve"><value>The card will show its purpose, technologies and links when real content is available.</value></data>
   <data name="TechnologiesLabel" xml:space="preserve"><value>Project technologies</value></data>
   <data name="ProjectTechnologyPlaceholder" xml:space="preserve"><value>Technologies to be defined</value></data>
   <data name="ProjectStatusPlaceholder" xml:space="preserve"><value>Coming soon</value></data>
   <data name="ProjectVisualPlaceholder" xml:space="preserve"><value>Project preview</value></data>
+	<data name="ProjectFeatured" xml:space="preserve"><value>Featured project</value></data>
+  <data name="ProjectRepository" xml:space="preserve"><value>View repository</value></data>
+  <data name="ProjectDemo" xml:space="preserve"><value>View demo</value></data>
   <data name="CertificatesEyebrow" xml:space="preserve"><value>Learning</value></data>
   <data name="CertificatesTitle" xml:space="preserve"><value>Certifications</value></data>
   <data name="CertificationPlaceholderTitle" xml:space="preserve"><value>Certification to be published</value></data>

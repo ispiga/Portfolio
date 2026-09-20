@@ -34,12 +34,16 @@
   <data name="ProjectsEyebrow" xml:space="preserve"><value>Trabajo seleccionado</value></data>
   <data name="ProjectsTitle" xml:space="preserve"><value>Proyectos</value></data>
   <data name="ProjectsIntro" xml:space="preserve"><value>Una selección de proyectos estará disponible próximamente.</value></data>
+	<data name="ProjectsEmpty" xml:space="preserve"><value>Aún no hay proyectos disponibles para mostrar.</value></data>
   <data name="ProjectPlaceholderTitle" xml:space="preserve"><value>Proyecto pendiente de publicar</value></data>
   <data name="ProjectPlaceholderDescription" xml:space="preserve"><value>La ficha mostrará el propósito, las tecnologías y los enlaces cuando exista contenido real.</value></data>
   <data name="TechnologiesLabel" xml:space="preserve"><value>Tecnologías del proyecto</value></data>
   <data name="ProjectTechnologyPlaceholder" xml:space="preserve"><value>Tecnologías por definir</value></data>
   <data name="ProjectStatusPlaceholder" xml:space="preserve"><value>Próximamente</value></data>
   <data name="ProjectVisualPlaceholder" xml:space="preserve"><value>Vista previa de proyecto</value></data>
+	<data name="ProjectFeatured" xml:space="preserve"><value>Proyecto destacado</value></data>
+  <data name="ProjectRepository" xml:space="preserve"><value>Ver repositorio</value></data>
+  <data name="ProjectDemo" xml:space="preserve"><value>Ver demo</value></data>
   <data name="CertificatesEyebrow" xml:space="preserve"><value>Formación</value></data>
   <data name="CertificatesTitle" xml:space="preserve"><value>Certificaciones</value></data>
   <data name="CertificationPlaceholderTitle" xml:space="preserve"><value>Certificación pendiente de publicar</value></data>

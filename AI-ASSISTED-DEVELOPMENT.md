@@ -1755,3 +1755,337 @@ Al finalizar:
 - Confirma que no se ha implementado CRUD, Identity ni administración.
 - No crees ningún commit automáticamente.
 - Detén el trabajo para revisión antes de continuar con la siguiente sección.
+
+
+# ****************************************
+# PROMPT PARA REALIZAR LA FASE 6 - PARTE 3
+# ****************************************
+
+Quiero continuar la FASE 6 — Funcionalidades del proyecto Portfolio.
+
+Lee y respeta obligatoriamente antes de modificar nada:
+
+1. PORTFOLIO_PROJECT.md
+2. .github/copilot-instructions.md
+3. README.md
+
+Ten en cuenta todo el desarrollo realizado en las fases 1, 2, 3, 4, 5 y en las secciones anteriores de la Fase 6.
+
+No sustituyas decisiones existentes, no crees una arquitectura paralela y no reviertas cambios actuales.
+
+## Contexto actual
+
+- Solución: Portfolio.sln
+- Framework: .NET 10
+- Aplicación: Portfolio.Web
+- Arquitectura:
+  - Portfolio.Web
+  - Portfolio.Application
+  - Portfolio.Domain
+  - Portfolio.Infrastructure
+  - Portfolio.Tests
+- Frontend: Blazor Web App con Razor Components
+- Renderizado: Interactive Server únicamente cuando aporte interactividad
+- Persistencia: EF Core 10 + SQL Server + Code First + Migrations
+- DbContext: Portfolio.Infrastructure/PortfolioDbContext.cs
+- Base de datos local: PortfolioDb
+- User Secrets configurado
+- Culturas:
+  - es-ES
+  - en-US
+- Cultura predeterminada: es-ES
+- Selector de idioma implementado mediante cookie de ASP.NET Core
+- Modelo de proyectos traducibles implementado
+- Migración de traducciones aplicada
+- `Project` contiene datos comunes:
+  - Id
+  - RepositoryUrl
+  - DemoUrl
+  - PreviewImagePath
+  - IsFeatured
+  - DisplayOrder
+- `ProjectTranslation` contiene:
+  - ProjectId
+  - LanguageCode
+  - Title
+  - Slug
+  - Summary
+  - Description
+- La migración `AddProjectPreviewImagePath` ya está aplicada a `PortfolioDb`.
+- `PreviewImagePath` es opcional y está configurado como `nvarchar(500) NULL`.
+- La Home todavía muestra proyectos estáticos, placeholders o estados vacíos.
+- `ProjectCard.razor` contiene actualmente un bloque visual provisional para la vista previa.
+
+## Objetivo de esta intervención
+
+Conectar únicamente la sección pública de proyectos de la Home con los datos almacenados en SQL Server.
+
+La implementación debe:
+
+- Consultar proyectos desde SQL Server.
+- Utilizar el modelo existente `Project` y `ProjectTranslation`.
+- Respetar la cultura actual `es-ES` o `en-US`.
+- Utilizar fallback a `es-ES` si no existe la traducción de la cultura actual.
+- Mantener únicamente proyectos con una traducción válida.
+- Ordenar los proyectos por `DisplayOrder`.
+- Utilizar `IsFeatured` según el comportamiento esperado de la sección actual.
+- Mostrar `PreviewImagePath` cuando tenga valor.
+- Mantener el placeholder visual actual cuando `PreviewImagePath` sea nulo o vacío.
+- Utilizar `DemoUrl` únicamente como enlace a la demo pública.
+- Utilizar `RepositoryUrl` únicamente como enlace al repositorio.
+- No inventar proyectos ni insertar datos de ejemplo.
+- Mantener el estado vacío localizado cuando no existan proyectos.
+
+## Uso de PreviewImagePath
+
+`PreviewImagePath` representa la ruta concreta de un archivo de imagen, por ejemplo:
+
+- `/images/projects/portfolio.webp`
+- `/images/projects/project-management.png`
+
+No representa:
+
+- Una carpeta.
+- La URL de la demo.
+- El repositorio.
+- El contenido binario de la imagen.
+
+Cuando exista una ruta válida:
+
+- Renderiza una imagen accesible en la tarjeta.
+- Utiliza `ProjectTranslation.Title` como texto alternativo, salvo que el diseño actual requiera otra solución localizada.
+- Conserva el diseño visual, proporciones y comportamiento responsive existentes.
+- Evita imágenes rotas si la ruta está vacía.
+
+Cuando no exista una ruta:
+
+- Mantén el bloque visual placeholder actual.
+- No muestres una imagen ficticia.
+- No generes una URL por defecto.
+
+No es necesario modificar nuevamente la entidad ni crear otra migración. El campo ya existe y la migración ya está aplicada.
+
+## No implementes todavía
+
+- CRUD.
+- Panel de administración.
+- Identity.
+- Formularios de administración.
+- Carga de imágenes.
+- Subida de archivos.
+- Gestión multimedia.
+- Blog dinámico.
+- Experiencia dinámica.
+- Certificaciones dinámicas.
+- Contacto persistente.
+- Nuevas entidades.
+- Nuevas tablas de traducciones.
+- Nuevas páginas públicas.
+- Sistema avanzado de publicación.
+- Edición de proyectos.
+- Categorías o tecnologías persistidas.
+- Campos adicionales no necesarios para esta sección.
+
+## Requisitos técnicos
+
+Antes de editar:
+
+1. Revisa `Project` y `ProjectTranslation`.
+2. Revisa las configuraciones EF Core actuales.
+3. Revisa `PortfolioDbContext`.
+4. Revisa `ProjectSection.razor`.
+5. Revisa `ProjectCard.razor`.
+6. Revisa `Home.razor`.
+7. Revisa los estilos de las tarjetas de proyectos en `wwwroot/css/app.css`.
+8. Revisa los patrones actuales de `Portfolio.Application`.
+9. Revisa las pruebas existentes.
+10. Comprueba el estado actual de Git.
+11. No modifiques archivos ajenos a esta funcionalidad.
+
+## Capa de aplicación
+
+Implementa la consulta siguiendo la arquitectura existente.
+
+Si todavía no existe un patrón de consultas públicas:
+
+- Crea únicamente el servicio necesario para proyectos.
+- Colócalo en la capa que corresponda según la arquitectura actual.
+- No introduzcas CQRS completo si el proyecto no lo utiliza.
+- No accedas directamente a `PortfolioDbContext` desde los componentes Blazor.
+- Utiliza un DTO o modelo de lectura.
+- No expongas entidades EF Core directamente a la interfaz.
+- Utiliza consultas asíncronas.
+- Evita mantener innecesariamente un DbContext vivo dentro del componente.
+
+La consulta debe obtener como mínimo:
+
+- Id del proyecto.
+- Título localizado.
+- Slug localizado.
+- Resumen localizado.
+- Descripción localizada si la tarjeta la utiliza.
+- RepositoryUrl.
+- DemoUrl.
+- PreviewImagePath.
+- IsFeatured.
+- DisplayOrder.
+
+## Selección de idioma
+
+La selección de la traducción debe seguir este orden:
+
+1. Leer `CultureInfo.CurrentUICulture.Name`.
+2. Utilizar la traducción de esa cultura si existe.
+3. Si no existe, utilizar la traducción `es-ES`.
+4. Si tampoco existe `es-ES`, descartar el proyecto de la presentación pública.
+5. No mostrar tarjetas incompletas.
+6. No crear contenido de fallback directamente en el componente.
+7. No duplicar la lógica de localización existente.
+
+Admite únicamente las culturas ya soportadas:
+
+- `es-ES`
+- `en-US`
+
+## Componentes y presentación
+
+Conecta la consulta con la sección actual de proyectos.
+
+Mantén:
+
+- La estructura semántica existente.
+- El diseño actual.
+- Tailwind CSS local.
+- `wwwroot/css/app.css`.
+- Los tokens semánticos existentes.
+- El soporte responsive.
+- La navegación mediante teclado.
+- El foco visible.
+- El contraste.
+- `prefers-reduced-motion`.
+- Los textos estructurales localizados mediante RESX.
+
+La tarjeta debe utilizar los datos reales del proyecto:
+
+- Título.
+- Resumen.
+- Imagen de vista previa si existe.
+- Tecnologías solo si ya existe una fuente real para ellas.
+- Enlace al repositorio si `RepositoryUrl` tiene valor.
+- Enlace a la demo si `DemoUrl` tiene valor.
+
+No inventes tecnologías ni estados de publicación.
+
+Si no hay tecnologías persistidas, no añadas badges ficticios. Mantén únicamente los elementos que puedan construirse con datos reales o conserva el diseño de forma neutra y localizada.
+
+Los enlaces externos deben:
+
+- Tener texto o accesibilidad suficiente.
+- Ser utilizables mediante teclado.
+- Mantener el contraste.
+- No romper el layout responsive.
+
+## Estado vacío
+
+Si la consulta no devuelve proyectos válidos:
+
+- Mostrar el estado vacío localizado que ya existe.
+- No insertar registros automáticamente.
+- No modificar la base de datos con datos de prueba.
+- No mostrar tarjetas placeholder como si fueran proyectos reales.
+
+## Imagen de vista previa
+
+Si `PreviewImagePath` tiene valor:
+
+- Renderiza un elemento `img`.
+- Usa `PreviewImagePath` como `src`.
+- Utiliza el título localizado como `alt`.
+- Mantén dimensiones y proporciones coherentes.
+- Evita desbordamientos y layout shifts innecesarios.
+
+Si `PreviewImagePath` es nulo o vacío:
+
+- Renderiza el placeholder visual actual.
+- Usa el recurso localizado `ProjectVisualPlaceholder`.
+- Conserva `aria-hidden="true"` únicamente en el bloque puramente decorativo.
+
+No añadas todavía mecanismos de subida, validación física del archivo ni almacenamiento multimedia.
+
+## Pruebas
+
+Añade únicamente pruebas útiles para esta funcionalidad.
+
+Como mínimo, valida:
+
+1. Que se recuperan proyectos ordenados por `DisplayOrder`.
+2. Que se selecciona la traducción de la cultura actual.
+3. Que se utiliza fallback a `es-ES`.
+4. Que un proyecto sin traducción válida no provoca errores.
+5. Que `PreviewImagePath` se devuelve correctamente.
+6. Que una ruta de imagen nula no provoca errores.
+7. Que `RepositoryUrl` y `DemoUrl` se conservan correctamente.
+8. Que una base de datos sin proyectos devuelve una colección vacía.
+9. Que el componente no accede directamente al DbContext.
+10. Que no se generan tecnologías ni contenido ficticio.
+11. Que las entidades y migraciones existentes siguen funcionando.
+
+Utiliza la estrategia de pruebas existente. No introduzcas una infraestructura de testing nueva salvo que sea imprescindible.
+
+## Validación manual
+
+Si el entorno lo permite, comprueba:
+
+- Home sin proyectos.
+- Home con un proyecto en `es-ES`.
+- Home con un proyecto en `en-US`.
+- Fallback a `es-ES` cuando falta la traducción inglesa.
+- Proyecto con `PreviewImagePath`.
+- Proyecto sin `PreviewImagePath`.
+- Proyecto con `DemoUrl`.
+- Proyecto con `RepositoryUrl`.
+- Proyecto sin enlaces.
+- Orden por `DisplayOrder`.
+- Cambio de idioma desde la Navbar.
+- Integración con el selector de tema.
+- Visualización responsive en escritorio y móvil.
+- Navegación mediante teclado.
+- Ausencia de imágenes rotas.
+
+## Validación final
+
+Ejecuta:
+
+- `dotnet build Portfolio.sln`
+- Todas las pruebas disponibles de `Portfolio.Tests`
+- `git diff --check`
+- `git status`
+
+No crees nuevas migraciones salvo que el modelo actual realmente lo necesite. `PreviewImagePath` ya existe en la entidad y en la base de datos.
+
+## Forma de trabajo obligatoria
+
+Trabaja de forma incremental:
+
+1. Inspecciona los componentes y patrones actuales.
+2. Presenta un plan si el cambio afecta a varias capas.
+3. Implementa únicamente la consulta pública de proyectos.
+4. Conecta la sección de proyectos de la Home.
+5. Sustituye el placeholder por la imagen cuando exista `PreviewImagePath`.
+6. Conserva el placeholder cuando no exista imagen.
+7. Añade las pruebas necesarias.
+8. Ejecuta compilación y pruebas.
+9. Revisa el estado final de Git.
+10. Detén el desarrollo para revisión.
+
+Al finalizar:
+
+- Resume los archivos modificados.
+- Explica cómo se consultan los proyectos.
+- Explica cómo se selecciona la traducción.
+- Explica el fallback a `es-ES`.
+- Explica cómo se utiliza `PreviewImagePath`.
+- Indica las pruebas ejecutadas y sus resultados.
+- Confirma que no se ha implementado CRUD, administración, Identity, carga de imágenes ni otras secciones dinámicas.
+- No crees ningún commit automáticamente.
+- Detén el trabajo para revisión antes de continuar con la siguiente parte de la Fase 6.

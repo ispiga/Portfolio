@@ -1,10 +1,33 @@
 @using Microsoft.Extensions.Localization
+@using Portfolio.Application.Projects
 @inject IStringLocalizer<SharedResource> Localizer
+@inject IProjectQueryService ProjectQueryService
 
 <section id="projects" class="home-section" aria-labelledby="projects-title">
     <div class="section-heading section-heading--split">
         <div><p class="eyebrow">@Localizer["ProjectsEyebrow"]</p><h2 id="projects-title">@Localizer["ProjectsTitle"]</h2></div>
         <p>@Localizer["ProjectsIntro"]</p>
     </div>
-    <div class="card-grid"><ProjectCard /></div>
+    @if (projects is { Count: > 0 })
+    {
+        <div class="card-grid">
+            @foreach (var project in projects)
+            {
+                <ProjectCard Project="project" />
+            }
+        </div>
+    }
+    else if (projects is not null)
+    {
+        <p class="project-section__empty">@Localizer["ProjectsEmpty"]</p>
+    }
 </section>
+
+@code {
+    private IReadOnlyList<ProjectReadModel>? projects;
+
+    protected override async Task OnInitializedAsync()
+    {
+        projects = await ProjectQueryService.GetProjectsAsync();
+    }
+}

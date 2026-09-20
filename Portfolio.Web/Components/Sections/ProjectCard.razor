@@ -1,14 +1,44 @@
 @using Microsoft.Extensions.Localization
+@using Portfolio.Application.Projects
 @inject IStringLocalizer<SharedResource> Localizer
 
 <article class="surface project-card">
-    <div class="project-card__visual" aria-hidden="true">@Localizer["ProjectVisualPlaceholder"]</div>
+    @if (!string.IsNullOrWhiteSpace(Project.PreviewImagePath))
+    {
+        <img class="project-card__image" src="@Project.PreviewImagePath" alt="@Project.Title" loading="lazy" />
+    }
+    else
+    {
+        <div class="project-card__visual" aria-hidden="true">@Localizer["ProjectVisualPlaceholder"]</div>
+    }
+
     <div class="project-card__content">
-        <h3>@Localizer["ProjectPlaceholderTitle"]</h3>
-        <p>@Localizer["ProjectPlaceholderDescription"]</p>
-        <ul class="tag-list" aria-label="@Localizer["TechnologiesLabel"]">
-            <li>@Localizer["ProjectTechnologyPlaceholder"]</li>
-            <li>@Localizer["ProjectStatusPlaceholder"]</li>
-        </ul>
+        @if (Project.IsFeatured)
+        {
+            <p class="project-card__featured">@Localizer["ProjectFeatured"]</p>
+        }
+
+        <h3>@Project.Title</h3>
+        <p>@Project.Summary</p>
+
+        @if (!string.IsNullOrWhiteSpace(Project.RepositoryUrl) || !string.IsNullOrWhiteSpace(Project.DemoUrl))
+        {
+            <div class="project-card__links">
+                @if (!string.IsNullOrWhiteSpace(Project.RepositoryUrl))
+                {
+                    <a class="button" href="@Project.RepositoryUrl" target="_blank" rel="noopener noreferrer">@Localizer["ProjectRepository"]</a>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(Project.DemoUrl))
+                {
+                    <a class="button button--primary" href="@Project.DemoUrl" target="_blank" rel="noopener noreferrer">@Localizer["ProjectDemo"]</a>
+                }
+            </div>
+        }
     </div>
 </article>
+
+@code {
+    [Parameter, EditorRequired]
+    public ProjectReadModel Project { get; set; } = null!;
+}

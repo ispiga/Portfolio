@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Portfolio.Application.Projects;
 using Portfolio.Domain.Entities;
 using Portfolio.Infrastructure;
 using Xunit;
@@ -85,6 +86,94 @@ public sealed class PersistenceModelTests
 
         Assert.True(previewImagePath.IsNullable);
         Assert.Equal(500, previewImagePath.GetMaxLength());
+    }
+
+    [Fact]
+    public void Project_translation_selector_uses_requested_culture_and_common_fields()
+    {
+        var project = new Project
+        {
+            Id = Guid.NewGuid(),
+            RepositoryUrl = "https://github.com/example/project",
+            DemoUrl = "https://example.com/project",
+            PreviewImagePath = "/images/projects/project.webp",
+            IsFeatured = true,
+            DisplayOrder = 2,
+            Translations =
+            [
+                new ProjectTranslation
+                {
+                    LanguageCode = "es-ES",
+                    Title = "Proyecto",
+                    Slug = "proyecto",
+                    Summary = "Resumen en español"
+                },
+                new ProjectTranslation
+                {
+                    LanguageCode = "en-US",
+                    Title = "Project",
+                    Slug = "project",
+                    Summary = "English summary"
+                }
+            ]
+        };
+
+        var result = ProjectTranslationSelector.Select(project, "en-US");
+
+        Assert.NotNull(result);
+        Assert.Equal("Project", result.Title);
+        Assert.Equal("project", result.Slug);
+        Assert.Equal("English summary", result.Summary);
+        Assert.Equal(project.PreviewImagePath, result.PreviewImagePath);
+        Assert.Equal(project.RepositoryUrl, result.RepositoryUrl);
+        Assert.Equal(project.DemoUrl, result.DemoUrl);
+        Assert.True(result.IsFeatured);
+        Assert.Equal(2, result.DisplayOrder);
+    }
+
+    [Fact]
+    public void Project_translation_selector_falls_back_to_spanish()
+    {
+        var project = new Project
+        {
+            Translations =
+            [
+                new ProjectTranslation
+                {
+                    LanguageCode = "es-ES",
+                    Title = "Proyecto",
+                    Slug = "proyecto",
+                    Summary = "Resumen"
+                }
+            ]
+        };
+
+        var result = ProjectTranslationSelector.Select(project, "en-US");
+
+        Assert.NotNull(result);
+        Assert.Equal("Proyecto", result.Title);
+    }
+
+    [Fact]
+    public void Project_translation_selector_discards_project_without_valid_translation()
+    {
+        var project = new Project
+        {
+            Translations =
+            [
+                new ProjectTranslation
+                {
+                    LanguageCode = "en-US",
+                    Title = "",
+                    Slug = "project",
+                    Summary = "Summary"
+                }
+            ]
+        };
+
+        var result = ProjectTranslationSelector.Select(project, "en-US");
+
+        Assert.Null(result);
     }
 
     private static PortfolioDbContext CreateContext()
