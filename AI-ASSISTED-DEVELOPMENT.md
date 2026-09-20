@@ -2089,3 +2089,277 @@ Al finalizar:
 - Confirma que no se ha implementado CRUD, administración, Identity, carga de imágenes ni otras secciones dinámicas.
 - No crees ningún commit automáticamente.
 - Detén el trabajo para revisión antes de continuar con la siguiente parte de la Fase 6.
+
+
+# ****************************************
+# PROMPT PARA REALIZAR LA FASE 6 - PARTE 4
+# ****************************************
+
+Quiero continuar la FASE 6 — Funcionalidades del proyecto Portfolio.
+
+Lee y respeta obligatoriamente antes de modificar nada:
+
+1. PORTFOLIO_PROJECT.md
+2. .github/copilot-instructions.md
+3. README.md
+
+Ten en cuenta todo el desarrollo realizado en las fases 1, 2, 3, 4, 5 y en las secciones anteriores de la Fase 6:
+
+- Selector de idioma en la Navbar.
+- Persistencia de cultura mediante cookie de ASP.NET Core.
+- Modelo de proyectos traducibles.
+- Migraciones de proyectos y traducciones aplicadas.
+- Campo `PreviewImagePath` para proyectos.
+- Servicio de consulta pública de proyectos.
+- DTO de lectura de proyectos.
+- Fallback de traducciones a `es-ES`.
+- Conexión de proyectos dinámicos con la Home.
+- Renderizado de imágenes, repositorio, demo y estado vacío localizado.
+
+No sustituyas decisiones existentes, no crees una arquitectura paralela y no reviertas cambios actuales.
+
+## Objetivo de esta intervención
+
+Implementar únicamente la sección pública de certificaciones dinámicas.
+
+La sección debe consultar y mostrar certificaciones desde SQL Server utilizando la arquitectura existente y manteniendo el diseño actual de `CertificationsSection.razor` y `CertificationCard.razor`.
+
+Antes de editar, revisa si el modelo actual de certificaciones es suficiente o si necesita separar datos comunes y datos traducibles siguiendo el patrón utilizado para proyectos.
+
+## Contexto actual
+
+- Solución: Portfolio.sln
+- Framework: .NET 10
+- Aplicación: Portfolio.Web
+- Frontend: Blazor Web App con Razor Components
+- Renderizado: Interactive Server únicamente cuando aporte interactividad
+- Persistencia: EF Core 10 + SQL Server + Code First + Migrations
+- DbContext: Portfolio.Infrastructure/PortfolioDbContext.cs
+- Base de datos: PortfolioDb
+- Culturas:
+  - es-ES
+  - en-US
+- Cultura predeterminada: es-ES
+- Selector de idioma implementado mediante cookie.
+- La sección de proyectos ya consulta contenido dinámico.
+- Las certificaciones actuales todavía pueden utilizar datos estáticos, placeholders o estado vacío.
+
+## Alcance permitido
+
+Implementa únicamente:
+
+- Revisión del modelo actual de `Certification`.
+- Modelo de traducciones de certificaciones si es necesario.
+- Configuraciones EF Core necesarias.
+- Migración necesaria, solo si el modelo cambia.
+- Servicio de consulta pública de certificaciones.
+- DTO de lectura.
+- Selección de traducción actual.
+- Fallback a `es-ES`.
+- Conexión con `CertificationsSection.razor`.
+- Actualización de `CertificationCard.razor`.
+- Recursos RESX necesarios.
+- Pruebas útiles para esta sección.
+
+## No implementes todavía
+
+- Proyectos adicionales ni cambios en proyectos ya implementados.
+- Experiencia dinámica.
+- Blog dinámico.
+- Contacto persistente.
+- CRUD.
+- Panel de administración.
+- Identity.
+- Formularios administrativos.
+- Carga de archivos.
+- Gestión multimedia.
+- Nuevas páginas públicas.
+- Tecnologías persistidas si no son necesarias para certificaciones.
+- Funcionalidades de publicación avanzada.
+- Funcionalidades de fases posteriores.
+
+## Requisitos técnicos
+
+Antes de modificar:
+
+1. Revisa `Certification`.
+2. Revisa `CertificationConfiguration`.
+3. Revisa `PortfolioDbContext`.
+4. Revisa las migraciones actuales.
+5. Revisa `CertificationsSection.razor`.
+6. Revisa `CertificationCard.razor`.
+7. Revisa los estilos existentes.
+8. Revisa el servicio y DTO utilizados para proyectos.
+9. Revisa los recursos RESX.
+10. Revisa las pruebas existentes.
+11. Comprueba el estado de Git.
+
+Reutiliza el patrón empleado para proyectos siempre que sea aplicable. No copies código sin analizar si la certificación requiere campos comunes y campos traducibles diferentes.
+
+## Modelo y traducciones
+
+Determina qué campos son comunes y cuáles traducibles.
+
+Como mínimo, analiza:
+
+- Nombre de la certificación.
+- Emisor.
+- Fecha de obtención.
+- URL de credencial.
+- Orden de presentación.
+- Slug, si realmente es necesario.
+- Descripción, solo si la interfaz actual la necesita.
+
+No añadas campos que no tengan una necesidad real en la interfaz.
+
+Si se necesita una tabla de traducciones:
+
+- No utilices columnas como `NameEn` o `IssuerEn`.
+- No dupliques tablas por idioma.
+- Mantén `es-ES` y `en-US`.
+- Utiliza una restricción única por entidad e idioma.
+- Mantén los campos comunes en `Certification`.
+- Mantén los campos traducibles en una entidad de traducción.
+- Conserva los datos existentes mediante una migración segura.
+- No apliques la migración sin revisarla.
+
+Si el modelo actual es suficiente para la sección y no requiere traducciones, no crees entidades nuevas innecesariamente.
+
+## Consulta pública
+
+Implementa la consulta siguiendo el patrón existente de proyectos:
+
+- Contrato en `Portfolio.Application`.
+- DTO de lectura.
+- Implementación EF Core en `Portfolio.Infrastructure`.
+- `IDbContextFactory<PortfolioDbContext>`.
+- `AsNoTracking()`.
+- Consultas asíncronas.
+- Proyección a DTO.
+- Ningún acceso directo al DbContext desde componentes Blazor.
+
+La consulta debe:
+
+- Ordenar por `DisplayOrder`.
+- Seleccionar la traducción de la cultura actual.
+- Aplicar fallback a `es-ES`.
+- Descartar certificaciones sin traducción válida.
+- Devolver únicamente los campos necesarios para la tarjeta.
+- Devolver una colección vacía si no hay datos.
+
+## Componentes públicos
+
+Conecta la consulta con:
+
+- `CertificationsSection.razor`.
+- `CertificationCard.razor`.
+
+Mantén:
+
+- HTML semántico.
+- Diseño actual.
+- Tailwind CSS local.
+- `wwwroot/css/app.css`.
+- Tokens semánticos.
+- Responsive.
+- Focus-visible.
+- Navegación por teclado.
+- Contraste adecuado.
+- `prefers-reduced-motion`.
+- Textos visibles mediante recursos RESX.
+
+Si no hay certificaciones:
+
+- Muestra un estado vacío localizado.
+- No insertes datos ficticios.
+- No muestres placeholders como si fueran certificaciones reales.
+
+No añadas imágenes si el modelo actual no las contempla y no son necesarias para esta sección.
+
+## Localización
+
+Utiliza `CultureInfo.CurrentUICulture.Name`.
+
+El orden de selección será:
+
+1. Cultura actual.
+2. Fallback a `es-ES`.
+3. Descartar la certificación si no existe ninguna traducción válida.
+
+No dupliques la lógica de localización dentro del componente.
+
+## Pruebas
+
+Añade únicamente pruebas útiles.
+
+Como mínimo, valida:
+
+1. Orden por `DisplayOrder`.
+2. Selección de traducción actual.
+3. Fallback a `es-ES`.
+4. Descarte de certificaciones sin traducción válida.
+5. Conservación de fecha, URL y demás campos comunes.
+6. Colección vacía sin registros.
+7. Restricciones del modelo si se crean entidades nuevas.
+8. Que el componente no accede directamente al DbContext.
+9. Que no se modifica el comportamiento existente de proyectos.
+
+Utiliza la infraestructura de pruebas actual. No añadas una nueva infraestructura salvo que sea imprescindible.
+
+## Validación final
+
+Ejecuta:
+
+- `dotnet build Portfolio.sln`
+- Todas las pruebas disponibles de `Portfolio.Tests`
+- `git diff --check`
+- `git status`
+
+Si el modelo cambia:
+
+- Genera la migración correspondiente.
+- Revísala.
+- Verifica que no pierde datos.
+- Aplícala únicamente a la base de datos local `PortfolioDb`.
+- Confirma que no quedan migraciones pendientes.
+
+Valida, si es posible:
+
+- Home sin certificaciones.
+- Certificación en `es-ES`.
+- Certificación en `en-US`.
+- Fallback a español.
+- Orden de certificaciones.
+- URLs de credencial.
+- Cambio de idioma desde la Navbar.
+- Selector de tema.
+- Escritorio.
+- Móvil.
+- Navegación mediante teclado.
+
+## Forma de trabajo obligatoria
+
+Trabaja de forma incremental:
+
+1. Inspecciona el modelo y componentes actuales.
+2. Presenta un plan si el cambio afecta a varias capas.
+3. Decide si el modelo actual necesita traducciones.
+4. Implementa únicamente certificaciones dinámicas.
+5. Añade migración solo si es necesaria.
+6. Conecta la sección pública.
+7. Añade las pruebas.
+8. Ejecuta compilación y pruebas.
+9. Revisa el estado final de Git.
+10. Detén el desarrollo para revisión.
+
+Al finalizar:
+
+- Resume los archivos modificados.
+- Explica el modelo utilizado.
+- Explica la consulta.
+- Explica la selección de idioma y el fallback.
+- Indica si se creó y aplicó una migración.
+- Indica las pruebas ejecutadas y sus resultados.
+- Confirma que proyectos, experiencia, blog, CRUD, administración e Identity no se han modificado ni implementado.
+- No crees ningún commit automáticamente.
+- Detén el trabajo para revisión antes de continuar con la siguiente sección de la Fase 6.

@@ -1,7 +1,30 @@
 @using Microsoft.Extensions.Localization
+@using Portfolio.Application.Certifications
 @inject IStringLocalizer<SharedResource> Localizer
+@inject ICertificationQueryService CertificationQueryService
 
 <section id="certificates" class="home-section" aria-labelledby="certificates-title">
     <div class="section-heading"><p class="eyebrow">@Localizer["CertificatesEyebrow"]</p><h2 id="certificates-title">@Localizer["CertificatesTitle"]</h2></div>
-    <div class="card-grid"><CertificationCard /></div>
+    @if (certifications is { Count: > 0 })
+    {
+        <div class="card-grid">
+            @foreach (var certification in certifications)
+            {
+                <CertificationCard Certification="certification" />
+            }
+        </div>
+    }
+    else if (certifications is not null)
+    {
+        <p class="project-section__empty">@Localizer["CertificationsEmpty"]</p>
+    }
 </section>
+
+@code {
+    private IReadOnlyList<CertificationReadModel>? certifications;
+
+    protected override async Task OnInitializedAsync()
+    {
+        certifications = await CertificationQueryService.GetCertificationsAsync();
+    }
+}

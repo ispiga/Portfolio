@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Portfolio.Application.Certifications;
 using Portfolio.Application.Projects;
 using Portfolio.Domain.Entities;
 using Portfolio.Infrastructure;
@@ -21,7 +22,7 @@ public sealed class PersistenceModelTests
             .ToArray();
 
         Assert.Equal(
-            ["BlogPost", "Certification", "Experience", "Project", "ProjectTranslation"],
+            ["BlogPost", "Certification", "CertificationTranslation", "Experience", "Project", "ProjectTranslation"],
             entityNames);
     }
 
@@ -86,6 +87,124 @@ public sealed class PersistenceModelTests
 
         Assert.True(previewImagePath.IsNullable);
         Assert.Equal(500, previewImagePath.GetMaxLength());
+    }
+
+    [Fact]
+    public void Certification_translations_have_required_constraints_and_cascade_delete()
+    {
+        using var context = CreateContext();
+
+        var certificationEntity = context.Model.FindEntityType(typeof(Certification))!;
+        var translationEntity = context.Model.FindEntityType(typeof(CertificationTranslation))!;
+
+        Assert.DoesNotContain("Name", certificationEntity.GetProperties().Select(property => property.Name));
+        Assert.DoesNotContain("Issuer", certificationEntity.GetProperties().Select(property => property.Name));
+        Assert.Equal(
+            [nameof(CertificationTranslation.CertificationId), nameof(CertificationTranslation.LanguageCode)],
+            translationEntity.FindPrimaryKey()!.Properties.Select(property => property.Name));
+
+        var foreignKey = translationEntity.GetForeignKeys().Single();
+        Assert.Equal(DeleteBehavior.Cascade, foreignKey.DeleteBehavior);
+
+        var designTimeTranslationEntity = context.GetService<IDesignTimeModel>().Model
+            .FindEntityType(typeof(CertificationTranslation))!;
+        var languageConstraint = designTimeTranslationEntity.GetCheckConstraints()
+            .Single(constraint => constraint.Name == "CK_CertificationTranslations_LanguageCode");
+        Assert.Contains("es-ES", languageConstraint.Sql);
+        Assert.Contains("en-US", languageConstraint.Sql);
+    }
+
+    [Fact]
+    public void Certification_translation_selector_uses_requested_culture_and_common_fields()
+    {
+        var certification = new Certification
+        {
+            Id = Guid.NewGuid(),
+            IssuedOn = new DateOnly(2025, 4, 15),
+            CredentialUrl = "https://example.com/credential",
+            ImagePath = "/images/certifications/certification.webp",
+            DisplayOrder = 3,
+            Translations =
+            [
+                new CertificationTranslation
+                {
+                    LanguageCode = "es-ES",
+                    Name = "Certificación",
+                    Issuer = "Emisor"
+                },
+                new CertificationTranslation
+                {
+                    LanguageCode = "en-US",
+                    Name = "Certification",
+                    Issuer = "Issuer"
+                }
+            ]
+        };
+
+        var result = CertificationTranslationSelector.Select(certification, "en-US");
+
+        Assert.NotNull(result);
+        Assert.Equal("Certification", result.Name);
+        Assert.Equal("Issuer", result.Issuer);
+        Assert.Equal(certification.IssuedOn, result.IssuedOn);
+        Assert.Equal(certification.CredentialUrl, result.CredentialUrl);
+        Assert.Equal(certification.ImagePath, result.ImagePath);
+        Assert.Equal(3, result.DisplayOrder);
+    }
+
+    [Fact]
+    public void Certification_image_path_is_optional_and_limited()
+    {
+        using var context = CreateContext();
+
+        var imagePath = context.Model.FindEntityType(typeof(Certification))!
+            .FindProperty(nameof(Certification.ImagePath))!;
+
+        Assert.True(imagePath.IsNullable);
+        Assert.Equal(500, imagePath.GetMaxLength());
+    }
+
+    [Fact]
+    public void Certification_translation_selector_falls_back_to_spanish()
+    {
+        var certification = new Certification
+        {
+            Translations =
+            [
+                new CertificationTranslation
+                {
+                    LanguageCode = "es-ES",
+                    Name = "Certificación",
+                    Issuer = "Emisor"
+                }
+            ]
+        };
+
+        var result = CertificationTranslationSelector.Select(certification, "en-US");
+
+        Assert.NotNull(result);
+        Assert.Equal("Certificación", result.Name);
+    }
+
+    [Fact]
+    public void Certification_translation_selector_discards_certification_without_valid_translation()
+    {
+        var certification = new Certification
+        {
+            Translations =
+            [
+                new CertificationTranslation
+                {
+                    LanguageCode = "en-US",
+                    Name = "",
+                    Issuer = "Issuer"
+                }
+            ]
+        };
+
+        var result = CertificationTranslationSelector.Select(certification, "en-US");
+
+        Assert.Null(result);
     }
 
     [Fact]

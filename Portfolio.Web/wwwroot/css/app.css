@@ -223,7 +223,12 @@ html[data-theme="dark"] {
 .tag-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.25rem 0 0; padding: 0; list-style: none; }
 .tag-list li { padding: 0.3rem 0.55rem; border: 1px solid var(--color-border); border-radius: 999px; color: var(--color-text-secondary); font-size: var(--text-small); }
 .certification-card { display: flex; align-items: flex-start; gap: 1rem; }
+.certification-card__image { width: 5rem; height: 5rem; flex: 0 0 auto; border: 1px solid var(--color-border); border-radius: var(--radius-small); object-fit: cover; background-color: var(--color-background); }
 .certification-card__badge { display: grid; place-items: center; width: 2.5rem; height: 2.5rem; flex: 0 0 auto; border: 1px solid var(--color-primary); border-radius: 50%; color: var(--color-primary); font-size: 1.5rem; }
+.certification-card__issuer { color: var(--color-text); font-weight: 700; }
+.certification-card__date { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.75rem; font-size: var(--text-small); }
+.certification-card__date span { color: var(--color-text-secondary); }
+.certification-card__link { display: inline-block; margin-top: 1rem; font-weight: 700; }
 .featured-post { display: grid; grid-template-columns: minmax(12rem, 0.8fr) minmax(0, 1.2fr); align-items: center; gap: 2rem; }
 .featured-post p { margin: 0; }
 .contact-form { max-width: 52rem; }

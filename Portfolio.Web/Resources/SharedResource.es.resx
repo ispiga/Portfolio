@@ -63,6 +63,9 @@
   <data name="ProjectDemo" xml:space="preserve"><value>Ver demo</value></data>
   <data name="CertificatesEyebrow" xml:space="preserve"><value>Formación</value></data>
   <data name="CertificatesTitle" xml:space="preserve"><value>Certificaciones</value></data>
+	<data name="CertificationsEmpty" xml:space="preserve"><value>Aún no hay certificaciones disponibles para mostrar.</value></data>
+  <data name="CertificationIssuedOn" xml:space="preserve"><value>Obtenida:</value></data>
+  <data name="CertificationCredential" xml:space="preserve"><value>Ver credencial</value></data>
   <data name="CertificationPlaceholderTitle" xml:space="preserve"><value>Certificación pendiente de publicar</value></data>
   <data name="CertificationPlaceholderDescription" xml:space="preserve"><value>Los detalles de la certificación se mostrarán cuando estén disponibles.</value></data>
   <data name="BlogEyebrow" xml:space="preserve"><value>Ideas y aprendizaje</value></data>

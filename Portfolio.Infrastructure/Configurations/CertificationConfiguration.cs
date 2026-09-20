@@ -10,9 +10,8 @@ public sealed class CertificationConfiguration : IEntityTypeConfiguration<Certif
     {
         builder.ToTable("Certifications");
         builder.HasKey(certification => certification.Id);
-        builder.Property(certification => certification.Name).HasMaxLength(200).IsRequired();
-        builder.Property(certification => certification.Issuer).HasMaxLength(200).IsRequired();
         builder.Property(certification => certification.IssuedOn).HasColumnType("date");
         builder.Property(certification => certification.CredentialUrl).HasMaxLength(500);
+        builder.Property(certification => certification.ImagePath).HasMaxLength(500);
     }
 }

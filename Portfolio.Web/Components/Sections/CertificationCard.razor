@@ -1,7 +1,35 @@
 @using Microsoft.Extensions.Localization
+@using System.Globalization
+@using Portfolio.Application.Certifications
 @inject IStringLocalizer<SharedResource> Localizer
 
 <article class="surface certification-card">
+    @if (!string.IsNullOrWhiteSpace(Certification.ImagePath))
+    {
+        <img class="certification-card__image" src="@Certification.ImagePath" alt="@Certification.Name" loading="lazy" />
+    }
+
     <div class="certification-card__badge" aria-hidden="true">+</div>
-    <div><h3>@Localizer["CertificationPlaceholderTitle"]</h3><p>@Localizer["CertificationPlaceholderDescription"]</p></div>
+    <div>
+        <h3>@Certification.Name</h3>
+        <p class="certification-card__issuer">@Certification.Issuer</p>
+
+        @if (Certification.IssuedOn is { } issuedOn)
+        {
+            <p class="certification-card__date">
+                <span>@Localizer["CertificationIssuedOn"]</span>
+                <time datetime="@issuedOn.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)">@issuedOn.ToString("D", CultureInfo.CurrentCulture)</time>
+            </p>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Certification.CredentialUrl))
+        {
+            <a class="certification-card__link" href="@Certification.CredentialUrl" target="_blank" rel="noopener noreferrer">@Localizer["CertificationCredential"]</a>
+        }
+    </div>
 </article>
+
+@code {
+    [Parameter, EditorRequired]
+    public CertificationReadModel Certification { get; set; } = null!;
+}
