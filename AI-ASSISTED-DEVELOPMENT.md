@@ -1592,3 +1592,166 @@ Al finalizar:
 - Indica el resultado de la compilación.
 - Confirma que no se ha implementado contenido dinámico ni administración.
 - Detén el trabajo para revisión antes de continuar con otra sección.
+
+
+# ****************************************
+# PROMPT PARA REALIZAR LA FASE 6 - PARTE 2
+# ****************************************
+
+Quiero continuar la FASE 6 — Funcionalidades del proyecto Portfolio.
+
+Lee y respeta obligatoriamente antes de modificar nada:
+
+1. PORTFOLIO_PROJECT.md
+2. .github/copilot-instructions.md
+3. README.md
+
+Ten en cuenta todo el desarrollo realizado en las fases 1, 2, 3, 4, 5 y la primera sección de la Fase 6. No sustituyas decisiones existentes, no crees una arquitectura paralela y no reviertas cambios actuales.
+
+## Contexto actual
+
+- Solución: Portfolio.sln
+- Framework: .NET 10
+- Aplicación: Portfolio.Web
+- Arquitectura:
+  - Portfolio.Web
+  - Portfolio.Application
+  - Portfolio.Domain
+  - Portfolio.Infrastructure
+  - Portfolio.Tests
+- Frontend: Blazor Web App con Razor Components
+- Renderizado: Interactive Server únicamente cuando aporte interactividad
+- Persistencia: EF Core 10 + SQL Server + Code First + Migrations
+- DbContext: Portfolio.Infrastructure/PortfolioDbContext.cs
+- Base de datos de desarrollo: PortfolioDb
+- User Secrets configurado para la conexión local
+- Culturas:
+  - es-ES
+  - en-US
+- Cultura predeterminada: es-ES
+- Recursos RESX existentes:
+  - SharedResource.resx
+  - SharedResource.es.resx
+  - SharedResource.en.resx
+- Selector de idioma de la Navbar implementado y revisado
+- La cookie de cultura de ASP.NET Core ya está funcionando
+- La Home continúa utilizando contenido estático, placeholders y estados vacíos
+
+## Objetivo de esta intervención
+
+Implementar únicamente el modelo base para contenido traducible en SQL Server.
+
+El objetivo es preparar la persistencia para que las futuras secciones de proyectos, experiencia, certificaciones y blog puedan tener traducciones mediante entidades principales y tablas de traducciones relacionadas.
+
+## No implementes todavía
+
+- Contenido dinámico en la Home.
+- Consultas públicas.
+- Servicios de aplicación para proyectos.
+- CRUD.
+- Panel de administración.
+- Identity.
+- Formularios de administración.
+- Blog dinámico.
+- Experiencia dinámica.
+- Certificaciones dinámicas.
+- Nuevas páginas públicas.
+- Selector de idioma adicional.
+- Traducciones de textos estructurales que ya utilizan RESX.
+- Campos duplicados como TitleEn, DescriptionEn, SummaryEn o SlugEn.
+- Tablas duplicadas por idioma.
+- Funcionalidades de fases posteriores.
+
+## Requisitos técnicos
+
+Antes de editar:
+
+1. Lee completamente las entidades actuales del dominio.
+2. Revisa PortfolioDbContext.cs.
+3. Revisa todas las configuraciones EF Core existentes.
+4. Revisa la migración inicial aplicada.
+5. Revisa los proyectos y referencias entre Domain, Application, Infrastructure y Web.
+6. Revisa las pruebas existentes.
+7. Comprueba si ya existe alguna entidad, propiedad o configuración relacionada con idiomas o traducciones.
+8. Comprueba el estado actual de Git y no modifiques archivos ajenos a esta funcionalidad.
+
+## Diseño esperado
+
+Define un modelo preparado para contenido localizado sin duplicar tablas por idioma.
+
+Como mínimo, analiza y decide cómo representar:
+
+- Código de idioma.
+- Entidad principal de contenido.
+- Entidad de traducción relacionada.
+- Relación entre entidad principal y traducciones.
+- Restricción única por entidad y código de idioma.
+- Campos traducibles.
+- Campos comunes que no deben duplicarse por idioma.
+- Longitud máxima de códigos y textos.
+- Reglas de borrado.
+- Índices necesarios.
+- Compatibilidad con las culturas existentes es-ES y en-US.
+
+Utiliza las decisiones documentadas en PORTFOLIO_PROJECT.md. No introduzcas una entidad administrable de idiomas si todavía no es necesaria para las culturas actuales.
+
+Si el diseño requiere concretar el primer contenido traducible, utiliza únicamente el dominio de proyectos y deja preparados los patrones necesarios para reutilizarlos posteriormente en experiencia, certificaciones y blog. No conectes todavía el contenido a la Home.
+
+## Persistencia
+
+- Añade únicamente las entidades y configuraciones necesarias para este modelo.
+- Actualiza PortfolioDbContext.cs siguiendo el patrón existente.
+- Crea una migración EF Core coherente con el modelo.
+- No apliques cambios destructivos.
+- No almacenes traducciones estructurales de la interfaz en SQL Server.
+- Mantén la base de datos de desarrollo y la configuración mediante User Secrets.
+- No añadas credenciales ni cadenas de conexión al repositorio.
+
+## Pruebas
+
+Añade únicamente pruebas útiles para esta funcionalidad.
+
+Como mínimo, valida:
+
+1. Que el modelo contiene la entidad principal y su entidad de traducciones.
+2. Que existe la relación esperada.
+3. Que la combinación de entidad y código de idioma es única.
+4. Que las restricciones principales del modelo están configuradas.
+5. Que no se han creado columnas duplicadas por idioma.
+6. Que las entidades existentes de las fases anteriores siguen presentes.
+7. Que la migración se genera correctamente.
+
+## Forma de trabajo obligatoria
+
+Trabaja de forma incremental:
+
+1. Inspecciona el repositorio.
+2. Presenta un plan breve si el cambio afecta a varias capas.
+3. Implementa solo el modelo de traducciones.
+4. Ejecuta las pruebas y la compilación.
+5. Revisa el estado final de Git.
+6. Detén el desarrollo para revisión.
+
+No continúes con contenido dinámico, consultas públicas ni administración después de completar esta sección.
+
+## Validación final
+
+Ejecuta:
+
+- dotnet build Portfolio.sln
+- Las pruebas disponibles de Portfolio.Tests
+- La generación o validación de la migración correspondiente
+- git status
+- git diff --check
+
+Al finalizar:
+
+- Resume los archivos modificados.
+- Explica el modelo de entidades y traducciones.
+- Explica las restricciones e índices añadidos.
+- Indica el nombre de la migración.
+- Indica las pruebas ejecutadas y sus resultados.
+- Confirma que no se ha conectado todavía la Home a contenido dinámico.
+- Confirma que no se ha implementado CRUD, Identity ni administración.
+- No crees ningún commit automáticamente.
+- Detén el trabajo para revisión antes de continuar con la siguiente sección.

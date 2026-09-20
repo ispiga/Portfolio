@@ -7,6 +7,8 @@ public sealed class PortfolioDbContext(DbContextOptions<PortfolioDbContext> opti
 {
     public DbSet<Project> Projects => Set<Project>();
 
+    public DbSet<ProjectTranslation> ProjectTranslations => Set<ProjectTranslation>();
+
     public DbSet<Experience> Experiences => Set<Experience>();
 
     public DbSet<Certification> Certifications => Set<Certification>();

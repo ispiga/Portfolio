@@ -476,11 +476,11 @@ Projects
     Id
     RepositoryUrl
     DemoUrl
+    PreviewImagePath
     IsFeatured
     DisplayOrder
 
 ProjectTranslations
-    Id
     ProjectId
     LanguageCode
     Title
@@ -1196,25 +1196,22 @@ La persistencia se ha preparado de forma incremental a partir de las secciones q
 
 La conexión se obtiene de `ConnectionStrings:Portfolio`. `Portfolio.Web/appsettings.json` y `appsettings.Development.json` no contienen nombres de servidores ni credenciales específicas de una máquina. El proyecto Web utiliza `UserSecretsId` para que cada entorno de desarrollo configure su propia instancia SQL Server mediante User Secrets. En otros entornos, especialmente producción, la cadena debe suministrarse mediante variables de entorno, secretos de Docker u otro mecanismo seguro de configuración.
 
-La primera migración es `InitialPortfolioContent`. Crea únicamente las tablas `Projects`, `Experiences`, `Certifications` y `BlogPosts`, sin datos iniciales. La migración se ha aplicado en la base de datos `PortfolioDb` del entorno local de desarrollo. Las migraciones permanecen en `Portfolio.Infrastructure/Migrations` y `dotnet ef` utiliza la configuración del proyecto Web, incluido el User Secret de desarrollo.
+La primera migración es `InitialPortfolioContent`. Crea únicamente las tablas `Projects`, `Experiences`, `Certifications` y `BlogPosts`, sin datos iniciales. Posteriormente, `AddProjectTranslations` separó los campos traducibles de proyectos en `ProjectTranslations`, y `AddProjectPreviewImagePath` añadió la ruta opcional de la imagen de vista previa. Las migraciones se han aplicado en la base de datos `PortfolioDb` del entorno local de desarrollo. Las migraciones permanecen en `Portfolio.Infrastructure/Migrations` y `dotnet ef` utiliza la configuración del proyecto Web, incluido el User Secret de desarrollo.
 
 La configuración local no se versiona con valores específicos. El procedimiento para inicializar, consultar o modificar `ConnectionStrings:Portfolio` mediante `dotnet user-secrets` está documentado en el `README.md` raíz.
 
 ### Catálogo inicial de entidades y columnas
 
-El modelo inicial de la Fase 5 se documenta a continuación. Estos campos son la base actual de persistencia y podrán evolucionar mediante nuevas migraciones cuando una sección concreta revele necesidades adicionales.
+El modelo actual de persistencia se documenta a continuación. Estos campos son la base actual y podrán evolucionar mediante nuevas migraciones cuando una sección concreta revele necesidades adicionales.
 
 #### `Projects`
 
 | Columna | Explicación |
 | --- | --- |
 | `Id` | Identificador interno único del proyecto. |
-| `Title` | Nombre o título del proyecto. |
-| `Slug` | Identificador textual para una posible URL legible, por ejemplo `mi-proyecto`. |
-| `Summary` | Resumen breve para tarjetas o listados. |
-| `Description` | Descripción ampliada para una futura vista de detalle. |
 | `RepositoryUrl` | URL del repositorio del proyecto, si existe. |
 | `DemoUrl` | URL de una demo pública, si existe. |
+| `PreviewImagePath` | Ruta de la imagen de vista previa del proyecto, si existe. Se almacena la ruta del archivo, no la imagen ni una carpeta. |
 | `IsFeatured` | Indica si el proyecto debe mostrarse como destacado. |
 | `DisplayOrder` | Orden manual de presentación. |
 
@@ -1254,7 +1251,7 @@ El modelo inicial de la Fase 5 se documenta a continuación. Estos campos son la
 | `IsPublished` | Indica si el artículo está publicado. |
 | `IsFeatured` | Indica si el artículo debe mostrarse como destacado. |
 
-En la Fase 6, cuando se implemente cada sección, estos campos se revisarán contra las necesidades reales de la interfaz y del contenido. Los campos traducibles se separarán progresivamente en tablas de traducciones, por ejemplo `ProjectTranslations`, con `ProjectId`, `LanguageCode`, `Title`, `Summary`, `Description` y `Slug`. No se crearán columnas como `TitleEn` ni tablas duplicadas por idioma.
+En la Fase 6, cuando se implemente cada sección, estos campos se revisarán contra las necesidades reales de la interfaz y del contenido. Los campos traducibles de proyectos se almacenan en `ProjectTranslations`, con la clave compuesta `ProjectId` + `LanguageCode` y los campos `Title`, `Summary`, `Description` y `Slug`. `PreviewImagePath` es un dato común del proyecto y no se duplica por idioma. La ruta debe apuntar a un archivo concreto gestionado fuera de SQL Server; no se almacenan imágenes binarias ni rutas de carpetas. No se crearán columnas como `TitleEn` ni tablas duplicadas por idioma.
 
 Esta fase no conecta la Home con la base de datos ni implementa contenido dinámico, CRUD, Identity, administración, carga de imágenes, correo o envío real de formularios. El modelo se ampliará mediante nuevas migraciones cuando cada módulo tenga necesidades concretas.
 

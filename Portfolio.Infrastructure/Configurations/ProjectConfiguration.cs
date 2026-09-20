@@ -10,12 +10,8 @@ public sealed class ProjectConfiguration : IEntityTypeConfiguration<Project>
     {
         builder.ToTable("Projects");
         builder.HasKey(project => project.Id);
-        builder.Property(project => project.Title).HasMaxLength(200).IsRequired();
-        builder.Property(project => project.Slug).HasMaxLength(200).IsRequired();
-        builder.Property(project => project.Summary).HasMaxLength(500).IsRequired();
-        builder.Property(project => project.Description).HasColumnType("nvarchar(max)");
         builder.Property(project => project.RepositoryUrl).HasMaxLength(500);
         builder.Property(project => project.DemoUrl).HasMaxLength(500);
-        builder.HasIndex(project => project.Slug).IsUnique();
+        builder.Property(project => project.PreviewImagePath).HasMaxLength(500);
     }
 }
