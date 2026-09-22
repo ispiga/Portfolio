@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Portfolio.Application.Certifications;
+using Portfolio.Application.Experiences;
 using Portfolio.Application.Projects;
 using Portfolio.Infrastructure.Services;
 
@@ -15,6 +16,7 @@ public static class DependencyInjection
     {
         var connectionString = configuration.GetConnectionString("Portfolio");
         services.AddScoped<ICertificationQueryService, CertificationQueryService>();
+        services.AddScoped<IExperienceQueryService, ExperienceQueryService>();
         services.AddScoped<IProjectQueryService, ProjectQueryService>();
 
         if (!string.IsNullOrWhiteSpace(connectionString))

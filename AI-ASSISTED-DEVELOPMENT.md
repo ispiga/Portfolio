@@ -2363,3 +2363,255 @@ Al finalizar:
 - Confirma que proyectos, experiencia, blog, CRUD, administración e Identity no se han modificado ni implementado.
 - No crees ningún commit automáticamente.
 - Detén el trabajo para revisión antes de continuar con la siguiente sección de la Fase 6.
+
+
+# ****************************************
+# PROMPT PARA REALIZAR LA FASE 6 - PARTE 5
+# ****************************************
+
+Quiero continuar la FASE 6 — Funcionalidades del proyecto Portfolio.
+
+Implementa únicamente la sección pública de experiencia dinámica.
+
+Ten en cuenta todas las decisiones y funcionalidades ya existentes en el proyecto:
+
+- .NET 10.
+- Blazor Web App con Razor Components.
+- Interactive Server únicamente cuando aporte interactividad.
+- Arquitectura separada en Domain, Application, Infrastructure, Web y Tests.
+- EF Core 10 con SQL Server, Code First y Migrations.
+- Selector de idioma en la Navbar.
+- Persistencia de cultura mediante cookie de ASP.NET Core.
+- Culturas `es-ES` y `en-US`.
+- Localización mediante recursos RESX.
+- Proyectos dinámicos con traducciones, fallback a `es-ES`, imágenes, repositorio, demo y estado vacío localizado.
+- Certificaciones dinámicas con traducciones, fallback a `es-ES`, fecha, credencial, imagen opcional y estado vacío localizado.
+- Uso de `IDbContextFactory<PortfolioDbContext>` para consultas públicas.
+- Ningún acceso directo al DbContext desde componentes Blazor.
+- Pruebas existentes en `Portfolio.Tests`.
+
+No reviertas, sustituyas ni dupliques decisiones ya implementadas.
+
+## Objetivo
+
+Convertir la sección pública de experiencia para que consulte y muestre datos desde SQL Server utilizando la arquitectura existente y manteniendo el diseño actual de `ExperienceTimeline.razor`.
+
+## Alcance permitido
+
+Implementa únicamente:
+
+- Revisión del modelo actual `Experience`.
+- Separación entre campos comunes y campos traducibles si es necesario.
+- Entidad de traducciones de experiencia si el modelo lo requiere.
+- Configuraciones EF Core.
+- Migración necesaria únicamente si cambia el modelo.
+- Contrato de consulta en `Portfolio.Application`.
+- DTO de lectura.
+- Selector de traducción actual.
+- Fallback a `es-ES`.
+- Servicio de consulta pública en `Portfolio.Infrastructure`.
+- Conexión con `ExperienceTimeline.razor`.
+- Actualización de componentes relacionados con experiencia únicamente si es necesario.
+- Recursos RESX necesarios.
+- Pruebas útiles para experiencia dinámica.
+
+## No implementes todavía
+
+- Blog dinámico.
+- Contacto persistente.
+- CRUD.
+- Panel de administración.
+- Identity.
+- Formularios administrativos.
+- Carga de archivos.
+- Gestión multimedia adicional.
+- Nuevas páginas públicas.
+- Tecnologías persistidas.
+- Funcionalidades de fases posteriores.
+- Cambios funcionales en proyectos o certificaciones ya implementados.
+
+## Revisión obligatoria antes de editar
+
+Inspecciona:
+
+1. `Experience`.
+2. `ExperienceConfiguration`.
+3. `PortfolioDbContext`.
+4. Migraciones actuales.
+5. `ExperienceTimeline.razor`.
+6. Componentes relacionados con experiencia.
+7. Estilos actuales de la timeline.
+8. Servicio y DTO de proyectos.
+9. Servicio y DTO de certificaciones.
+10. Recursos RESX.
+11. Pruebas existentes.
+12. Estado actual de Git.
+
+Antes de editar, presenta un plan si el cambio afecta a varias capas.
+
+## Modelo y traducciones
+
+Determina qué campos son comunes y cuáles traducibles siguiendo los patrones utilizados para proyectos y certificaciones.
+
+Analiza como mínimo:
+
+- Rol o puesto.
+- Empresa u organización.
+- Resumen o descripción.
+- Fecha de inicio.
+- Fecha de finalización.
+- Orden de presentación.
+- Indicador de experiencia actual, solo si la interfaz existente lo necesita.
+
+No añadas campos que no tengan una necesidad real en la interfaz actual.
+
+Si se necesita una tabla de traducciones:
+
+- No utilices columnas como `RoleTitleEn`, `CompanyNameEn` o `SummaryEn`.
+- No dupliques tablas por idioma.
+- Mantén `es-ES` y `en-US`.
+- Utiliza una clave o restricción única por entidad e idioma.
+- Mantén los campos comunes en `Experience`.
+- Mantén los campos traducibles en una entidad de traducción.
+- Conserva los datos existentes mediante una migración segura.
+- Revisa la migración antes de aplicarla.
+- No añadas slug, imagen ni campos multimedia si la interfaz actual no los necesita.
+
+## Consulta pública
+
+Reutiliza el patrón existente:
+
+- Contrato en `Portfolio.Application`.
+- DTO de lectura.
+- Implementación EF Core en `Portfolio.Infrastructure`.
+- `IDbContextFactory<PortfolioDbContext>`.
+- `AsNoTracking()`.
+- Consultas asíncronas.
+- Proyección o selección a DTO.
+- Ningún acceso directo al DbContext desde componentes Blazor.
+
+La consulta debe:
+
+- Ordenar por `DisplayOrder`.
+- Seleccionar la traducción de la cultura actual.
+- Utilizar `CultureInfo.CurrentUICulture.Name`.
+- Aplicar fallback a `es-ES`.
+- Descartar experiencias sin traducción válida.
+- Devolver únicamente los campos necesarios para la timeline.
+- Devolver una colección vacía si no existen experiencias.
+
+El orden de selección debe ser:
+
+1. Cultura actual.
+2. Fallback a `es-ES`.
+3. Descartar la experiencia si no existe ninguna traducción válida.
+
+No dupliques la lógica de localización dentro de los componentes.
+
+## Componentes públicos
+
+Conecta la consulta con:
+
+- `ExperienceTimeline.razor`.
+- Componentes relacionados únicamente si es necesario.
+
+Mantén:
+
+- El diseño visual actual de la timeline.
+- HTML semántico.
+- Navegación mediante teclado.
+- `focus-visible`.
+- Diseño responsive.
+- Contraste suficiente.
+- Soporte para `prefers-reduced-motion`.
+- Tailwind CSS local.
+- `wwwroot/css/app.css`.
+- Tokens semánticos existentes.
+- Textos visibles mediante recursos RESX.
+
+Si no hay experiencias:
+
+- Muestra un estado vacío localizado.
+- No insertes experiencias ficticias.
+- No muestres placeholders como si fueran experiencias reales.
+
+## Pruebas
+
+Utiliza la infraestructura de pruebas existente.
+
+Valida como mínimo:
+
+1. Orden por `DisplayOrder`.
+2. Selección de la traducción actual.
+3. Fallback a `es-ES`.
+4. Descarte de experiencias sin traducción válida.
+5. Conservación de fechas y demás campos comunes.
+6. Colección vacía sin registros.
+7. Restricciones del modelo si se crean entidades nuevas.
+8. Que los componentes no acceden directamente al DbContext.
+9. Que no se modifica el comportamiento existente de proyectos.
+10. Que no se modifica el comportamiento existente de certificaciones.
+
+## Migración
+
+Si el modelo cambia:
+
+- Genera la migración correspondiente.
+- Revísala manualmente.
+- Verifica que no pierda datos existentes.
+- Aplícala únicamente a la base de datos local `PortfolioDb`.
+- Confirma que no quedan migraciones pendientes.
+
+## Validación final
+
+Ejecuta:
+dotnet build Portfolio.sln
+
+
+Ejecuta todas las pruebas de `Portfolio.Tests`.
+
+Ejecuta:
+git diff --check git status
+
+
+Valida, si es posible:
+
+- Home sin experiencias.
+- Experiencia en `es-ES`.
+- Experiencia en `en-US`.
+- Fallback a español.
+- Orden de experiencias.
+- Fechas correctas.
+- Cambio de idioma desde la Navbar.
+- Selector de tema.
+- Vista de escritorio.
+- Vista móvil.
+- Navegación mediante teclado.
+
+## Forma de trabajo obligatoria
+
+Trabaja incrementalmente:
+
+1. Inspecciona el modelo y los componentes actuales.
+2. Presenta un plan si procede.
+3. Decide si el modelo necesita traducciones.
+4. Implementa únicamente experiencia dinámica.
+5. Añade migración solo si es necesaria.
+6. Conecta la sección pública.
+7. Añade las pruebas.
+8. Ejecuta compilación y pruebas.
+9. Revisa el estado final de Git.
+10. Detén el desarrollo para revisión.
+
+Al finalizar:
+
+- Resume los archivos modificados.
+- Explica el modelo utilizado.
+- Explica la consulta.
+- Explica la selección de idioma y el fallback.
+- Indica si se creó y aplicó una migración.
+- Indica las pruebas ejecutadas y sus resultados.
+- Confirma que proyectos y certificaciones no se han modificado funcionalmente.
+- Confirma que blog, contacto, CRUD, administración e Identity no se han implementado.
+- No crees ningún commit automáticamente.
+- Detén el trabajo para revisión antes de continuar con la siguiente sección de la Fase 6.

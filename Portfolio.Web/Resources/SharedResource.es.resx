@@ -48,6 +48,8 @@
   <data name="ExperienceEyebrow" xml:space="preserve"><value>Trayectoria</value></data>
   <data name="ExperienceTitle" xml:space="preserve"><value>Experiencia</value></data>
   <data name="ExperienceEmpty" xml:space="preserve"><value>La experiencia profesional se incorporará cuando estén disponibles los datos definitivos.</value></data>
+	<data name="ExperienceCurrent" xml:space="preserve"><value>Actualidad</value></data>
+  <data name="ExperienceDateSeparator" xml:space="preserve"><value>—</value></data>
   <data name="ProjectsEyebrow" xml:space="preserve"><value>Trabajo seleccionado</value></data>
   <data name="ProjectsTitle" xml:space="preserve"><value>Proyectos</value></data>
   <data name="ProjectsIntro" xml:space="preserve"><value>Una selección de proyectos estará disponible próximamente.</value></data>

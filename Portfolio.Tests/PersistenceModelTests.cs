@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Portfolio.Application.Certifications;
+using Portfolio.Application.Experiences;
 using Portfolio.Application.Projects;
 using Portfolio.Domain.Entities;
 using Portfolio.Infrastructure;
@@ -22,8 +23,118 @@ public sealed class PersistenceModelTests
             .ToArray();
 
         Assert.Equal(
-            ["BlogPost", "Certification", "CertificationTranslation", "Experience", "Project", "ProjectTranslation"],
+            ["BlogPost", "Certification", "CertificationTranslation", "Experience", "ExperienceTranslation", "Project", "ProjectTranslation"],
             entityNames);
+    }
+
+    [Fact]
+    public void Experience_translations_have_localized_fields_and_required_constraints()
+    {
+        using var context = CreateContext();
+
+        var experienceEntity = context.Model.FindEntityType(typeof(Experience))!;
+        var translationEntity = context.Model.FindEntityType(typeof(ExperienceTranslation))!;
+
+        Assert.DoesNotContain("RoleTitle", experienceEntity.GetProperties().Select(property => property.Name));
+        Assert.DoesNotContain("CompanyName", experienceEntity.GetProperties().Select(property => property.Name));
+        Assert.DoesNotContain("Summary", experienceEntity.GetProperties().Select(property => property.Name));
+        Assert.Equal(
+            [nameof(ExperienceTranslation.ExperienceId), nameof(ExperienceTranslation.LanguageCode)],
+            translationEntity.FindPrimaryKey()!.Properties.Select(property => property.Name));
+
+        var foreignKey = translationEntity.GetForeignKeys().Single();
+        Assert.Equal(DeleteBehavior.Cascade, foreignKey.DeleteBehavior);
+
+        var designTimeTranslationEntity = context.GetService<IDesignTimeModel>().Model
+            .FindEntityType(typeof(ExperienceTranslation))!;
+        var languageConstraint = designTimeTranslationEntity.GetCheckConstraints()
+            .Single(constraint => constraint.Name == "CK_ExperienceTranslations_LanguageCode");
+        Assert.Contains("es-ES", languageConstraint.Sql);
+        Assert.Contains("en-US", languageConstraint.Sql);
+    }
+
+    [Fact]
+    public void Experience_translation_selector_uses_requested_culture_and_common_fields()
+    {
+        var experience = new Experience
+        {
+            Id = Guid.NewGuid(),
+            StartDate = new DateOnly(2022, 1, 10),
+            EndDate = new DateOnly(2024, 6, 30),
+            DisplayOrder = 4,
+            Translations =
+            [
+                new ExperienceTranslation
+                {
+                    LanguageCode = "es-ES",
+                    RoleTitle = "Desarrollador",
+                    CompanyName = "Empresa",
+                    Summary = "Resumen en español"
+                },
+                new ExperienceTranslation
+                {
+                    LanguageCode = "en-US",
+                    RoleTitle = "Developer",
+                    CompanyName = "Company",
+                    Summary = "English summary"
+                }
+            ]
+        };
+
+        var result = ExperienceTranslationSelector.Select(experience, "en-US");
+
+        Assert.NotNull(result);
+        Assert.Equal("Developer", result.RoleTitle);
+        Assert.Equal("Company", result.CompanyName);
+        Assert.Equal("English summary", result.Summary);
+        Assert.Equal(experience.StartDate, result.StartDate);
+        Assert.Equal(experience.EndDate, result.EndDate);
+        Assert.Equal(4, result.DisplayOrder);
+    }
+
+    [Fact]
+    public void Experience_translation_selector_falls_back_to_spanish()
+    {
+        var experience = new Experience
+        {
+            Translations =
+            [
+                new ExperienceTranslation
+                {
+                    LanguageCode = "es-ES",
+                    RoleTitle = "Desarrollador",
+                    CompanyName = "Empresa",
+                    Summary = "Resumen"
+                }
+            ]
+        };
+
+        var result = ExperienceTranslationSelector.Select(experience, "en-US");
+
+        Assert.NotNull(result);
+        Assert.Equal("Desarrollador", result.RoleTitle);
+    }
+
+    [Fact]
+    public void Experience_translation_selector_discards_experience_without_valid_translation()
+    {
+        var experience = new Experience
+        {
+            Translations =
+            [
+                new ExperienceTranslation
+                {
+                    LanguageCode = "en-US",
+                    RoleTitle = "Developer",
+                    CompanyName = "",
+                    Summary = "Summary"
+                }
+            ]
+        };
+
+        var result = ExperienceTranslationSelector.Select(experience, "en-US");
+
+        Assert.Null(result);
     }
 
     [Fact]

@@ -1,13 +1,61 @@
 @using Microsoft.Extensions.Localization
+@using System.Globalization
+@using Portfolio.Application.Experiences
 @inject IStringLocalizer<SharedResource> Localizer
+@inject IExperienceQueryService ExperienceQueryService
 
 <section class="home-section" aria-labelledby="experience-title">
     <div class="section-heading">
         <p class="eyebrow">@Localizer["ExperienceEyebrow"]</p>
         <h2 id="experience-title">@Localizer["ExperienceTitle"]</h2>
     </div>
-    <div class="timeline-empty surface">
-        <span class="timeline-empty__marker" aria-hidden="true"></span>
-        <p>@Localizer["ExperienceEmpty"]</p>
-    </div>
+    @if (experiences is { Count: > 0 })
+    {
+        <ol class="experience-timeline">
+            @foreach (var experience in experiences)
+            {
+                <li class="experience-timeline__item">
+                    <article class="experience-card surface">
+                        <div class="experience-card__date">
+                            <time datetime="@experience.StartDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)">
+                                @experience.StartDate.ToString("MMM yyyy", CultureInfo.CurrentUICulture)
+                            </time>
+                            <span aria-hidden="true">@Localizer["ExperienceDateSeparator"]</span>
+                            @if (experience.EndDate is { } endDate)
+                            {
+                                <time datetime="@endDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)">
+                                    @endDate.ToString("MMM yyyy", CultureInfo.CurrentUICulture)
+                                </time>
+                            }
+                            else
+                            {
+                                <span>@Localizer["ExperienceCurrent"]</span>
+                            }
+                        </div>
+                        <div>
+                            <h3>@experience.RoleTitle</h3>
+                            <p class="experience-card__company">@experience.CompanyName</p>
+                            <p>@experience.Summary</p>
+                        </div>
+                    </article>
+                </li>
+            }
+        </ol>
+    }
+    else if (experiences is not null)
+    {
+        <div class="timeline-empty surface">
+            <span class="timeline-empty__marker" aria-hidden="true"></span>
+            <p>@Localizer["ExperienceEmpty"]</p>
+        </div>
+    }
 </section>
+
+@code {
+    private IReadOnlyList<ExperienceReadModel>? experiences;
+
+    protected override async Task OnInitializedAsync()
+    {
+        experiences = await ExperienceQueryService.GetExperiencesAsync();
+    }
+}

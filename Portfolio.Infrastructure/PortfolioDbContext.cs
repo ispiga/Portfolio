@@ -11,6 +11,8 @@ public sealed class PortfolioDbContext(DbContextOptions<PortfolioDbContext> opti
 
     public DbSet<Experience> Experiences => Set<Experience>();
 
+    public DbSet<ExperienceTranslation> ExperienceTranslations => Set<ExperienceTranslation>();
+
     public DbSet<Certification> Certifications => Set<Certification>();
 
     public DbSet<BlogPost> BlogPosts => Set<BlogPost>();
