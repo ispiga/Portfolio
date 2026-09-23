@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Portfolio.Application.Blog;
 using Portfolio.Application.Certifications;
 using Portfolio.Application.Experiences;
 using Portfolio.Application.Projects;
@@ -23,7 +24,7 @@ public sealed class PersistenceModelTests
             .ToArray();
 
         Assert.Equal(
-            ["BlogPost", "Certification", "CertificationTranslation", "Experience", "ExperienceTranslation", "Project", "ProjectTranslation"],
+            ["BlogPost", "BlogPostTranslation", "Certification", "CertificationTranslation", "Experience", "ExperienceTranslation", "Project", "ProjectTranslation"],
             entityNames);
     }
 
@@ -138,7 +139,7 @@ public sealed class PersistenceModelTests
     }
 
     [Fact]
-    public void Project_translation_and_blog_post_slugs_are_unique()
+    public void Project_translation_and_blog_post_translation_slugs_are_unique()
     {
         using var context = CreateContext();
 
@@ -146,12 +147,165 @@ public sealed class PersistenceModelTests
             .GetIndexes()
             .Single(index => index.Properties.Select(property => property.Name)
                 .SequenceEqual([nameof(ProjectTranslation.LanguageCode), nameof(ProjectTranslation.Slug)]));
-        var blogPostSlugIndex = context.Model.FindEntityType(typeof(BlogPost))!
+        var blogPostSlugIndex = context.Model.FindEntityType(typeof(BlogPostTranslation))!
             .GetIndexes()
-            .Single(index => index.Properties.Single().Name == nameof(BlogPost.Slug));
+            .Single(index => index.Properties.Select(property => property.Name)
+                .SequenceEqual([nameof(BlogPostTranslation.LanguageCode), nameof(BlogPostTranslation.Slug)]));
 
         Assert.True(projectSlugIndex.IsUnique);
         Assert.True(blogPostSlugIndex.IsUnique);
+    }
+
+    [Fact]
+    public void Blog_post_translations_have_localized_fields_and_cascade_delete()
+    {
+        using var context = CreateContext();
+
+        var blogPostEntity = context.Model.FindEntityType(typeof(BlogPost))!;
+        var translationEntity = context.Model.FindEntityType(typeof(BlogPostTranslation))!;
+
+        Assert.DoesNotContain("Title", blogPostEntity.GetProperties().Select(property => property.Name));
+        Assert.DoesNotContain("Slug", blogPostEntity.GetProperties().Select(property => property.Name));
+        Assert.DoesNotContain("Excerpt", blogPostEntity.GetProperties().Select(property => property.Name));
+        Assert.DoesNotContain("Content", blogPostEntity.GetProperties().Select(property => property.Name));
+        var featuredImagePath = blogPostEntity.FindProperty(nameof(BlogPost.FeaturedImagePath))!;
+        Assert.True(featuredImagePath.IsNullable);
+        Assert.Equal(500, featuredImagePath.GetMaxLength());
+        var featuredImageAlt = translationEntity.FindProperty(nameof(BlogPostTranslation.FeaturedImageAlt))!;
+        Assert.True(featuredImageAlt.IsNullable);
+        Assert.Equal(500, featuredImageAlt.GetMaxLength());
+        Assert.Equal(
+            [nameof(BlogPostTranslation.BlogPostId), nameof(BlogPostTranslation.LanguageCode)],
+            translationEntity.FindPrimaryKey()!.Properties.Select(property => property.Name));
+
+        var foreignKey = translationEntity.GetForeignKeys().Single();
+        Assert.Equal(DeleteBehavior.Cascade, foreignKey.DeleteBehavior);
+
+        var designTimeTranslationEntity = context.GetService<IDesignTimeModel>().Model
+            .FindEntityType(typeof(BlogPostTranslation))!;
+        var languageConstraint = designTimeTranslationEntity.GetCheckConstraints()
+            .Single(constraint => constraint.Name == "CK_BlogPostTranslations_LanguageCode");
+        Assert.Contains("es-ES", languageConstraint.Sql);
+        Assert.Contains("en-US", languageConstraint.Sql);
+    }
+
+    [Fact]
+    public void Blog_post_translation_selector_uses_requested_culture_and_common_fields()
+    {
+        var publishedOn = new DateTimeOffset(2026, 9, 22, 12, 0, 0, TimeSpan.Zero);
+        var blogPost = CreateBlogPost(
+            Guid.NewGuid(),
+            publishedOn,
+            isFeatured: true,
+            new BlogPostTranslation
+            {
+                LanguageCode = "es-ES",
+                Title = "Artículo",
+                Slug = "articulo",
+                Excerpt = "Resumen",
+                Content = "Contenido",
+                FeaturedImageAlt = "Imagen del artículo"
+            },
+            new BlogPostTranslation
+            {
+                LanguageCode = "en-US",
+                Title = "Article",
+                Slug = "article",
+                Excerpt = "Summary",
+                Content = "Content",
+                FeaturedImageAlt = "Article image"
+            });
+        blogPost.FeaturedImagePath = "/images/blog/article.webp";
+
+        var result = BlogPostTranslationSelector.Select(blogPost, "en-US");
+
+        Assert.NotNull(result);
+        Assert.Equal("Article", result.Title);
+        Assert.Equal("article", result.Slug);
+        Assert.Equal("Summary", result.Excerpt);
+        Assert.Equal("Content", result.Content);
+        Assert.Equal(blogPost.FeaturedImagePath, result.FeaturedImagePath);
+        Assert.Equal("Article image", result.FeaturedImageAlt);
+        Assert.Equal(publishedOn, result.PublishedOn);
+        Assert.True(result.IsFeatured);
+    }
+
+    [Fact]
+    public void Blog_post_translation_selector_uses_title_as_image_alt_fallback()
+    {
+        var blogPost = CreateBlogPost(
+            Guid.NewGuid(),
+            DateTimeOffset.UtcNow,
+            isFeatured: true,
+            new BlogPostTranslation
+            {
+                LanguageCode = "es-ES",
+                Title = "Artículo sin alt",
+                Slug = "articulo-sin-alt",
+                Excerpt = "Resumen",
+                Content = "Contenido"
+            });
+
+        var result = BlogPostTranslationSelector.Select(blogPost, "es-ES");
+
+        Assert.NotNull(result);
+        Assert.Equal("Artículo sin alt", result.FeaturedImageAlt);
+    }
+
+    [Fact]
+    public void Blog_post_translation_selector_falls_back_and_discards_invalid_posts()
+    {
+        var validPost = CreateBlogPost(
+            Guid.NewGuid(),
+            DateTimeOffset.UtcNow,
+            isFeatured: false,
+            new BlogPostTranslation
+            {
+                LanguageCode = "es-ES",
+                Title = "Artículo",
+                Slug = "articulo",
+                Excerpt = "Resumen",
+                Content = "Contenido"
+            });
+        var invalidPost = CreateBlogPost(
+            Guid.NewGuid(),
+            DateTimeOffset.UtcNow.AddDays(1),
+            isFeatured: true,
+            new BlogPostTranslation
+            {
+                LanguageCode = "en-US",
+                Title = "Article",
+                Slug = "article",
+                Excerpt = "",
+                Content = "Content"
+            });
+
+        var result = BlogPostTranslationSelector.SelectFeatured(
+            [invalidPost, validPost],
+            "en-US");
+
+        Assert.NotNull(result);
+        Assert.Equal(validPost.Id, result.Id);
+        Assert.Equal("Artículo", result.Title);
+    }
+
+    [Fact]
+    public void Blog_post_translation_selector_orders_featured_posts_then_date_and_id()
+    {
+        var date = DateTimeOffset.UtcNow;
+        var earlierId = Guid.Parse("00000000-0000-0000-0000-000000000001");
+        var laterId = Guid.Parse("00000000-0000-0000-0000-000000000002");
+        var posts = new[]
+        {
+            CreateBlogPost(laterId, date, isFeatured: true, CreateTranslation("later")),
+            CreateBlogPost(earlierId, date, isFeatured: true, CreateTranslation("earlier")),
+            CreateBlogPost(Guid.NewGuid(), date.AddDays(1), isFeatured: false, CreateTranslation("recent"))
+        };
+
+        var result = BlogPostTranslationSelector.SelectFeatured(posts, "es-ES");
+
+        Assert.NotNull(result);
+        Assert.Equal(earlierId, result.Id);
     }
 
     [Fact]
@@ -404,6 +558,34 @@ public sealed class PersistenceModelTests
         var result = ProjectTranslationSelector.Select(project, "en-US");
 
         Assert.Null(result);
+    }
+
+    private static BlogPost CreateBlogPost(
+        Guid id,
+        DateTimeOffset publishedOn,
+        bool isFeatured,
+        params BlogPostTranslation[] translations)
+    {
+        return new BlogPost
+        {
+            Id = id,
+            PublishedOn = publishedOn,
+            IsPublished = true,
+            IsFeatured = isFeatured,
+            Translations = translations
+        };
+    }
+
+    private static BlogPostTranslation CreateTranslation(string slug)
+    {
+        return new BlogPostTranslation
+        {
+            LanguageCode = "es-ES",
+            Title = slug,
+            Slug = slug,
+            Excerpt = "Resumen",
+            Content = "Contenido"
+        };
     }
 
     private static PortfolioDbContext CreateContext()

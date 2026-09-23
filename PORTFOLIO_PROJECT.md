@@ -461,7 +461,7 @@ Blog = "Blog"
 Contact = "Contacto"
 ```
 
-Los recursos en inglés ya están preparados para los textos existentes, pero todavía no existe un selector de idioma visible en la navbar ni una preferencia de idioma persistida. El selector se implementará en la Fase 6, junto al selector de tema y a su derecha, manteniendo el sistema de recursos sin duplicar las pantallas.
+Los recursos en inglés están preparados para los textos existentes. La Navbar ya dispone de selector de idioma y la cultura se persiste mediante la cookie de localización de ASP.NET Core, manteniendo el sistema de recursos sin duplicar las pantallas.
 
 ### Culturas y contenido localizado
 
@@ -796,7 +796,7 @@ Se integrará dentro de "Sobre mí", pero como bloque visual independiente.
 
 No se creará inicialmente una sección principal independiente llamada "Experiencia" en la navegación.
 
-Se utilizará preferentemente una timeline:
+Se utiliza una timeline dinámica:
 
 ```text
 2025 — Actualidad
@@ -809,78 +809,50 @@ Desarrollador...
 ...
 ```
 
-Esto evita saturar el menú y permite que "Sobre mí" funcione como una página/perfil profesional completo.
+Los datos se consultan desde SQL Server mediante un servicio de aplicación y se muestran únicamente cuando existe una traducción válida para la cultura actual o para `es-ES` como fallback. Esto evita saturar el menú y permite que "Sobre mí" funcione como una página/perfil profesional completo.
 
 ---
 
 # 18. Proyectos
 
-En Home se mostrará una selección de proyectos mediante un:
+En Home se muestra una selección de proyectos mediante una:
 
-**Carrusel de proyectos**
+**rejilla responsive de tarjetas**
 
-Cada tarjeta podrá mostrar:
+Cada tarjeta muestra, según los datos disponibles:
 
 - imagen
 - nombre
 - breve descripción
-- tecnologías
 - GitHub
 - demo si existe
-- enlace para ver el proyecto
 
-El usuario podrá acceder a una vista más completa del proyecto.
+La tarjeta muestra actualmente la información traducida disponible, la imagen de vista previa si existe y los enlaces de repositorio o demo cuando están configurados. La consulta utiliza `IDbContextFactory<PortfolioDbContext>`, `AsNoTracking()` y selección de traducción por cultura con fallback a `es-ES`.
 
-Ruta pública prevista:
-
-```text
-/projects/{slug}
-```
-
-Se prefiere `slug` para URLs públicas legibles.
-
-El esquema definitivo de `Project` se decidirá cuando se diseñe esta sección.
-
-No crear la entidad completa antes de conocer las necesidades reales del diseño.
+Actualmente no existe una ruta pública de detalle de proyecto ni se duplica la navegación mediante enlaces ficticios. Una futura ruta `/projects/{slug}` requerirá una decisión específica de alcance y una consulta propia.
 
 ---
 
 # 19. Certificaciones
 
-Las certificaciones no utilizarán el mismo patrón visual que los proyectos.
+Las certificaciones no utilizan el mismo patrón visual que los proyectos.
 
-Se utilizará preferentemente:
+Se utiliza:
 
 - grid
 - tarjetas
-- posible timeline
-- presentación visual alternativa al carrusel
 
 Esto permite demostrar variedad de diseño UI.
 
-Cada certificación podrá tener una vista de detalle:
+La Home muestra actualmente las certificaciones mediante tarjetas en una rejilla responsive. Cada tarjeta puede mostrar el nombre y emisor traducidos, la fecha de obtención, la imagen local si existe y el enlace de credencial si está configurado.
 
-```text
-/certifications/{slug}
-```
-
-El detalle podrá mostrar:
-
-- nombre
-- organización
-- fecha
-- duración/horas
-- descripción
-- imagen
-- documento si corresponde
-
-El modelo definitivo se diseñará cuando se construya la sección.
+Actualmente no existe una ruta pública de detalle ni un `slug` de certificación. Una futura ruta de detalle requerirá una decisión específica de alcance y un modelo ampliado si fuese necesario.
 
 ---
 
 # 20. Blog
 
-En Home se mostrará:
+En Home se muestra:
 
 **el último artículo publicado**
 
@@ -888,23 +860,26 @@ No el último artículo creado.
 
 Esto evita que borradores o contenidos no publicados aparezcan públicamente.
 
-La tarjeta podrá incluir:
+La tarjeta incluye actualmente:
 
 - imagen destacada
 - título
 - fecha
 - extracto
-- botón "Leer artículo"
-- botón/enlace para acceder al blog completo
+- estado vacío localizado cuando no existe una publicación válida
 
-Rutas previstas:
+La consulta pública selecciona primero publicaciones destacadas válidas y después la publicación más reciente por fecha descendente, utilizando el identificador como desempate estable. Excluye publicaciones no publicadas y publicaciones futuras.
+
+La selección de traducción utiliza la cultura actual (`es-ES` o `en-US`) y hace fallback a `es-ES`. Si no existe una destacada válida, se muestra la publicación pública más reciente válida.
+
+Actualmente la sección se limita a la publicación destacada de Home. No se han creado todavía las rutas:
 
 ```text
 /blog
 /blog/{slug}
 ```
 
-El contenido será administrado desde el panel mediante TinyMCE.
+El contenido completo se almacena en `BlogPostTranslation.Content` y podrá administrarse desde el panel mediante TinyMCE en la Fase 7. La carga y gestión administrativa de imágenes también pertenece a esa fase.
 
 ---
 
@@ -1196,7 +1171,7 @@ La persistencia se ha preparado de forma incremental a partir de las secciones q
 
 La conexión se obtiene de `ConnectionStrings:Portfolio`. `Portfolio.Web/appsettings.json` y `appsettings.Development.json` no contienen nombres de servidores ni credenciales específicas de una máquina. El proyecto Web utiliza `UserSecretsId` para que cada entorno de desarrollo configure su propia instancia SQL Server mediante User Secrets. En otros entornos, especialmente producción, la cadena debe suministrarse mediante variables de entorno, secretos de Docker u otro mecanismo seguro de configuración.
 
-La primera migración es `InitialPortfolioContent`. Crea únicamente las tablas `Projects`, `Experiences`, `Certifications` y `BlogPosts`, sin datos iniciales. Posteriormente, `AddProjectTranslations` separó los campos traducibles de proyectos en `ProjectTranslations`, y `AddProjectPreviewImagePath` añadió la ruta opcional de la imagen de vista previa. Las migraciones se han aplicado en la base de datos `PortfolioDb` del entorno local de desarrollo. Las migraciones permanecen en `Portfolio.Infrastructure/Migrations` y `dotnet ef` utiliza la configuración del proyecto Web, incluido el User Secret de desarrollo.
+La primera migración es `InitialPortfolioContent`. Crea las tablas iniciales sin datos de contenido. Posteriormente, `AddProjectTranslations` separó los campos traducibles de proyectos en `ProjectTranslations`, `AddProjectPreviewImagePath` añadió la ruta opcional de la imagen de vista previa, `AddCertificationTranslations` separó los campos traducibles de certificaciones, `AddCertificationImagePath` añadió su imagen opcional, `AddExperienceTranslations` separó los campos traducibles de experiencia, `AddBlogPostTranslations` separó los campos traducibles de artículos y `AddBlogPostFeaturedImage` añadió la imagen destacada común y su texto alternativo localizado. Las migraciones se han aplicado en la base de datos `PortfolioDb` del entorno local de desarrollo. Las migraciones permanecen en `Portfolio.Infrastructure/Migrations` y `dotnet ef` utiliza la configuración del proyecto Web, incluido el User Secret de desarrollo.
 
 La configuración local no se versiona con valores específicos. El procedimiento para inicializar, consultar o modificar `ConnectionStrings:Portfolio` mediante `dotnet user-secrets` está documentado en el `README.md` raíz.
 
@@ -1220,40 +1195,39 @@ El modelo actual de persistencia se documenta a continuación. Estos campos son 
 | Columna | Explicación |
 | --- | --- |
 | `Id` | Identificador interno único de la experiencia. |
-| `RoleTitle` | Nombre del puesto o rol desempeñado. |
-| `CompanyName` | Nombre de la empresa u organización. |
-| `Summary` | Resumen de las funciones o responsabilidades. |
 | `StartDate` | Fecha de inicio de la experiencia. |
 | `EndDate` | Fecha de finalización; puede quedar vacía si continúa activa. |
 | `DisplayOrder` | Orden manual dentro de la línea temporal. |
+
+Los campos `RoleTitle`, `CompanyName` y `Summary` se almacenan en `ExperienceTranslations`, junto con `LanguageCode`.
 
 #### `Certifications`
 
 | Columna | Explicación |
 | --- | --- |
 | `Id` | Identificador interno único de la certificación. |
-| `Name` | Nombre de la certificación. |
-| `Issuer` | Organización que la concede. |
 | `IssuedOn` | Fecha de obtención, si se conoce. |
 | `CredentialUrl` | URL de verificación o credencial, si existe. |
+| `ImagePath` | Ruta de la imagen local de la certificación, si existe. |
 | `DisplayOrder` | Orden manual de presentación. |
+
+Los campos `Name` e `Issuer` se almacenan en `CertificationTranslations`, junto con `LanguageCode`.
 
 #### `BlogPosts`
 
 | Columna | Explicación |
 | --- | --- |
 | `Id` | Identificador interno único del artículo. |
-| `Title` | Título del artículo. |
-| `Slug` | Identificador textual para una posible URL legible. |
-| `Excerpt` | Extracto o resumen breve del artículo. |
-| `Content` | Contenido completo del artículo. |
+| `FeaturedImagePath` | Ruta de la imagen destacada local del artículo, si existe. No se almacena la imagen como BLOB. |
 | `PublishedOn` | Fecha y hora de publicación, si se ha publicado. |
 | `IsPublished` | Indica si el artículo está publicado. |
 | `IsFeatured` | Indica si el artículo debe mostrarse como destacado. |
 
-En la Fase 6, cuando se implemente cada sección, estos campos se revisarán contra las necesidades reales de la interfaz y del contenido. Los campos traducibles de proyectos se almacenan en `ProjectTranslations`, con la clave compuesta `ProjectId` + `LanguageCode` y los campos `Title`, `Summary`, `Description` y `Slug`. `PreviewImagePath` es un dato común del proyecto y no se duplica por idioma. La ruta debe apuntar a un archivo concreto gestionado fuera de SQL Server; no se almacenan imágenes binarias ni rutas de carpetas. No se crearán columnas como `TitleEn` ni tablas duplicadas por idioma.
+Los campos `Title`, `Slug`, `Excerpt` y `Content` se almacenan en `BlogPostTranslations`, junto con `LanguageCode`. `FeaturedImageAlt` también se almacena en esa tabla porque puede localizarse por idioma; si está vacío, la capa de aplicación utiliza el título como fallback accesible.
 
-Esta fase no conecta la Home con la base de datos ni implementa contenido dinámico, CRUD, Identity, administración, carga de imágenes, correo o envío real de formularios. El modelo se ampliará mediante nuevas migraciones cuando cada módulo tenga necesidades concretas.
+Los campos traducibles de proyectos se almacenan en `ProjectTranslations`, con la clave compuesta `ProjectId` + `LanguageCode` y los campos `Title`, `Summary`, `Description` y `Slug`. `PreviewImagePath`, `ImagePath` y `FeaturedImagePath` son datos comunes de sus entidades respectivas y no se duplican por idioma. Las rutas deben apuntar a archivos concretos gestionados fuera de SQL Server; no se almacenan imágenes binarias ni rutas de carpetas. No se crearán columnas como `TitleEn` ni tablas duplicadas por idioma.
+
+La Fase 6 ya conecta con SQL Server las secciones públicas de experiencia, proyectos, certificaciones y blog mediante servicios de consulta, DTOs, `AsNoTracking()`, consultas asíncronas y selección localizada con fallback a `es-ES`. Esta fase no implementa todavía CRUD, Identity, administración, carga de imágenes, correo ni envío real de formularios. El modelo se ampliará mediante nuevas migraciones cuando cada módulo tenga necesidades concretas.
 
 ---
 

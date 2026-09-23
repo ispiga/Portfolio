@@ -10,11 +10,8 @@ public sealed class BlogPostConfiguration : IEntityTypeConfiguration<BlogPost>
     {
         builder.ToTable("BlogPosts");
         builder.HasKey(post => post.Id);
-        builder.Property(post => post.Title).HasMaxLength(200).IsRequired();
-        builder.Property(post => post.Slug).HasMaxLength(200).IsRequired();
-        builder.Property(post => post.Excerpt).HasMaxLength(500).IsRequired();
-        builder.Property(post => post.Content).HasColumnType("nvarchar(max)").IsRequired();
+        builder.Property(post => post.FeaturedImagePath)
+            .HasMaxLength(500);
         builder.Property(post => post.PublishedOn).HasColumnType("datetimeoffset");
-        builder.HasIndex(post => post.Slug).IsUnique();
     }
 }

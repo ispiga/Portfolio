@@ -2615,3 +2615,268 @@ Al finalizar:
 - Confirma que blog, contacto, CRUD, administración e Identity no se han implementado.
 - No crees ningún commit automáticamente.
 - Detén el trabajo para revisión antes de continuar con la siguiente sección de la Fase 6.
+
+
+# ****************************************
+# PROMPT PARA REALIZAR LA FASE 6 - PARTE 6
+# ****************************************
+
+Quiero continuar la FASE 6 — Funcionalidades del proyecto Portfolio.
+
+La sección pública de experiencia dinámica ya ha sido revisada y aprobada. Implementa ahora únicamente el blog público dinámico, siguiendo exactamente las decisiones arquitectónicas y funcionales ya existentes en el proyecto.
+
+## Contexto técnico
+
+- .NET 10.
+- Blazor Web App con Razor Components.
+- Interactive Server únicamente cuando aporte interactividad.
+- Arquitectura separada en Domain, Application, Infrastructure, Web y Tests.
+- EF Core 10 con SQL Server, Code First y Migrations.
+- Persistencia mediante `IDbContextFactory<PortfolioDbContext>` para consultas públicas.
+- Ningún acceso directo al DbContext desde componentes Blazor.
+- Culturas `es-ES` y `en-US`.
+- Persistencia de cultura mediante cookie de ASP.NET Core.
+- Localización estructural mediante recursos RESX.
+- Contenido dinámico localizado mediante entidad principal y tabla de traducciones.
+- La sección pública utiliza Tailwind CSS local y `wwwroot/css/app.css`.
+- Los textos visibles deben utilizar recursos localizados.
+- La cultura predeterminada es `es-ES`.
+- Los componentes públicos deben mantener HTML semántico, responsive, accesibilidad, navegación por teclado, `focus-visible`, contraste suficiente y `prefers-reduced-motion`.
+
+## Objetivo
+
+Convertir la sección pública existente del blog para que consulte datos desde SQL Server y los muestre dinámicamente, manteniendo el diseño actual de `FeaturedPost.razor` y sin introducir contenido ficticio.
+
+La implementación debe seguir el mismo patrón utilizado para proyectos, certificaciones y experiencia:
+
+- Contrato de consulta en `Portfolio.Application`.
+- DTO de lectura.
+- Selector de traducción.
+- Fallback a `es-ES`.
+- Servicio de consulta EF Core en `Portfolio.Infrastructure`.
+- Uso de `AsNoTracking()`.
+- Consultas asíncronas.
+- Proyección o selección a DTO.
+- Conexión desde el componente Blazor mediante un servicio.
+- Ningún acceso directo al DbContext desde componentes.
+
+## Revisión obligatoria antes de editar
+
+Inspecciona primero:
+
+1. `BlogPost`.
+2. `BlogPostConfiguration`.
+3. `PortfolioDbContext`.
+4. Migraciones actuales.
+5. `FeaturedPost.razor`.
+6. Componentes relacionados con blog.
+7. La sección actual de blog en `Home.razor`.
+8. Estilos actuales utilizados por el blog.
+9. Modelos, servicios y DTO de proyectos.
+10. Modelos, servicios y DTO de certificaciones.
+11. Modelo, servicio, selector y componente de experiencia recientemente implementados.
+12. Recursos RESX.
+13. Pruebas existentes.
+14. Estado actual de Git.
+
+No edites ningún archivo hasta haber inspeccionado el alcance y presentado un plan si el cambio afecta a varias capas.
+
+## Modelo y traducciones
+
+Determina qué campos de `BlogPost` son comunes y cuáles traducibles según las necesidades reales de `FeaturedPost.razor` y el patrón ya utilizado.
+
+Como mínimo, analiza:
+
+- Título.
+- Slug.
+- Extracto.
+- Contenido.
+- Fecha de publicación.
+- Indicador de publicación.
+- Indicador de destacado.
+- Imagen o recurso visual, únicamente si ya existe y la interfaz actual lo necesita.
+
+Si el modelo necesita traducciones:
+
+- Crea una entidad `BlogPostTranslation`.
+- No utilices columnas como `TitleEn`, `ExcerptEn` o `ContentEn`.
+- No dupliques tablas por idioma.
+- Mantén `es-ES` y `en-US`.
+- Utiliza una clave primaria o restricción única por entidad e idioma.
+- Mantén los campos comunes en `BlogPost`.
+- Mantén los campos traducibles en `BlogPostTranslation`.
+- Conserva los datos existentes mediante una migración segura.
+- La migración debe copiar los datos actuales a la traducción `es-ES` antes de eliminar columnas, si procede.
+- No añadas slug, imagen, categorías, etiquetas, autor ni metadatos si la interfaz actual no los necesita.
+
+No implementes todavía el editor TinyMCE ni ninguna funcionalidad administrativa. El editor y la gestión del contenido pertenecen a una fase posterior de administración.
+
+## Consulta pública
+
+La consulta debe:
+
+- Utilizar `IDbContextFactory<PortfolioDbContext>`.
+- Utilizar `AsNoTracking()`.
+- Ser asíncrona.
+- Seleccionar únicamente el contenido necesario para `FeaturedPost.razor`.
+- Utilizar `CultureInfo.CurrentUICulture.Name`.
+- Seleccionar primero la traducción de la cultura actual.
+- Aplicar fallback a `es-ES`.
+- Descartar publicaciones sin traducción válida.
+- No mostrar publicaciones no publicadas.
+- Si la interfaz actual utiliza el estado destacado, respetar `IsFeatured`.
+- Determinar claramente qué hacer si no hay una publicación destacada válida:
+  - mostrar la publicación pública más reciente, si ese comportamiento encaja con el componente actual;
+  - o mostrar el estado vacío localizado.
+- No inventar entradas.
+- Devolver una colección vacía o `null` controlado según el patrón existente, sin provocar errores en la interfaz.
+
+Si se necesita ordenar:
+
+- Publicaciones destacadas primero cuando corresponda.
+- Después por fecha de publicación descendente.
+- Utiliza el identificador como desempate estable.
+- No muestres publicaciones futuras salvo que el modelo y el comportamiento existente lo contemplen expresamente.
+
+## Componente público
+
+Conecta la consulta con:
+
+- `FeaturedPost.razor`.
+- `Home.razor` únicamente si es necesario.
+- Otros componentes de blog solo si ya existen y el cambio es imprescindible.
+
+Mantén:
+
+- El diseño visual actual.
+- HTML semántico.
+- Estado vacío localizado.
+- Enlaces accesibles.
+- `focus-visible`.
+- Diseño responsive.
+- Tailwind CSS local.
+- Tokens semánticos existentes.
+- Soporte para `prefers-reduced-motion`.
+- Todos los textos visibles mediante recursos RESX.
+
+No implementes todavía:
+
+- Panel de administración.
+- CRUD.
+- Identity.
+- Editor TinyMCE.
+- Gestión de categorías o etiquetas.
+- Comentarios.
+- Contacto persistente.
+- Nuevas funcionalidades de proyectos, certificaciones o experiencia.
+- Funcionalidades multimedia adicionales.
+- Cambios funcionales en la Navbar, selector de idioma o selector de tema.
+
+Si para mostrar el blog es imprescindible una página pública `/blog` o `/blog/{slug}`, analiza primero si esa ampliación es necesaria para la interfaz actual. No crees nuevas páginas públicas de forma automática: mantén el alcance en la sección que ya existe y documenta cualquier necesidad adicional antes de implementarla.
+
+## Recursos RESX
+
+Añade únicamente los recursos necesarios en:
+
+- `SharedResource.resx`.
+- `SharedResource.es.resx`.
+- `SharedResource.en.resx`.
+
+Como mínimo revisa:
+
+- Estado vacío.
+- Etiqueta de publicación.
+- Fecha de publicación.
+- Enlace para leer el artículo, si ya existe en el diseño.
+- Texto alternativo o etiqueta visual si la interfaz lo necesita.
+
+No escribas textos visibles directamente en el componente.
+
+## Pruebas
+
+Utiliza la infraestructura existente de `Portfolio.Tests`.
+
+Valida como mínimo:
+
+1. Traducción de la cultura actual.
+2. Fallback a `es-ES`.
+3. Descarte de publicaciones sin traducción válida.
+4. Exclusión de publicaciones no publicadas.
+5. Selección correcta de la publicación destacada o de la publicación más reciente, según el comportamiento decidido.
+6. Orden por fecha y desempate estable.
+7. Conservación de los campos comunes.
+8. Colección vacía sin registros válidos.
+9. Restricciones del modelo si se crea una entidad de traducción.
+10. Clave compuesta o restricción única por idioma.
+11. Borrado en cascada.
+12. Que el componente no accede directamente al DbContext.
+13. Que no se modifica el comportamiento existente de proyectos.
+14. Que no se modifica el comportamiento existente de certificaciones.
+15. Que no se modifica el comportamiento existente de experiencia.
+
+## Migración
+
+Si el modelo cambia:
+
+- Genera la migración correspondiente.
+- Revísala manualmente.
+- Verifica que no pierda datos existentes.
+- Aplícala únicamente a la base de datos local `PortfolioDb`.
+- Confirma que no quedan migraciones pendientes.
+- No modifiques migraciones anteriores ya aplicadas.
+
+## Validación final
+
+Ejecuta:
+dotnet build Portfolio.sln
+
+
+Ejecuta todas las pruebas de `Portfolio.Tests`.
+
+Ejecuta:
+git diff --check git status
+
+
+Valida, si es posible:
+
+- Home sin publicaciones válidas.
+- Publicación destacada en `es-ES`.
+- Publicación destacada en `en-US`.
+- Fallback a español.
+- Exclusión de publicaciones no publicadas.
+- Orden por fecha.
+- Enlaces correctos.
+- Cambio de idioma desde la Navbar.
+- Selector de tema.
+- Vista de escritorio.
+- Vista móvil.
+- Navegación mediante teclado.
+- Estado vacío localizado.
+
+## Forma de trabajo obligatoria
+
+Trabaja incrementalmente:
+
+1. Inspecciona el modelo y los componentes actuales.
+2. Presenta un plan si procede.
+3. Decide si el modelo necesita traducciones.
+4. Implementa únicamente el blog público dinámico.
+5. Añade migración solo si es necesaria.
+6. Conecta la sección pública existente.
+7. Añade las pruebas.
+8. Ejecuta compilación y pruebas.
+9. Revisa el estado final de Git.
+10. Detén el desarrollo para revisión.
+
+Al finalizar:
+
+- Resume los archivos modificados.
+- Explica el modelo utilizado.
+- Explica la consulta.
+- Explica la selección de idioma y el fallback.
+- Indica si se creó y aplicó una migración.
+- Indica las pruebas ejecutadas y sus resultados.
+- Confirma que proyectos, certificaciones y experiencia no se han modificado funcionalmente.
+- Confirma que administración, CRUD, Identity, TinyMCE y contacto persistente no se han implementado.
+- No crees ningún commit automáticamente.
+- Detén el trabajo para revisión antes de continuar con la siguiente sección de la Fase 6.

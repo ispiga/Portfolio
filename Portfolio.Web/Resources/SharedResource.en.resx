@@ -73,6 +73,8 @@
   <data name="BlogEyebrow" xml:space="preserve"><value>Ideas and learning</value></data>
   <data name="BlogTitle" xml:space="preserve"><value>Latest published article</value></data>
   <data name="BlogPlaceholderVisual" xml:space="preserve"><value>Featured article</value></data>
+	<data name="BlogFeatured" xml:space="preserve"><value>Featured article</value></data>
+  <data name="BlogPublishedOn" xml:space="preserve"><value>Published:</value></data>
   <data name="BlogEmpty" xml:space="preserve"><value>There are no published articles to feature yet.</value></data>
   <data name="ContactEyebrow" xml:space="preserve"><value>Let's connect</value></data>
   <data name="ContactTitle" xml:space="preserve"><value>Contact</value></data>

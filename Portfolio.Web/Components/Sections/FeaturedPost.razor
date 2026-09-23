@@ -1,7 +1,54 @@
 @using Microsoft.Extensions.Localization
+@using System.Globalization
+@using Portfolio.Application.Blog
 @inject IStringLocalizer<SharedResource> Localizer
+@inject IBlogPostQueryService BlogPostQueryService
 
 <section id="blog" class="home-section" aria-labelledby="blog-title">
     <div class="section-heading"><p class="eyebrow">@Localizer["BlogEyebrow"]</p><h2 id="blog-title">@Localizer["BlogTitle"]</h2></div>
-    <article class="surface featured-post"><div class="featured-post__visual" aria-hidden="true">@Localizer["BlogPlaceholderVisual"]</div><div><p>@Localizer["BlogEmpty"]</p></div></article>
+    @if (post is not null)
+    {
+        <article class="surface featured-post">
+            @if (!string.IsNullOrWhiteSpace(post.FeaturedImagePath))
+            {
+                <img class="featured-post__image"
+                     src="@post.FeaturedImagePath"
+                     alt="@post.FeaturedImageAlt"
+                     loading="lazy" />
+            }
+            else
+            {
+                <div class="featured-post__visual" aria-hidden="true">@Localizer["BlogPlaceholderVisual"]</div>
+            }
+            <div>
+                @if (post.IsFeatured)
+                {
+                    <p class="featured-post__featured">@Localizer["BlogFeatured"]</p>
+                }
+                <h3>@post.Title</h3>
+                <p class="featured-post__date">
+                    <span>@Localizer["BlogPublishedOn"]</span>
+                    <time datetime="@post.PublishedOn.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)">
+                        @post.PublishedOn.ToString("d", CultureInfo.CurrentUICulture)
+                    </time>
+                </p>
+                <p>@post.Excerpt</p>
+            </div>
+        </article>
+    }
+    else if (hasLoaded)
+    {
+        <p class="featured-post__empty">@Localizer["BlogEmpty"]</p>
+    }
 </section>
+
+@code {
+    private BlogPostReadModel? post;
+    private bool hasLoaded;
+
+    protected override async Task OnInitializedAsync()
+    {
+        post = await BlogPostQueryService.GetFeaturedPostAsync();
+        hasLoaded = true;
+    }
+}

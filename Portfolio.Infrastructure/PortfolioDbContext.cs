@@ -17,6 +17,8 @@ public sealed class PortfolioDbContext(DbContextOptions<PortfolioDbContext> opti
 
     public DbSet<BlogPost> BlogPosts => Set<BlogPost>();
 
+    public DbSet<BlogPostTranslation> BlogPostTranslations => Set<BlogPostTranslation>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(PortfolioDbContext).Assembly);

@@ -1,0 +1,40 @@
+﻿using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
+
+namespace Portfolio.Infrastructure.Migrations
+{
+    /// <inheritdoc />
+    public partial class AddBlogPostFeaturedImage : Migration
+    {
+        /// <inheritdoc />
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.AddColumn<string>(
+                name: "FeaturedImageAlt",
+                table: "BlogPostTranslations",
+                type: "nvarchar(500)",
+                maxLength: 500,
+                nullable: true);
+
+            migrationBuilder.AddColumn<string>(
+                name: "FeaturedImagePath",
+                table: "BlogPosts",
+                type: "nvarchar(500)",
+                maxLength: 500,
+                nullable: true);
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropColumn(
+                name: "FeaturedImageAlt",
+                table: "BlogPostTranslations");
+
+            migrationBuilder.DropColumn(
+                name: "FeaturedImagePath",
+                table: "BlogPosts");
+        }
+    }
+}
