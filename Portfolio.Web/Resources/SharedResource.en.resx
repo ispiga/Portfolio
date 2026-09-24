@@ -78,10 +78,20 @@
   <data name="BlogEmpty" xml:space="preserve"><value>There are no published articles to feature yet.</value></data>
   <data name="ContactEyebrow" xml:space="preserve"><value>Let's connect</value></data>
   <data name="ContactTitle" xml:space="preserve"><value>Contact</value></data>
-  <data name="ContactIntro" xml:space="preserve"><value>This form is an initial visual structure and does not send messages yet.</value></data>
-  <data name="ContactPlaceholder" xml:space="preserve"><value>Submission and validation will be implemented in a later phase.</value></data>
+	<data name="ContactIntro" xml:space="preserve"><value>Do you have an idea or an opportunity? Send me a message.</value></data>
+  <data name="ContactFormNote" xml:space="preserve"><value>I will reply to your message as soon as possible.</value></data>
   <data name="ContactName" xml:space="preserve"><value>Name</value></data>
   <data name="ContactEmail" xml:space="preserve"><value>Email</value></data>
   <data name="ContactMessage" xml:space="preserve"><value>Message</value></data>
-  <data name="ContactSubmit" xml:space="preserve"><value>Prepare message</value></data>
+	<data name="ContactSubmit" xml:space="preserve"><value>Send message</value></data>
+  <data name="ContactSending" xml:space="preserve"><value>Sending message…</value></data>
+  <data name="ContactSuccess" xml:space="preserve"><value>Your message was sent successfully.</value></data>
+  <data name="ContactError" xml:space="preserve"><value>The message could not be sent. Please try again later.</value></data>
+  <data name="ContactValidationError" xml:space="preserve"><value>Review the indicated fields before sending the form.</value></data>
+  <data name="ContactRequired" xml:space="preserve"><value>This field is required.</value></data>
+  <data name="ContactEmailInvalid" xml:space="preserve"><value>Enter a valid email address.</value></data>
+  <data name="ContactNameMaxLength" xml:space="preserve"><value>The name cannot exceed 100 characters.</value></data>
+  <data name="ContactEmailMaxLength" xml:space="preserve"><value>The email cannot exceed 254 characters.</value></data>
+  <data name="ContactMessageMaxLength" xml:space="preserve"><value>The message cannot exceed 4000 characters.</value></data>
+  <data name="ContactHoneypotLabel" xml:space="preserve"><value>Company</value></data>
 </root>

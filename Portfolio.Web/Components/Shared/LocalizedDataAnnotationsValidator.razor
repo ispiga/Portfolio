@@ -1,0 +1,141 @@
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.Extensions.Localization
+@using Portfolio.Application.Contact
+@implements IDisposable
+@inject IStringLocalizer<SharedResource> Localizer
+
+@code {
+    [CascadingParameter]
+    private EditContext CurrentEditContext { get; set; } = default!;
+
+    private ValidationMessageStore? messageStore;
+
+    protected override void OnInitialized()
+    {
+        ArgumentNullException.ThrowIfNull(CurrentEditContext);
+
+        messageStore = new ValidationMessageStore(CurrentEditContext);
+        CurrentEditContext.OnValidationRequested += HandleValidationRequested;
+        CurrentEditContext.OnFieldChanged += HandleFieldChanged;
+    }
+
+    private void HandleValidationRequested(object? sender, ValidationRequestedEventArgs args)
+    {
+        ValidateModel();
+    }
+
+    private void HandleFieldChanged(object? sender, FieldChangedEventArgs args)
+    {
+        if (messageStore is null)
+        {
+            return;
+        }
+
+        messageStore.Clear(args.FieldIdentifier);
+        ValidateProperty(args.FieldIdentifier);
+        CurrentEditContext.NotifyValidationStateChanged();
+    }
+
+    private void ValidateModel()
+    {
+        if (messageStore is null)
+        {
+            return;
+        }
+
+        messageStore.Clear();
+        var validationResults = new List<ValidationResult>();
+        var validationContext = new ValidationContext(CurrentEditContext.Model);
+        Validator.TryValidateObject(
+            CurrentEditContext.Model,
+            validationContext,
+            validationResults,
+            validateAllProperties: true);
+
+        foreach (var validationResult in validationResults)
+        {
+            AddLocalizedMessages(validationResult);
+        }
+
+        CurrentEditContext.NotifyValidationStateChanged();
+    }
+
+    private void ValidateProperty(FieldIdentifier fieldIdentifier)
+    {
+        var property = fieldIdentifier.Model.GetType().GetProperty(fieldIdentifier.FieldName);
+        if (property is null)
+        {
+            return;
+        }
+
+        var validationResults = new List<ValidationResult>();
+        var validationContext = new ValidationContext(fieldIdentifier.Model)
+        {
+            MemberName = fieldIdentifier.FieldName
+        };
+        Validator.TryValidateProperty(
+            property.GetValue(fieldIdentifier.Model),
+            validationContext,
+            validationResults);
+
+        foreach (var validationResult in validationResults)
+        {
+            AddLocalizedMessages(validationResult, fieldIdentifier);
+        }
+    }
+
+    private void AddLocalizedMessages(ValidationResult validationResult, FieldIdentifier? fieldIdentifier = null)
+    {
+        var memberNames = validationResult.MemberNames.Any()
+            ? validationResult.MemberNames
+            : fieldIdentifier is not null
+                ? [fieldIdentifier.Value.FieldName]
+                : [];
+
+        foreach (var memberName in memberNames)
+        {
+            var memberIdentifier = fieldIdentifier is not null
+                ? fieldIdentifier.Value
+                : new FieldIdentifier(CurrentEditContext.Model, memberName);
+            messageStore!.Add(memberIdentifier, GetLocalizedMessage(memberName, validationResult));
+        }
+    }
+
+    private string GetLocalizedMessage(string memberName, ValidationResult validationResult)
+    {
+        if (validationResult.ErrorMessage is not null)
+        {
+            var errorMessage = validationResult.ErrorMessage;
+            if (errorMessage.Contains("required", StringComparison.OrdinalIgnoreCase))
+            {
+                return Localizer["ContactRequired"].Value;
+            }
+
+            if (memberName == nameof(ContactRequest.Email)
+                && (errorMessage.Contains("valid", StringComparison.OrdinalIgnoreCase)
+                    || errorMessage.Contains("e-mail", StringComparison.OrdinalIgnoreCase)))
+            {
+                return Localizer["ContactEmailInvalid"].Value;
+            }
+
+            if (errorMessage.Contains("between", StringComparison.OrdinalIgnoreCase)
+                || errorMessage.Contains("maximum", StringComparison.OrdinalIgnoreCase))
+            {
+                return Localizer[$"Contact{memberName}MaxLength"].Value;
+            }
+        }
+
+        return Localizer["ContactValidationError"].Value;
+    }
+
+    public void Dispose()
+    {
+        if (messageStore is null)
+        {
+            return;
+        }
+
+        CurrentEditContext.OnValidationRequested -= HandleValidationRequested;
+        CurrentEditContext.OnFieldChanged -= HandleFieldChanged;
+    }
+}

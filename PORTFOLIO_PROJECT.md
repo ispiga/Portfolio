@@ -906,13 +906,15 @@ Formulario Blazor
        ↓
 Validación
        ↓
-POST
+ContactService
        ↓
-Backend .NET
+IEmailService
        ↓
-Servicio de correo
+MailKitEmailService
        ↓
-Email
+SMTP
+       ↓
+Email de destino
 ```
 
 El formulario deberá contemplar:
@@ -921,6 +923,62 @@ El formulario deberá contemplar:
 - mensajes de éxito/error
 - protección antispam
 - logging apropiado
+
+### Arquitectura del envío
+
+El componente Blazor no accederá directamente a MailKit, SMTP, `Infrastructure`, `DbContext` ni a ningún proveedor externo. El envío se realizará mediante las capas de aplicación e infraestructura:
+
+```text
+Portfolio.Web
+       ↓
+ContactService
+       ↓
+IEmailService (Portfolio.Application)
+       ↓
+MailKitEmailService (Portfolio.Infrastructure)
+       ↓
+Servidor SMTP
+```
+
+`IEmailService` será el contrato que permita sustituir MailKit por otro proveedor en el futuro sin modificar el formulario de contacto. El envío será asíncrono y el componente esperará el resultado para mostrar el estado correcto al usuario; no se utilizarán operaciones «fire-and-forget» para evitar perder errores de entrega.
+
+### Transporte de correo inicial
+
+Durante la primera implementación se utilizará **Gmail SMTP mediante MailKit y autenticación OAuth 2.0**. MailKit deberá referenciarse únicamente desde `Portfolio.Infrastructure`; `Portfolio.Application` contendrá los contratos y el caso de uso, y `Portfolio.Web` solo consumirá el servicio de aplicación.
+
+La autenticación utilizará un OAuth Client ID, Client Secret y Refresh Token de Google para obtener access tokens temporales. La configuración del transporte se realizará mediante opciones validadas y valores externos a los archivos versionados. No se utilizarán contraseñas SMTP ni se almacenarán en el repositorio client secrets, refresh tokens o access tokens; todos deberán proporcionarse mediante User Secrets o variables de entorno.
+
+El scope SMTP de Gmail será `https://mail.google.com/` y el refresh token se conservará únicamente como secreto de configuración. El proveedor renovará el access token cuando sea necesario y no registrará sus valores.
+
+La configuración local se almacenará con .NET User Secrets y la configuración de despliegue mediante variables de entorno o un almacén de secretos del entorno. No se debe abrir, leer ni copiar el contenido real de `secrets.json` al documentar o revisar esta configuración. Para referencia, estas son únicamente las claves esperadas y valores ficticios; no se deben usar literalmente:
+
+```json
+{
+  "ContactEmail": {
+    "UserName": "sender@example.invalid",
+    "FromAddress": "sender@example.invalid",
+    "OAuth": {
+      "ClientId": "example-client-id.apps.googleusercontent.com",
+      "ClientSecret": "EXAMPLE_CLIENT_SECRET",
+      "RefreshToken": "EXAMPLE_REFRESH_TOKEN"
+    }
+  }
+}
+```
+
+`Host`, `Port`, `ToAddress`, `UseStartTls`, `OAuth:TokenEndpoint` y `OAuth:Scope` pueden usar los valores no sensibles definidos en `appsettings.json`. `ClientSecret` y `RefreshToken` deben permanecer en User Secrets o en el almacén seguro del entorno; nunca en archivos versionados, logs o documentación.
+
+Como configuración funcional prevista:
+
+- el destinatario será configurable y actualmente se prevé `mi-cuenta-personal@gmail.com`;
+- el remitente no se fijará en el componente ni en el código del servicio;
+- el client ID, client secret, refresh token, host, puerto, seguridad y direcciones se suministrarán mediante configuración segura.
+
+### Migración futura al correo del QNAP
+
+Cuando el portfolio se aloje en el QNAP, se podrá sustituir Gmail SMTP y su autenticación OAuth 2.0 por el servidor de correo del propio QNAP sin modificar `ContactSection.razor`, `ContactService` ni el contrato `IEmailService`. La implementación futura podrá utilizar autenticación propia del QNAP o un adaptador SMTP específico. La configuración futura podrá utilizar `contacto@midominio.com` como remitente y mantener `mi-cuenta-personal@gmail.com` como destinatario, siempre que el dominio, DNS y servidor SMTP estén configurados correctamente.
+
+Esta migración deberá limitarse al transporte y a su configuración. No se creará un buzón de mensajes, historial, panel de administración ni persistencia de contactos como parte de esta funcionalidad.
 
 ---
 

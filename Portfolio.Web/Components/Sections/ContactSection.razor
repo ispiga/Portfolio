@@ -1,15 +1,84 @@
 @using Microsoft.Extensions.Localization
+@using Portfolio.Application.Contact
+@using Portfolio.Web.Components.Shared
 @inject IStringLocalizer<SharedResource> Localizer
+@inject IContactService ContactService
 
 <section id="contact" class="home-section" aria-labelledby="contact-title">
     <div class="section-heading"><p class="eyebrow">@Localizer["ContactEyebrow"]</p><h2 id="contact-title">@Localizer["ContactTitle"]</h2><p>@Localizer["ContactIntro"]</p></div>
-    <form class="surface contact-form" @onsubmit:preventDefault>
-        <p class="form-note">@Localizer["ContactPlaceholder"]</p>
+    <EditForm Model="@model" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" class="surface contact-form">
+        <LocalizedDataAnnotationsValidator />
+        <p class="form-note">@Localizer["ContactFormNote"]</p>
         <div class="form-grid">
-            <div class="form-field"><label for="contact-name">@Localizer["ContactName"]</label><input id="contact-name" name="name" type="text" autocomplete="name" /></div>
-            <div class="form-field"><label for="contact-email">@Localizer["ContactEmail"]</label><input id="contact-email" name="email" type="email" autocomplete="email" /></div>
+            <div class="form-field">
+                <label for="contact-name">@Localizer["ContactName"]</label>
+                <InputText id="contact-name" @bind-Value="model.Name" autocomplete="name" disabled="@isSubmitting" />
+                <ValidationMessage For="@(() => model.Name)" />
+            </div>
+            <div class="form-field">
+                <label for="contact-email">@Localizer["ContactEmail"]</label>
+                <InputText id="contact-email" @bind-Value="model.Email" type="email" autocomplete="email" disabled="@isSubmitting" />
+                <ValidationMessage For="@(() => model.Email)" />
+            </div>
         </div>
-        <div class="form-field"><label for="contact-message">@Localizer["ContactMessage"]</label><textarea id="contact-message" name="message" rows="5"></textarea></div>
-        <button class="button button--primary" type="submit">@Localizer["ContactSubmit"]</button>
-    </form>
+        <div class="form-field">
+            <label for="contact-message">@Localizer["ContactMessage"]</label>
+            <InputTextArea id="contact-message" @bind-Value="model.Message" rows="5" disabled="@isSubmitting" />
+            <ValidationMessage For="@(() => model.Message)" />
+        </div>
+        <div class="contact-form__honeypot" aria-hidden="true">
+            <label for="contact-company">@Localizer["ContactHoneypotLabel"]</label>
+            <InputText id="contact-company" @bind-Value="model.Honeypot" tabindex="-1" autocomplete="off" />
+        </div>
+        @if (!string.IsNullOrEmpty(statusMessage))
+        {
+            <p class="form-status" role="status" aria-live="polite">@statusMessage</p>
+        }
+        <button class="button button--primary" type="submit" disabled="@isSubmitting">
+            @(isSubmitting ? Localizer["ContactSending"] : Localizer["ContactSubmit"])
+        </button>
+    </EditForm>
 </section>
+
+@code {
+    private ContactRequest model = new();
+    private bool isSubmitting;
+    private string statusMessage = string.Empty;
+
+    private async Task HandleValidSubmit()
+    {
+        if (isSubmitting)
+        {
+            return;
+        }
+
+        isSubmitting = true;
+        statusMessage = Localizer["ContactSending"].Value;
+
+        try
+        {
+            var result = await ContactService.SubmitAsync(model);
+            statusMessage = result switch
+            {
+                ContactSubmissionResult.Sent => Localizer["ContactSuccess"].Value,
+                ContactSubmissionResult.Rejected => Localizer["ContactError"].Value,
+                ContactSubmissionResult.Invalid => Localizer["ContactValidationError"].Value,
+                _ => Localizer["ContactError"].Value
+            };
+
+            if (result == ContactSubmissionResult.Sent)
+            {
+                model = new ContactRequest();
+            }
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private void HandleInvalidSubmit(EditContext _)
+    {
+        statusMessage = Localizer["ContactValidationError"].Value;
+    }
+}

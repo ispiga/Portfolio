@@ -252,6 +252,8 @@ html[data-theme="dark"] {
 .form-field label { color: var(--color-text); font-weight: 700; }
 .form-field input, .form-field textarea { width: 100%; min-height: 2.875rem; padding: 0.625rem 0.75rem; border: 1px solid var(--color-border); border-radius: var(--radius-small); background-color: var(--color-background); color: var(--color-text); }
 .form-field textarea { resize: vertical; }
+.form-status { margin: 1rem 0; color: var(--color-primary); font-weight: 700; }
+.contact-form__honeypot { position: absolute; inset-inline-start: -9999px; width: 1px; height: 1px; overflow: hidden; }
 
 @media (max-width: 47.999rem) {
     .home-hero { grid-template-columns: 1fr; min-height: auto; }

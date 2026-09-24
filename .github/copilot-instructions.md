@@ -39,6 +39,19 @@
 - Do not duplicate theme or `localStorage` logic in C#.
 - Do not create a second theme API.
 
+## Contact email
+
+- Keep the public contact flow layered: `Portfolio.Web` ? application `ContactService` ? `IEmailService` in `Portfolio.Application` ? `MailKitEmailService` in `Portfolio.Infrastructure` ? SMTP.
+- Do not reference MailKit, SMTP APIs or infrastructure services directly from a Blazor component.
+- Use asynchronous email sending and await the result in the application flow; do not use fire-and-forget delivery for contact submissions.
+- The current transport is Gmail SMTP through MailKit with OAuth 2.0. Keep the email provider and authentication strategy replaceable so the application can later use the SMTP server hosted on QNAP without changing the form or `IEmailService` contract.
+- Keep sender, recipient, host, port, security mode, OAuth client values and refresh tokens in validated options supplied through User Secrets or environment variables; never use SMTP passwords, commit credentials or hard-code secrets in components or services.
+- Use Gmail's OAuth 2.0 SMTP scope `https://mail.google.com/`; cache access tokens only in memory and never log client secrets, refresh tokens or access tokens.
+- Never open, read, print or copy the contents of the user's `secrets.json` or User Secrets store. When documenting configuration, show only setting names and clearly fictitious placeholder values.
+- Keep OAuth `ClientSecret` and `RefreshToken` out of tracked files, logs, generated examples containing real values, and chat responses.
+- The current intended recipient is `mi-cuenta-personal@gmail.com`. The future QNAP configuration may use `contacto@midominio.com` as the sender; both addresses must remain configuration values.
+- Do not add contact persistence, inbox history or an administration panel unless the project specification explicitly changes.
+
 ## Implementation discipline
 
 - Prefer simple solutions over unnecessary abstractions or patterns.
