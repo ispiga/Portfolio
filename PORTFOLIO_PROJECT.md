@@ -202,10 +202,13 @@ Ejemplos:
 - imágenes de proyectos
 - imágenes de certificaciones
 - imágenes destacadas del blog
+- imágenes, diplomas y cartas de recomendación asociados a una experiencia laboral, cuando exista autorización para gestionarlos y publicarlos
 - documentos PDF
 - otros archivos multimedia
 
 La aplicación y la base de datos deben permanecer desacopladas del almacenamiento físico de estos archivos.
+
+Los documentos de experiencia pueden contener datos personales o información confidencial. No serán públicos por defecto: su publicación deberá ser explícita y contar con autorización. En la Fase 7 se determinará si una experiencia necesita varios adjuntos y cómo modelar sus metadatos y permisos; la entidad `Experience` actual no tiene campos de media.
 
 Esto facilitará el despliegue mediante Docker y evitará perder archivos al recrear un contenedor.
 
@@ -879,7 +882,7 @@ Actualmente la sección se limita a la publicación destacada de Home. No se han
 /blog/{slug}
 ```
 
-El contenido completo se almacena en `BlogPostTranslation.Content` y podrá administrarse desde el panel mediante TinyMCE en la Fase 7. La carga y gestión administrativa de imágenes también pertenece a esa fase.
+El contenido completo se almacena en `BlogPostTranslation.Content` y se administrará desde el panel mediante TinyMCE en la Fase 7. TinyMCE se limita al contenido enriquecido del blog: los demás módulos usan campos estructurados y localizados, no necesitan edición de HTML enriquecido. La carga y gestión administrativa de imágenes también pertenece a esa fase.
 
 ---
 
@@ -1285,7 +1288,7 @@ Los campos `Title`, `Slug`, `Excerpt` y `Content` se almacenan en `BlogPostTrans
 
 Los campos traducibles de proyectos se almacenan en `ProjectTranslations`, con la clave compuesta `ProjectId` + `LanguageCode` y los campos `Title`, `Summary`, `Description` y `Slug`. `PreviewImagePath`, `ImagePath` y `FeaturedImagePath` son datos comunes de sus entidades respectivas y no se duplican por idioma. Las rutas deben apuntar a archivos concretos gestionados fuera de SQL Server; no se almacenan imágenes binarias ni rutas de carpetas. No se crearán columnas como `TitleEn` ni tablas duplicadas por idioma.
 
-La Fase 6 ya conecta con SQL Server las secciones públicas de experiencia, proyectos, certificaciones y blog mediante servicios de consulta, DTOs, `AsNoTracking()`, consultas asíncronas y selección localizada con fallback a `es-ES`. Esta fase no implementa todavía CRUD, Identity, administración, carga de imágenes, correo ni envío real de formularios. El modelo se ampliará mediante nuevas migraciones cuando cada módulo tenga necesidades concretas.
+La Fase 6 está completada. Conecta con SQL Server las secciones públicas de experiencia, proyectos, certificaciones y blog mediante servicios de consulta, DTOs, `AsNoTracking()`, consultas asíncronas y selección localizada con fallback a `es-ES`. También implementa el formulario de contacto con validación server-side, honeypot, localización, logging seguro y envío asíncrono por Gmail SMTP con MailKit y OAuth 2.0; el envío real se probó correctamente. No incluye CRUD, Identity, administración ni gestión administrativa de archivos, que corresponden a la Fase 7. El modelo se ampliará mediante nuevas migraciones solo cuando cada módulo revele necesidades concretas.
 
 ---
 
@@ -1399,7 +1402,7 @@ FASE 6 — Funcionalidades
 ├── Blog
 └── Contacto
 
-La Fase 6 se ejecutará de forma incremental por secciones, no como una implementación monolítica de todos los módulos. El orden será orientativo y cada sección se tratará como un ciclo independiente:
+La Fase 6 se desarrolló de forma incremental por secciones, no como una implementación monolítica de todos los módulos. El ciclo seguido fue:
 
 ```text
 Seleccionar una sección
@@ -1425,7 +1428,7 @@ Validar de nuevo la sección
 Continuar con la siguiente sección
 ```
 
-Después de cada sección implementada se realizará una pausa explícita para que el resultado pueda revisarse visual y funcionalmente. Durante esa pausa podrán ajustarse los campos, las traducciones, las reglas de publicación, la experiencia responsive o la composición del componente antes de reanudar el desarrollo. No se continuará con la siguiente sección hasta cerrar la revisión de la sección actual.
+Después de cada sección se realizó una pausa explícita para revisar el resultado visual y funcionalmente. La Fase 6 queda cerrada; la misma práctica de implementación incremental y revisión se mantendrá en la Fase 7.
 │
 ▼
 FASE 7 — Administración
@@ -1461,6 +1464,24 @@ FASE 9 — Docker/QNAP
 ```
 
 El orden podrá modificarse cuando una decisión técnica lo justifique, pero no se debe adelantar trabajo innecesariamente.
+
+### Entregas incrementales de la Fase 7
+
+La Fase 7 se implementará por entregas funcionales, con pruebas y revisión antes de continuar:
+
+1. **Fundamentos administrativos:** ASP.NET Core Identity, login/logout, autorización de `/admin`, creación segura del único administrador y estructura del Dashboard. No habrá registro público. TinyMCE no forma parte de esta entrega.
+2. **Experiencia:** CRUD, edición de `es-ES` y `en-US`, aviso visible de la traducción que falte y orden de presentación. Se definirá la gestión de varios adjuntos por experiencia, como diplomas o cartas de recomendación. La entidad `Experience` actual no tiene media; el modelo se ampliará solo después de acordar metadatos, cantidad y reglas de acceso. Los documentos potencialmente sensibles serán privados por defecto y solo se expondrán con autorización explícita.
+3. **Proyectos:** CRUD, edición localizada, aviso de traducciones ausentes, orden/destacado y gestión de las imágenes asociadas.
+4. **Certificaciones:** CRUD, edición localizada, aviso de traducciones ausentes, fechas, credenciales, orden e imágenes o documentos acordados.
+5. **Blog:** listado de artículos con acción para crear, editar o eliminar. La acción «Editar» seleccionará el artículo por su identificador y cargará ese contenido en el editor; no hace falta un desplegable separado para escogerlo. La edición localizada se realizará desde el mismo formulario mediante pestañas o controles de idioma. TinyMCE 8 se usará únicamente para `BlogPostTranslation.Content`, por ser el campo de texto enriquecido; experiencia, proyectos y certificaciones usarán campos estructurados y controles de texto normales. El formulario incluirá un estado editorial explícito y permitirá guardar cambios aunque el artículo tenga todos sus campos rellenos pero todavía se encuentre en redacción.
+
+El almacenamiento de archivos se implementará como infraestructura reutilizable al aparecer la primera necesidad y se aprovechará en los módulos siguientes. Será configurable para desarrollo y QNAP, mantendrá los binarios fuera de SQL Server y aplicará validaciones de tipo/tamaño, nombres seguros y reglas explícitas de publicación/acceso.
+
+### Avisos de traducción y estado editorial del blog
+
+El estado de traducción indica si existe y está completa la traducción de cada idioma. Si falta, el panel mostrará un aviso específico, por ejemplo, «Falta la traducción en English». Es un aviso de edición y no el estado editorial del contenido.
+
+El estado editorial corresponde al artículo completo del blog: **Incompleto/Borrador**, **Listo para publicar** o **Publicado**. No se derivará automáticamente de que los campos obligatorios estén rellenos, porque el autor puede querer seguir ampliando un artículo aparentemente completo. El modelo actual ya dispone de `IsPublished` y `PublishedOn`, que representan la publicación efectiva; durante la Fase 7 se diseñará una representación explícita del estado editorial, preferiblemente un enum o equivalente, y se decidirá si sustituye a `IsPublished` mediante una migración o convive con él por compatibilidad. La advertencia de idioma ausente permanecerá separada y no se confundirá con estos estados.
 
 ---
 
@@ -1548,29 +1569,26 @@ Antes de empezar la implementación visual, las decisiones principales están ce
 - [x] Logo propio pendiente de diseño
 - [x] Home pública con estructura visual inicial
 - [x] Componentes reutilizables para las secciones de la Home
-- [x] Formulario de contacto visual sin envío real
+- [x] Formulario de contacto funcional con envío real probado mediante Gmail SMTP y OAuth 2.0
 - [x] Estados vacíos localizados para contenido aún no disponible
 - [x] Composición tecnológica provisional sin recursos externos
 - [x] Desarrollo incremental mediante Git
 - [x] Entidades iniciales de persistencia para proyectos, experiencia, certificaciones y artículos
 - [x] `PortfolioDbContext` y configuraciones EF Core en Infrastructure
 - [x] Migración inicial aplicada en la base de datos local de desarrollo
+- [x] Fase 6 — Funcionalidades completada, incluido el envío real del formulario de contacto
 
 ---
 
 # 30. Próximo paso
 
-El siguiente objetivo es preparar la **Fase 6 — Funcionalidades**, manteniendo la Home visual sin introducir contenido inventado:
+La **Fase 6 — Funcionalidades** está finalizada, incluida la prueba real satisfactoria del formulario de contacto mediante Gmail SMTP y OAuth 2.0. No quedan tareas de código de esa fase pendientes.
 
-```text
-feat: connect portfolio content
-```
+El siguiente objetivo es comenzar la **Fase 7 — Administración** de forma incremental, empezando por Identity, login/logout, autorización y la estructura del Dashboard. Los módulos de contenido se abordarán después, uno por entrega, como se detalla en el plan de Fase 7.
 
-La Fase 5 ha dejado preparada y aplicada la persistencia inicial. En la Fase 6 se podrán implementar progresivamente las consultas y la conexión de las secciones públicas con el contenido, sin adelantar todavía la administración ni el CRUD.
+La administración permitirá editar `Español` y `English` desde el mismo formulario mediante pestañas o controles equivalentes; la cultura seleccionada en la Navbar pública no determinará el idioma de edición del panel. El panel mostrará una advertencia cuando falte una traducción, sin confundir ese aviso con el estado editorial del blog.
 
-La administración futura gestionará las traducciones desde el mismo formulario mediante pestañas o botones de idioma, inicialmente `Español` y `English`. El idioma seleccionado en la Navbar pública no determinará el idioma de edición del panel. Cada traducción podrá tener un estado independiente, por ejemplo `Completo`, `Pendiente` o `Publicado`, permitiendo publicar un idioma aunque el otro todavía esté pendiente.
-
-Al guardar un contenido se actualizarán la entidad principal y sus traducciones dentro de una única transacción. La eliminación de la entidad principal deberá eliminar sus traducciones relacionadas de forma controlada. La validación de traducciones obligatorias, el fallback a `es-ES` y la publicación independiente se concretarán al diseñar el panel administrativo.
+Al guardar un contenido se actualizarán la entidad principal y sus traducciones dentro de una única transacción. La eliminación de la entidad principal deberá eliminar sus traducciones relacionadas de forma controlada. Se mantendrán la validación de los campos requeridos y el fallback público a `es-ES`; el estado editorial del blog se elegirá explícitamente en el formulario y no se sustituirá por una inferencia basada en campos rellenos. El contenido se seleccionará desde el listado administrativo y la edición abrirá el registro seleccionado, con sus traducciones en el mismo formulario.
 
 > **No comenzar creando todas las entidades de base de datos.**
 >

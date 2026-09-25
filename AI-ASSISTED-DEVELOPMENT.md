@@ -2880,3 +2880,261 @@ Al finalizar:
 - Confirma que administración, CRUD, Identity, TinyMCE y contacto persistente no se han implementado.
 - No crees ningún commit automáticamente.
 - Detén el trabajo para revisión antes de continuar con la siguiente sección de la Fase 6.
+
+
+# ****************************************
+# PROMPT PARA REALIZAR LA FASE 6 - PARTE 7
+# ****************************************
+
+# FASE 6 — Implementar contacto funcional
+
+Quiero continuar la FASE 6 — Funcionalidades del proyecto Portfolio.
+
+Las secciones públicas de experiencia, proyectos, certificaciones y blog ya están implementadas, revisadas y aprobadas. Implementa ahora únicamente la funcionalidad de contacto público definida en PORTFOLIO_PROJECT.md.
+
+## Contexto técnico
+
+- .NET 10.
+- Blazor Web App con Razor Components.
+- Interactive Server únicamente cuando aporte interactividad.
+- Arquitectura separada en:
+  - Portfolio.Domain
+  - Portfolio.Application
+  - Portfolio.Infrastructure
+  - Portfolio.Web
+  - Portfolio.Tests
+- La parte pública utiliza Blazor, Razor Components, Tailwind CSS local y `wwwroot/css/app.css`.
+- Todos los textos visibles deben utilizar recursos RESX compartidos.
+- Culturas soportadas:
+  - es-ES
+  - en-US
+- es-ES es la cultura predeterminada.
+- La cultura se persiste mediante cookie de ASP.NET Core.
+- No se debe modificar funcionalmente la Navbar, selector de idioma ni selector de tema.
+- No se debe introducir Bootstrap, fuentes externas, una SPA pura ni duplicación de páginas por idioma.
+- Se debe mantener HTML semántico, responsive, accesibilidad, navegación mediante teclado, focus-visible, contraste suficiente y prefers-reduced-motion.
+
+## Revisión obligatoria antes de editar
+
+Inspecciona primero:
+
+1. `Portfolio.Web/Components/Sections/ContactSection.razor`.
+2. El layout y el modelo de renderizado interactivo actual.
+3. `Program.cs`.
+4. `appsettings.json` y `appsettings.Development.json`.
+5. Los proyectos Application e Infrastructure.
+6. Los patrones de servicios y contratos existentes.
+7. Los recursos:
+   - `SharedResource.resx`
+   - `SharedResource.es.resx`
+   - `SharedResource.en.resx`
+8. `Portfolio.Tests`.
+9. Estado actual de Git.
+
+No edites ningún archivo hasta haber inspeccionado el alcance. Si el cambio afecta a varias capas, presenta primero un plan.
+
+## Alcance funcional
+
+Implementa únicamente el formulario público de contacto existente.
+
+El formulario debe incluir como mínimo:
+
+- Nombre.
+- Email.
+- Mensaje.
+- Validación obligatoria.
+- Mensaje de éxito localizado.
+- Mensaje de error localizado.
+- Estado de envío.
+- Protección básica contra envíos automatizados.
+- Logging apropiado sin registrar el contenido completo del mensaje ni datos sensibles.
+
+El formulario debe mantener el diseño visual actual de `ContactSection.razor`.
+
+## Persistencia y correo
+
+No crees una entidad de contacto ni una migración salvo que el código existente demuestre que la persistencia es necesaria.
+
+El comportamiento esperado es:
+Formulario Blazor ↓ Validación ↓ Servicio de aplicación ↓ Servicio de correo ↓ Email de destino configurado
+
+
+No se debe implementar un buzón, historial de mensajes ni panel de administración en esta tarea.
+
+Antes de elegir un proveedor de correo concreto:
+
+- Revisa si el proyecto ya tiene una decisión, dependencia o configuración existente.
+- No añadas una dependencia externa sin justificarla.
+- No introduzcas credenciales en el repositorio.
+- Utiliza configuración segura mediante opciones, User Secrets o variables de entorno.
+- Si no existe ninguna decisión sobre el transporte de correo, detén la implementación antes de elegir SMTP, SendGrid, MailKit u otro proveedor y solicita esa decisión.
+
+Si el transporte ya está decidido, implementa:
+
+- Contrato en `Portfolio.Application`.
+- Modelo de solicitud.
+- Servicio de aplicación.
+- Implementación concreta en `Portfolio.Infrastructure`.
+- Registro mediante inyección de dependencias.
+- Configuración segura y validada.
+
+El email del destinatario y la configuración del transporte no deben estar hardcodeados.
+
+## Protección antispam
+
+Implementa únicamente una protección básica y coherente con el alcance actual, por ejemplo:
+
+- Campo honeypot no visible para usuarios.
+- Validación server-side.
+- Limitación básica de solicitudes si existe infraestructura apropiada.
+
+No introduzcas CAPTCHA ni servicios externos salvo que ya estén contemplados por el proyecto.
+
+La validación debe ejecutarse siempre en servidor, aunque exista validación en el componente Blazor.
+
+## Localización
+
+Añade únicamente los recursos necesarios en:
+
+- `SharedResource.resx`
+- `SharedResource.es.resx`
+- `SharedResource.en.resx`
+
+Como mínimo revisa:
+
+- Etiqueta de nombre.
+- Etiqueta de email.
+- Etiqueta de mensaje.
+- Texto del botón de envío.
+- Mensaje de campo obligatorio.
+- Mensaje de email inválido.
+- Mensaje de envío en progreso.
+- Mensaje de envío correcto.
+- Mensaje de error.
+- Texto del honeypot si fuese necesario para accesibilidad, sin hacerlo visible.
+
+No escribas textos visibles directamente en el componente.
+
+## Componente Blazor
+
+Conecta la funcionalidad con el `ContactSection.razor` existente.
+
+El componente debe:
+
+- Utilizar `EditForm`.
+- Utilizar validación con `DataAnnotationsValidator` o el patrón ya existente.
+- Evitar doble envío mientras se procesa la solicitud.
+- Mostrar estado de progreso.
+- Mostrar resultado localizado.
+- Mantener navegación por teclado.
+- Utilizar labels asociados correctamente.
+- Mantener tamaños táctiles razonables.
+- Utilizar `aria-live` solo donde sea necesario para comunicar el resultado.
+- No perder el foco de forma inesperada.
+- No acceder directamente a servicios SMTP ni a Infrastructure desde el componente.
+- No acceder directamente al DbContext.
+
+## Pruebas
+
+Utiliza la infraestructura existente de `Portfolio.Tests`.
+
+Añade pruebas para:
+
+1. Solicitud válida.
+2. Nombre obligatorio.
+3. Email obligatorio.
+4. Email con formato inválido.
+5. Mensaje obligatorio.
+6. Longitudes máximas.
+7. Rechazo del honeypot activado.
+8. No envío cuando la validación falla.
+9. Envío correcto mediante el servicio de aplicación.
+10. Gestión de error del servicio de correo.
+11. No filtración del contenido completo del mensaje en los logs.
+12. Configuración inválida del correo.
+13. Que el componente no accede directamente al DbContext.
+14. Que no se modifica el comportamiento de proyectos.
+15. Que no se modifica el comportamiento de certificaciones.
+16. Que no se modifica el comportamiento de experiencia.
+17. Que no se modifica el comportamiento del blog.
+18. Que no se modifica el selector de idioma ni el selector de tema.
+
+Si no existe infraestructura de pruebas para el transporte de correo, utiliza una implementación fake o mock sin añadir complejidad innecesaria.
+
+## Migraciones
+
+No generes migraciones si el contacto no necesita persistencia.
+
+Si durante la inspección se demuestra que el modelo actual exige persistir mensajes:
+
+- Explica primero el motivo.
+- Diseña la entidad y sus restricciones.
+- Crea una migración segura.
+- Revisa manualmente la migración.
+- Aplícala únicamente a la base de datos local `PortfolioDb`.
+- No modifiques migraciones anteriores.
+
+## Validación final
+
+Ejecuta:
+dotnet build Portfolio.sln
+
+
+Ejecuta todas las pruebas de `Portfolio.Tests`.
+
+Ejecuta:
+git diff --check git status
+
+
+Valida, si es posible:
+
+- Formulario vacío.
+- Validación de campos.
+- Email inválido.
+- Estado de envío.
+- Mensaje de éxito.
+- Error controlado del correo.
+- Honeypot.
+- Vista de escritorio.
+- Vista móvil.
+- Navegación mediante teclado.
+- Cambio de idioma.
+- Textos en es-ES.
+- Textos en en-US.
+- Selector de tema.
+
+## Restricciones
+
+No implementes todavía:
+
+- Panel de administración.
+- CRUD.
+- Identity.
+- Gestión de usuarios.
+- Bandeja de mensajes.
+- Persistencia de contactos salvo necesidad demostrada.
+- TinyMCE.
+- Gestión de imágenes.
+- Categorías o etiquetas.
+- Comentarios.
+- Nuevas funcionalidades de proyectos.
+- Nuevas funcionalidades de certificaciones.
+- Nuevas funcionalidades de experiencia.
+- Nuevas funcionalidades del blog.
+- Cambios funcionales en Navbar, selector de idioma o selector de tema.
+
+No crees ningún commit automáticamente.
+
+Trabaja incrementalmente:
+
+1. Inspecciona el contacto actual.
+2. Determina el transporte de correo disponible.
+3. Presenta un plan.
+4. Implementa contrato y modelo.
+5. Implementa servicio.
+6. Conecta el componente Blazor.
+7. Añade localización.
+8. Añade pruebas.
+9. Ejecuta compilación y pruebas.
+10. Revisa Git.
+11. Detén el desarrollo para revisión.
