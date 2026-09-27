@@ -8,6 +8,7 @@
     <ResourcePreloader />
     <script src="@Assets["js/theme.js"]"></script>
     <link rel="stylesheet" href="@Assets["css/tailwind.css"]" />
+    <link rel="stylesheet" href="_content/MudBlazor/MudBlazor.min.css" />
     <link rel="stylesheet" href="@Assets["css/app.css"]" />
     <link rel="stylesheet" href="@Assets["Portfolio.Web.styles.css"]" />
     <ImportMap />
@@ -16,8 +17,13 @@
 </head>
 
 <body>
+    <MudThemeProvider />
+    <MudPopoverProvider />
+    <MudDialogProvider />
+    <MudSnackbarProvider />
     <Routes />
     <ReconnectModal />
+    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
     <script src="@Assets["_framework/blazor.web.js"]"></script>
 </body>
 

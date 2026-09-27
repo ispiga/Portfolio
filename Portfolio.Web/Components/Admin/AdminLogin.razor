@@ -1,0 +1,84 @@
+@page "/admin/login"
+@attribute [AllowAnonymous]
+@layout AdminLoginLayout
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> Localizer
+
+<PageTitle>@Localizer["AdminLoginTitle"]</PageTitle>
+
+<main class="admin-login" id="main-content">
+    <section class="admin-login__card surface" aria-labelledby="admin-login-title">
+        <a class="admin-login__brand" href="/">@Localizer["PortfolioName"]</a>
+        <h1 id="admin-login-title">@Localizer["AdminLoginTitle"]</h1>
+        <p>@Localizer["AdminLoginDescription"]</p>
+
+        @if (Error == "invalid")
+        {
+            <p class="admin-message admin-message--error" role="alert">@Localizer["AdminLoginFailed"]</p>
+        }
+        else if (Error == "validation")
+        {
+            <p class="admin-message admin-message--error" role="alert">@Localizer["AdminValidationSummary"]</p>
+        }
+        else if (LoggedOut == "true")
+        {
+            <p class="admin-message" role="status">@Localizer["AdminLoggedOut"]</p>
+        }
+
+        <form action="/admin/login/submit" method="post" class="admin-login__form">
+            <AntiforgeryToken />
+            <input type="hidden" name="ReturnUrl" value="@ReturnUrl" />
+
+            <div class="admin-field">
+                <label for="admin-email">@Localizer["AdminEmailLabel"]</label>
+                <input id="admin-email" name="Email" type="email" autocomplete="username" required maxlength="256" aria-describedby="@(EmailError is null ? null : "admin-email-error")" />
+                @if (EmailError == "required")
+                {
+                    <span id="admin-email-error" class="admin-field__error">@Localizer["AdminEmailRequired"]</span>
+                }
+                else if (EmailError == "invalid")
+                {
+                    <span id="admin-email-error" class="admin-field__error">@Localizer["AdminEmailInvalid"]</span>
+                }
+            </div>
+
+            <div class="admin-field">
+                <label for="admin-password">@Localizer["AdminPasswordLabel"]</label>
+                <div class="admin-password-control">
+                    <input id="admin-password" name="Password" type="@(isPasswordVisible ? "text" : "password")" autocomplete="current-password" required aria-describedby="@(PasswordError is null ? null : "admin-password-error")" />
+                    <button class="admin-password-control__toggle" type="button" aria-label="@Localizer[isPasswordVisible ? "HidePassword" : "ShowPassword"]" aria-pressed="@isPasswordVisible" @onclick="TogglePasswordVisibility">
+                        <span aria-hidden="true">@(isPasswordVisible ? "◉" : "◎")</span>
+                    </button>
+                </div>
+                @if (PasswordError == "required")
+                {
+                    <span id="admin-password-error" class="admin-field__error">@Localizer["AdminPasswordRequired"]</span>
+                }
+            </div>
+
+            <button class="button button--primary admin-login__submit" type="submit">@Localizer["AdminLoginButton"]</button>
+        </form>
+    </section>
+</main>
+
+@code {
+    [SupplyParameterFromQuery(Name = "error")]
+    public string? Error { get; set; }
+
+    [SupplyParameterFromQuery(Name = "emailError")]
+    public string? EmailError { get; set; }
+
+    [SupplyParameterFromQuery(Name = "passwordError")]
+    public string? PasswordError { get; set; }
+
+    [SupplyParameterFromQuery(Name = "returnUrl")]
+    public string? ReturnUrl { get; set; }
+
+    [SupplyParameterFromQuery(Name = "loggedOut")]
+    public string? LoggedOut { get; set; }
+
+    private bool isPasswordVisible;
+
+    private void TogglePasswordVisibility() => isPasswordVisible = !isPasswordVisible;
+}

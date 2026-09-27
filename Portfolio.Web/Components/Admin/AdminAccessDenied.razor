@@ -1,0 +1,16 @@
+@page "/admin/access-denied"
+@attribute [AllowAnonymous]
+@layout AdminLoginLayout
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> Localizer
+
+<PageTitle>@Localizer["AdminAccessDeniedTitle"]</PageTitle>
+
+<main class="admin-login" id="main-content">
+    <section class="admin-login__card surface" aria-labelledby="admin-access-denied-title">
+        <h1 id="admin-access-denied-title">@Localizer["AdminAccessDeniedTitle"]</h1>
+        <p>@Localizer["AdminAccessDeniedMessage"]</p>
+        <a class="button button--primary" href="/">@Localizer["AdminReturnHome"]</a>
+    </section>
+</main>

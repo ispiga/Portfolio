@@ -94,4 +94,46 @@
   <data name="ContactEmailMaxLength" xml:space="preserve"><value>The email cannot exceed 254 characters.</value></data>
   <data name="ContactMessageMaxLength" xml:space="preserve"><value>The message cannot exceed 4000 characters.</value></data>
   <data name="ContactHoneypotLabel" xml:space="preserve"><value>Company</value></data>
+  <data name="AdminAreaLabel" xml:space="preserve"><value>Administration</value></data>
+  <data name="AdminNavigation" xml:space="preserve"><value>Administrative navigation</value></data>
+  <data name="AdminDashboard" xml:space="preserve"><value>Dashboard</value></data>
+  <data name="AdminDashboardTitle" xml:space="preserve"><value>Administration dashboard</value></data>
+  <data name="AdminLoginTitle" xml:space="preserve"><value>Administrator sign in</value></data>
+  <data name="AdminLoginDescription" xml:space="preserve"><value>Sign in with the authorized administrator account.</value></data>
+  <data name="AdminEmailLabel" xml:space="preserve"><value>Email address</value></data>
+  <data name="AdminEmailRequired" xml:space="preserve"><value>Enter your email address.</value></data>
+  <data name="AdminEmailInvalid" xml:space="preserve"><value>Enter a valid email address.</value></data>
+  <data name="AdminPasswordLabel" xml:space="preserve"><value>Password</value></data>
+  <data name="AdminPasswordRequired" xml:space="preserve"><value>Enter your password.</value></data>
+	<data name="ShowPassword" xml:space="preserve"><value>Show password</value></data>
+  <data name="HidePassword" xml:space="preserve"><value>Hide password</value></data>
+  <data name="AdminLoginButton" xml:space="preserve"><value>Sign in</value></data>
+  <data name="AdminLoginFailed" xml:space="preserve"><value>Sign-in failed. Check your credentials and try again.</value></data>
+  <data name="AdminValidationSummary" xml:space="preserve"><value>Review the indicated fields before continuing.</value></data>
+  <data name="AdminLoggedOut" xml:space="preserve"><value>You have signed out successfully.</value></data>
+  <data name="AdminLogout" xml:space="preserve"><value>Sign out</value></data>
+  <data name="AdminWelcome" xml:space="preserve"><value>Signed in as {0}.</value></data>
+  <data name="AdminIdentityTitle" xml:space="preserve"><value>Identity</value></data>
+  <data name="AdminIdentityLabel" xml:space="preserve"><value>Authenticated user</value></data>
+  <data name="AdminRoleLabel" xml:space="preserve"><value>Administrator</value></data>
+  <data name="AdminActionsTitle" xml:space="preserve"><value>Content areas</value></data>
+  <data name="AdminExperiences" xml:space="preserve"><value>Experience</value></data>
+  <data name="AdminExperiencesDescription" xml:space="preserve"><value>Manage professional experience.</value></data>
+  <data name="AdminProjects" xml:space="preserve"><value>Projects</value></data>
+  <data name="AdminProjectsDescription" xml:space="preserve"><value>Manage portfolio projects.</value></data>
+  <data name="AdminCertifications" xml:space="preserve"><value>Certifications</value></data>
+  <data name="AdminCertificationsDescription" xml:space="preserve"><value>Manage certifications and credentials.</value></data>
+  <data name="AdminBlog" xml:space="preserve"><value>Blog</value></data>
+  <data name="AdminBlogDescription" xml:space="preserve"><value>Manage articles and posts.</value></data>
+  <data name="AdminModuleNotAvailable" xml:space="preserve"><value>Planned for a future delivery</value></data>
+  <data name="AdminOpenModule" xml:space="preserve"><value>Coming soon</value></data>
+  <data name="AdminContentSummaryTitle" xml:space="preserve"><value>Content status</value></data>
+  <data name="AdminContentSummary" xml:space="preserve"><value>Authentication and the administration structure are ready. Content management is not enabled yet.</value></data>
+  <data name="AdminPublicSiteAction" xml:space="preserve"><value>View public site</value></data>
+  <data name="AdminAccessDeniedTitle" xml:space="preserve"><value>Access denied</value></data>
+  <data name="AdminAccessDeniedMessage" xml:space="preserve"><value>Your account is not authorized to access this area.</value></data>
+  <data name="AdminLoginRequiredTitle" xml:space="preserve"><value>Sign in to continue</value></data>
+  <data name="AdminLoginRequiredMessage" xml:space="preserve"><value>This area requires an authorized administrator account.</value></data>
+  <data name="AdminLoginLink" xml:space="preserve"><value>Go to administrator sign in</value></data>
+  <data name="AdminReturnHome" xml:space="preserve"><value>Return to the public site</value></data>
 </root>

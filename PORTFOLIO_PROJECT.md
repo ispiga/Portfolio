@@ -1477,6 +1477,19 @@ La Fase 7 se implementará por entregas funcionales, con pruebas y revisión ant
 
 El almacenamiento de archivos se implementará como infraestructura reutilizable al aparecer la primera necesidad y se aprovechará en los módulos siguientes. Será configurable para desarrollo y QNAP, mantendrá los binarios fuera de SQL Server y aplicará validaciones de tipo/tamaño, nombres seguros y reglas explícitas de publicación/acceso.
 
+### Entrega 1 implementada — Fundamentos administrativos
+
+- `PortfolioDbContext` deriva de `IdentityDbContext<PortfolioUser>` y conserva la persistencia en `Portfolio.Infrastructure`.
+- ASP.NET Core Identity autentica mediante cookie `Portfolio.Admin.Authentication`, `HttpOnly`, `SameSite=Lax` y `Secure`, con expiración fija de 30 minutos y sin renovación deslizante. La cookie incorpora una marca de expiración validada también en las solicitudes HTTP; los circuitos Blazor revalidan cada minuto la expiración y el security stamp.
+- La política `AdministratorOnly` exige el rol `Administrator`. No existe registro público.
+- Rutas implementadas: `GET /admin/login`, `POST /admin/login/submit`, `POST /admin/logout`, `GET /admin/access-denied` y `GET /admin` (Dashboard). El POST de login usa una ruta separada para evitar colisiones con el endpoint Razor Component; login y logout validan antiforgery, y logout requiere la política administrativa. El login permite mostrar u ocultar la contraseña.
+- El Dashboard muestra la identidad autenticada, navegación separada, resumen inicial de contenido y accesos deshabilitados para experiencias, proyectos, certificaciones y blog. No incluye CRUD.
+- El login y el Dashboard utilizan recursos compartidos para `es-ES` y `en-US`. Los navbars público y administrativo comparten selectores compactos de tema e idioma; las opciones incluyen iconos, con etiquetas accesibles no visibles. El tema administrativo utiliza los tokens semánticos compartidos también en los paneles MudBlazor.
+- Si hay una sesión administrativa, el navbar público muestra únicamente la acción para cerrar sesión, sin mostrar el correo. El cierre de sesión está al final y alineado a la derecha en ambos navbars.
+- `Portfolio.AdminProvisioning` aprovisiona de forma puntual el único administrador usando `UserManager`; pide y confirma la contraseña de forma oculta, y la almacena Identity como hash. Exige que la migración esté aplicada. En desarrollo comparte el `UserSecretsId` de Web; en despliegue acepta la cadena de conexión mediante configuración de entorno.
+- Migración generada: `20260925120731_AddAdministrativeIdentity` (`AddAdministrativeIdentity`), aplicada en la base de datos de desarrollo; debe aplicarse en cada nueva base de datos destino antes del aprovisionamiento.
+- Quedan para futuras entregas la gestión de usuarios, recuperación de contraseña, MFA y CRUD de contenidos. Los enlaces a los módulos de contenido permanecen deshabilitados.
+
 ### Avisos de traducción y estado editorial del blog
 
 El estado de traducción indica si existe y está completa la traducción de cada idioma. Si falta, el panel mostrará un aviso específico, por ejemplo, «Falta la traducción en English». Es un aviso de edición y no el estado editorial del contenido.
@@ -1577,6 +1590,7 @@ Antes de empezar la implementación visual, las decisiones principales están ce
 - [x] `PortfolioDbContext` y configuraciones EF Core en Infrastructure
 - [x] Migración inicial aplicada en la base de datos local de desarrollo
 - [x] Fase 6 — Funcionalidades completada, incluido el envío real del formulario de contacto
+- [x] Fase 7, entrega 1 — Identity, autorización administrativa, aprovisionamiento y Dashboard inicial
 
 ---
 
@@ -1584,7 +1598,7 @@ Antes de empezar la implementación visual, las decisiones principales están ce
 
 La **Fase 6 — Funcionalidades** está finalizada, incluida la prueba real satisfactoria del formulario de contacto mediante Gmail SMTP y OAuth 2.0. No quedan tareas de código de esa fase pendientes.
 
-El siguiente objetivo es comenzar la **Fase 7 — Administración** de forma incremental, empezando por Identity, login/logout, autorización y la estructura del Dashboard. Los módulos de contenido se abordarán después, uno por entrega, como se detalla en el plan de Fase 7.
+La primera entrega de la **Fase 7 — Administración** está finalizada: Identity, login/logout, autorización administrativa, aprovisionamiento seguro y Dashboard inicial. El siguiente objetivo es la entrega de **Experiencias**, siguiendo el alcance incremental y las decisiones sobre adjuntos privados descritas en el plan de Fase 7.
 
 La administración permitirá editar `Español` y `English` desde el mismo formulario mediante pestañas o controles equivalentes; la cultura seleccionada en la Navbar pública no determinará el idioma de edición del panel. El panel mostrará una advertencia cuando falte una traducción, sin confundir ese aviso con el estado editorial del blog.
 

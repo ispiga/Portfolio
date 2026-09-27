@@ -80,4 +80,46 @@
   <data name="Language" xml:space="preserve"><value>Idioma</value></data>
   <data name="LanguageSpanish" xml:space="preserve"><value>Español</value></data>
   <data name="LanguageEnglish" xml:space="preserve"><value>English</value></data>
+  <data name="AdminAreaLabel" xml:space="preserve"><value>Administración</value></data>
+  <data name="AdminNavigation" xml:space="preserve"><value>Navegación administrativa</value></data>
+  <data name="AdminDashboard" xml:space="preserve"><value>Dashboard</value></data>
+  <data name="AdminDashboardTitle" xml:space="preserve"><value>Panel de administración</value></data>
+  <data name="AdminLoginTitle" xml:space="preserve"><value>Acceso administrativo</value></data>
+  <data name="AdminLoginDescription" xml:space="preserve"><value>Inicia sesión con la cuenta administrativa.</value></data>
+  <data name="AdminEmailLabel" xml:space="preserve"><value>Correo electrónico</value></data>
+  <data name="AdminEmailRequired" xml:space="preserve"><value>Introduce el correo electrónico.</value></data>
+  <data name="AdminEmailInvalid" xml:space="preserve"><value>Introduce un correo electrónico válido.</value></data>
+  <data name="AdminPasswordLabel" xml:space="preserve"><value>Contraseña</value></data>
+  <data name="AdminPasswordRequired" xml:space="preserve"><value>Introduce la contraseña.</value></data>
+	<data name="ShowPassword" xml:space="preserve"><value>Mostrar contraseña</value></data>
+  <data name="HidePassword" xml:space="preserve"><value>Ocultar contraseña</value></data>
+  <data name="AdminLoginButton" xml:space="preserve"><value>Iniciar sesión</value></data>
+  <data name="AdminLoginFailed" xml:space="preserve"><value>No se pudo iniciar sesión. Comprueba las credenciales e inténtalo de nuevo.</value></data>
+  <data name="AdminValidationSummary" xml:space="preserve"><value>Revisa los campos indicados antes de continuar.</value></data>
+  <data name="AdminLoggedOut" xml:space="preserve"><value>La sesión se ha cerrado correctamente.</value></data>
+  <data name="AdminLogout" xml:space="preserve"><value>Cerrar sesión</value></data>
+  <data name="AdminWelcome" xml:space="preserve"><value>Sesión iniciada como {0}.</value></data>
+  <data name="AdminIdentityTitle" xml:space="preserve"><value>Identidad</value></data>
+  <data name="AdminIdentityLabel" xml:space="preserve"><value>Usuario autenticado</value></data>
+  <data name="AdminRoleLabel" xml:space="preserve"><value>Administrador</value></data>
+  <data name="AdminActionsTitle" xml:space="preserve"><value>Áreas de contenido</value></data>
+  <data name="AdminExperiences" xml:space="preserve"><value>Experiencias</value></data>
+  <data name="AdminExperiencesDescription" xml:space="preserve"><value>Gestión de la trayectoria profesional.</value></data>
+  <data name="AdminProjects" xml:space="preserve"><value>Proyectos</value></data>
+  <data name="AdminProjectsDescription" xml:space="preserve"><value>Gestión de proyectos del portfolio.</value></data>
+  <data name="AdminCertifications" xml:space="preserve"><value>Certificaciones</value></data>
+  <data name="AdminCertificationsDescription" xml:space="preserve"><value>Gestión de certificaciones y credenciales.</value></data>
+  <data name="AdminBlog" xml:space="preserve"><value>Blog</value></data>
+  <data name="AdminBlogDescription" xml:space="preserve"><value>Gestión de artículos y publicaciones.</value></data>
+  <data name="AdminModuleNotAvailable" xml:space="preserve"><value>Preparado para una próxima entrega</value></data>
+  <data name="AdminOpenModule" xml:space="preserve"><value>Próximamente</value></data>
+  <data name="AdminContentSummaryTitle" xml:space="preserve"><value>Estado del contenido</value></data>
+  <data name="AdminContentSummary" xml:space="preserve"><value>La autenticación y la estructura administrativa están listas. La gestión de contenido todavía no está habilitada.</value></data>
+  <data name="AdminPublicSiteAction" xml:space="preserve"><value>Ver sitio público</value></data>
+  <data name="AdminAccessDeniedTitle" xml:space="preserve"><value>Acceso denegado</value></data>
+  <data name="AdminAccessDeniedMessage" xml:space="preserve"><value>Tu cuenta no tiene permisos para acceder a esta área.</value></data>
+  <data name="AdminLoginRequiredTitle" xml:space="preserve"><value>Inicia sesión para continuar</value></data>
+  <data name="AdminLoginRequiredMessage" xml:space="preserve"><value>Esta área requiere una cuenta administrativa autorizada.</value></data>
+  <data name="AdminLoginLink" xml:space="preserve"><value>Ir al acceso administrativo</value></data>
+  <data name="AdminReturnHome" xml:space="preserve"><value>Volver al sitio público</value></data>
 </root>

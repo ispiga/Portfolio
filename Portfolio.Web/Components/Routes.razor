@@ -1,8 +1,28 @@
 @rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> Localizer
 
 <Router AppAssembly="typeof(Program).Assembly" NotFoundPage="typeof(Pages.NotFound)">
     <Found Context="routeData">
-        <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
+        <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)">
+            <NotAuthorized Context="authenticationState">
+                <section class="content-card" aria-labelledby="authorization-message">
+                    @if (authenticationState.User.Identity?.IsAuthenticated == true)
+                    {
+                        <h1 id="authorization-message">@Localizer["AdminAccessDeniedTitle"]</h1>
+                        <p>@Localizer["AdminAccessDeniedMessage"]</p>
+                    }
+                    else
+                    {
+                        <AdminLoginRedirect />
+                        <h1 id="authorization-message">@Localizer["AdminLoginRequiredTitle"]</h1>
+                        <p>@Localizer["AdminLoginRequiredMessage"]</p>
+                        <a href="/admin/login" class="button button--primary">@Localizer["AdminLoginLink"]</a>
+                    }
+                </section>
+            </NotAuthorized>
+        </AuthorizeRouteView>
         <FocusOnNavigate RouteData="routeData" Selector="h1" />
     </Found>
 </Router>

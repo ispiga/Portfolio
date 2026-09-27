@@ -14,7 +14,7 @@ namespace Portfolio.Tests;
 public sealed class PersistenceModelTests
 {
     [Fact]
-    public void Model_contains_only_the_initial_portfolio_entities()
+    public void Model_contains_portfolio_and_identity_entities()
     {
         using var context = CreateContext();
 
@@ -23,9 +23,12 @@ public sealed class PersistenceModelTests
             .OrderBy(name => name)
             .ToArray();
 
-        Assert.Equal(
+        Assert.All(
             ["BlogPost", "BlogPostTranslation", "Certification", "CertificationTranslation", "Experience", "ExperienceTranslation", "Project", "ProjectTranslation"],
-            entityNames);
+            entityName => Assert.Contains(entityName, entityNames));
+        Assert.All(
+            ["PortfolioUser", "IdentityRole", "IdentityRoleClaim`1", "IdentityUserClaim`1", "IdentityUserLogin`1", "IdentityUserRole`1", "IdentityUserToken`1"],
+            entityName => Assert.Contains(entityName, entityNames));
     }
 
     [Fact]

@@ -1,9 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Portfolio.Domain.Entities;
+using Portfolio.Infrastructure.Identity;
 
 namespace Portfolio.Infrastructure;
 
-public sealed class PortfolioDbContext(DbContextOptions<PortfolioDbContext> options) : DbContext(options)
+public sealed class PortfolioDbContext(DbContextOptions<PortfolioDbContext> options) : IdentityDbContext<PortfolioUser>(options)
 {
     public DbSet<Project> Projects => Set<Project>();
 
@@ -21,6 +23,7 @@ public sealed class PortfolioDbContext(DbContextOptions<PortfolioDbContext> opti
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(PortfolioDbContext).Assembly);
     }
 }

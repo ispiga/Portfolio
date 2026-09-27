@@ -1,0 +1,31 @@
+@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> Localizer
+
+<div class="admin-layout">
+    <header class="admin-header">
+        <a class="admin-brand" href="/admin">@Localizer["PortfolioName"] <span>@Localizer["AdminAreaLabel"]</span></a>
+        <div class="admin-header__controls">
+            <ThemeSelector />
+            <LanguageSelector />
+            <form class="admin-account" action="/admin/logout" method="post">
+                <AntiforgeryToken />
+                <button class="button button--secondary" type="submit">@Localizer["AdminLogout"]</button>
+            </form>
+        </div>
+    </header>
+    <div class="admin-shell">
+        <nav class="admin-navigation" aria-label="@Localizer["AdminNavigation"]">
+            <a class="admin-navigation__link is-active" href="/admin">@Localizer["AdminDashboard"]</a>
+            <span class="admin-navigation__item" aria-disabled="true">@Localizer["AdminExperiences"]</span>
+            <span class="admin-navigation__item" aria-disabled="true">@Localizer["AdminProjects"]</span>
+            <span class="admin-navigation__item" aria-disabled="true">@Localizer["AdminCertifications"]</span>
+            <span class="admin-navigation__item" aria-disabled="true">@Localizer["AdminBlog"]</span>
+            <a class="admin-navigation__link" href="/">@Localizer["AdminPublicSiteAction"]</a>
+        </nav>
+        <main class="admin-main" id="admin-main" tabindex="-1">
+            @Body
+        </main>
+    </div>
+</div>

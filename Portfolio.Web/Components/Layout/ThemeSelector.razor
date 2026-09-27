@@ -3,11 +3,11 @@
 @inject IJSRuntime JS
 
 <div class="theme-selector">
-    <label for="theme-select">@Localizer["Theme"]</label>
-    <select id="theme-select" class="theme-selector__control" value="@selectedTheme" @onchange="OnThemeChanged">
-        <option value="system">@Localizer["ThemeSystem"]</option>
-        <option value="light">@Localizer["ThemeLight"]</option>
-        <option value="dark">@Localizer["ThemeDark"]</option>
+    <label class="visually-hidden" for="theme-select">@Localizer["Theme"]</label>
+    <select id="theme-select" class="theme-selector__control" aria-label="@Localizer["Theme"]" value="@selectedTheme" @onchange="OnThemeChanged">
+        <option value="system">🖥️ @Localizer["ThemeSystem"]</option>
+        <option value="light">☀️ @Localizer["ThemeLight"]</option>
+        <option value="dark">🌙 @Localizer["ThemeDark"]</option>
     </select>
 </div>
 

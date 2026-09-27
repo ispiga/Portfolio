@@ -1,4 +1,6 @@
 @using Microsoft.Extensions.Localization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Portfolio.Infrastructure.Identity
 @inject IStringLocalizer<SharedResource> Localizer
 @inject NavigationManager Navigation
 
@@ -24,6 +26,16 @@
             </ul>
             <ThemeSelector />
             <LanguageSelector />
+            <AuthorizeView Policy="@PortfolioAuthorization.AdministratorPolicy">
+                <Authorized>
+                    <div class="portfolio-account" aria-label="@Localizer["AdminNavigation"]">
+                        <form action="/admin/logout" method="post">
+                            <AntiforgeryToken />
+                            <button class="button button--secondary" type="submit">@Localizer["AdminLogout"]</button>
+                        </form>
+                    </div>
+                </Authorized>
+            </AuthorizeView>
         </div>
     </div>
 </nav>

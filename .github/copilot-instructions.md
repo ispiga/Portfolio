@@ -38,6 +38,14 @@
 - Use only the existing `portfolioTheme` API in `wwwroot/js/theme.js` through JS interop.
 - Do not duplicate theme or `localStorage` logic in C#.
 - Do not create a second theme API.
+- Keep public and admin layouts aligned with the shared semantic theme tokens, including MudBlazor surfaces and typography.
+
+## Administration and Identity
+
+- Do not add public user registration. Provision the initial administrator through `Portfolio.AdminProvisioning`; keep web Identity services for sign-in, sign-out and authorization only.
+- Preserve the fixed 30-minute administrator session, HTTP cookie expiry validation, and Blazor circuit revalidation.
+- Keep logout as an antiforgery-protected POST and expose it in both public and admin navigation when the administrator is authenticated; do not display the admin email in the public navbar.
+- Keep theme and language selectors available in both layouts and accessible when their visible labels are omitted.
 
 ## Contact email
 

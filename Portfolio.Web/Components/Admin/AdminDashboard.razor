@@ -1,0 +1,73 @@
+@page "/admin"
+@attribute [Authorize(Policy = PortfolioAuthorization.AdministratorPolicy)]
+@layout AdminLayout
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.Extensions.Localization
+@using Portfolio.Infrastructure.Identity
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IStringLocalizer<SharedResource> Localizer
+
+<PageTitle>@Localizer["AdminDashboardTitle"]</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="admin-dashboard">
+    <header class="admin-dashboard__heading">
+        <MudText Typo="Typo.h1" Tag="@("h1")">@Localizer["AdminDashboardTitle"]</MudText>
+        <MudText Typo="Typo.body1">@Localizer["AdminWelcome", userName]</MudText>
+    </header>
+
+    <section aria-labelledby="admin-identity-title" class="admin-dashboard__section">
+        <MudText Typo="Typo.h2" Tag="@("h2")" id="admin-identity-title">@Localizer["AdminIdentityTitle"]</MudText>
+        <MudPaper Elevation="1" Class="pa-5 admin-identity-card">
+            <MudText Typo="Typo.overline">@Localizer["AdminIdentityLabel"]</MudText>
+            <MudText Typo="Typo.h6">@userName</MudText>
+            <MudChip T="string" Color="Color.Info" Variant="Variant.Outlined">@Localizer["AdminRoleLabel"]</MudChip>
+        </MudPaper>
+    </section>
+
+    <section aria-labelledby="admin-actions-title" class="admin-dashboard__section">
+        <MudText Typo="Typo.h2" Tag="@("h2")" id="admin-actions-title">@Localizer["AdminActionsTitle"]</MudText>
+        <MudGrid Spacing="3">
+            @foreach (var module in Modules)
+            {
+                <MudItem xs="12" sm="6" lg="3">
+                    <MudPaper Elevation="1" Class="pa-5 admin-module-card">
+                        <MudText Typo="Typo.h6" Tag="@("h3")">@Localizer[module.Title]</MudText>
+                        <MudText Typo="Typo.body2">@Localizer[module.Description]</MudText>
+                        <MudText Typo="Typo.caption" Class="admin-module-card__status">@Localizer["AdminModuleNotAvailable"]</MudText>
+                        <MudButton Href="@module.Path" Disabled="true" Variant="Variant.Outlined">@Localizer["AdminOpenModule"]</MudButton>
+                    </MudPaper>
+                </MudItem>
+            }
+        </MudGrid>
+    </section>
+
+    <section aria-labelledby="admin-content-status-title" class="admin-dashboard__section">
+        <MudText Typo="Typo.h2" Tag="@("h2")" id="admin-content-status-title">@Localizer["AdminContentSummaryTitle"]</MudText>
+        <MudPaper Elevation="1" Class="pa-5">
+            <MudText Typo="Typo.body1">@Localizer["AdminContentSummary"]</MudText>
+        </MudPaper>
+    </section>
+
+    <MudButton Href="/" Color="Color.Primary" Variant="Variant.Filled">@Localizer["AdminPublicSiteAction"]</MudButton>
+</MudContainer>
+
+@code {
+    private string userName = string.Empty;
+
+    private static readonly AdminModule[] Modules =
+    [
+        new("AdminExperiences", "AdminExperiencesDescription", "/admin/experiences"),
+        new("AdminProjects", "AdminProjectsDescription", "/admin/projects"),
+        new("AdminCertifications", "AdminCertificationsDescription", "/admin/certifications"),
+        new("AdminBlog", "AdminBlogDescription", "/admin/blog")
+    ];
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        userName = authenticationState.User.Identity?.Name ?? string.Empty;
+    }
+
+    private sealed record AdminModule(string Title, string Description, string Path);
+}
