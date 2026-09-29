@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Portfolio.Infrastructure.Identity;
 using Portfolio.Web.Components.Admin;
@@ -14,6 +15,9 @@ public static class AdminAuthenticationEndpoints
             .AllowAnonymous();
 
         endpoints.MapPost("/admin/logout", LogoutAsync)
+            .RequireAuthorization(PortfolioAuthorization.AdministratorPolicy);
+
+        endpoints.MapPost("/admin/session/activity", RenewSessionAsync)
             .RequireAuthorization(PortfolioAuthorization.AdministratorPolicy);
 
         return endpoints;
@@ -86,6 +90,35 @@ public static class AdminAuthenticationEndpoints
 
         await signInManager.SignOutAsync();
         return Results.LocalRedirect("/");
+    }
+
+    private static async Task<IResult> RenewSessionAsync(
+        HttpContext context,
+        IAntiforgery antiforgery,
+        AdminSessionActivityStore activityStore)
+    {
+        if (!await antiforgery.IsRequestValidAsync(context))
+        {
+            return Results.BadRequest();
+        }
+
+        if (!AdminSession.TryGetSessionId(context.User, out var sessionId))
+        {
+            return Results.NoContent();
+        }
+
+        var now = DateTimeOffset.UtcNow;
+        if (!activityStore.IsActive(sessionId, now))
+        {
+            return Results.NoContent();
+        }
+
+        if (activityStore.TryRenew(sessionId, now, TimeSpan.FromSeconds(30), out var expiresAt))
+        {
+            await AdminSession.RenewAsync(context, expiresAt);
+        }
+
+        return Results.NoContent();
     }
 
     private static bool IsLocalUrl(string? returnUrl) =>

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Portfolio.Application.Experiences;
 using Portfolio.Domain.Entities;
 
 namespace Portfolio.Infrastructure.Configurations;
@@ -25,7 +26,7 @@ public sealed class ExperienceTranslationConfiguration : IEntityTypeConfiguratio
             .HasMaxLength(200)
             .IsRequired();
         builder.Property(translation => translation.Summary)
-            .HasMaxLength(1000)
+            .HasMaxLength(ExperienceEditValidator.MaximumSummaryLength)
             .IsRequired();
 
         builder.HasOne(translation => translation.Experience)

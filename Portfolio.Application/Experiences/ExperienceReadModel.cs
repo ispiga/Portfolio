@@ -7,4 +7,5 @@ public sealed record ExperienceReadModel(
     string Summary,
     DateOnly StartDate,
     DateOnly? EndDate,
-    int DisplayOrder);
+    int DisplayOrder,
+    IReadOnlyList<ExperienceAttachmentPreviewReadModel>? Attachments = null);

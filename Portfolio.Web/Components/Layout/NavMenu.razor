@@ -1,15 +1,16 @@
 @using Microsoft.Extensions.Localization
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Routing
 @using Portfolio.Infrastructure.Identity
 @inject IStringLocalizer<SharedResource> Localizer
 @inject NavigationManager Navigation
 
 <nav class="portfolio-navbar" aria-label="@Localizer["MainNavigation"]">
     <div class="portfolio-shell portfolio-navbar__content">
-        <a class="portfolio-logo" href="/" @onclick="GoHome">
+        <NavLink class="portfolio-logo" href="/" Match="NavLinkMatch.All" @onclick="GoHome" data-unsaved-navigation>
             <span class="portfolio-logo__mark" aria-hidden="true">[ LOGO ]</span>
             <span>@Localizer["PortfolioName"]</span>
-        </a>
+        </NavLink>
 
         <button class="portfolio-menu-toggle" type="button" aria-controls="portfolio-navigation" aria-expanded="@isMenuOpen" @onclick="ToggleMenu">
             <span class="portfolio-menu-toggle__icon" aria-hidden="true">☰</span>
@@ -18,20 +19,31 @@
 
         <div id="portfolio-navigation" class="portfolio-navbar__panel @(isMenuOpen ? "is-open" : string.Empty)">
             <ul class="portfolio-navigation__list">
-                <li><a class="@(IsCurrent("about") ? "is-active" : string.Empty)" href="/#about" @onclick="SelectAbout">@Localizer["About"]</a></li>
-                <li><a class="@(IsCurrent("projects") ? "is-active" : string.Empty)" href="/#projects" @onclick="SelectProjects">@Localizer["Projects"]</a></li>
-                <li><a class="@(IsCurrent("certificates") ? "is-active" : string.Empty)" href="/#certificates" @onclick="SelectCertificates">@Localizer["Certificates"]</a></li>
-                <li><a class="@(IsCurrent("blog") ? "is-active" : string.Empty)" href="/#blog" @onclick="SelectBlog">@Localizer["Blog"]</a></li>
-                <li><a class="@(IsCurrent("contact") ? "is-active" : string.Empty)" href="/#contact" @onclick="SelectContact">@Localizer["Contact"]</a></li>
+                <li><a class="@(IsCurrent("about") ? "is-active" : string.Empty)" href="/#about" @onclick="SelectAbout" @onclick:preventDefault="true" data-unsaved-navigation>@Localizer["About"]</a></li>
+                <li><a class="@(IsCurrent("projects") ? "is-active" : string.Empty)" href="/#projects" @onclick="SelectProjects" @onclick:preventDefault="true" data-unsaved-navigation>@Localizer["Projects"]</a></li>
+                <li><a class="@(IsCurrent("certificates") ? "is-active" : string.Empty)" href="/#certificates" @onclick="SelectCertificates" @onclick:preventDefault="true" data-unsaved-navigation>@Localizer["Certificates"]</a></li>
+                <li><a class="@(IsCurrent("blog") ? "is-active" : string.Empty)" href="/#blog" @onclick="SelectBlog" @onclick:preventDefault="true" data-unsaved-navigation>@Localizer["Blog"]</a></li>
+                <li><a class="@(IsCurrent("contact") ? "is-active" : string.Empty)" href="/#contact" @onclick="SelectContact" @onclick:preventDefault="true" data-unsaved-navigation>@Localizer["Contact"]</a></li>
+                <AuthorizeView Policy="@PortfolioAuthorization.AdministratorPolicy">
+                    <Authorized>
+                        <li>
+                            <NavLink class="portfolio-navigation__icon-link" href="/admin" @onclick="CloseMenu" aria-label="@Localizer["AdminDashboardTitle"]" title="@Localizer["AdminDashboardTitle"]" data-unsaved-navigation>
+                                <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z" /><path d="m19.4 15 .1.1 1.4 1.1-1.4 2.4-1.7-.6a8 8 0 0 1-1.5.9l-.3 1.8h-2.8l-.3-1.8a8 8 0 0 1-1.6-.9l-1.7.6-1.4-2.4 1.4-1.1a7 7 0 0 1 0-1.9l-1.4-1.1 1.4-2.4 1.7.6a8 8 0 0 1 1.6-.9l.3-1.8h2.8l.3 1.8a8 8 0 0 1 1.5.9l1.7-.6 1.4 2.4-1.4 1.1a7 7 0 0 1-.1 1.8Z" transform="translate(-1 -1)" /></svg>
+                            </NavLink>
+                        </li>
+                    </Authorized>
+                </AuthorizeView>
             </ul>
             <ThemeSelector />
             <LanguageSelector />
             <AuthorizeView Policy="@PortfolioAuthorization.AdministratorPolicy">
                 <Authorized>
                     <div class="portfolio-account" aria-label="@Localizer["AdminNavigation"]">
-                        <form action="/admin/logout" method="post">
+                        <form id="public-navbar-logout-form" action="/admin/logout" method="post">
                             <AntiforgeryToken />
-                            <button class="button button--secondary" type="submit">@Localizer["AdminLogout"]</button>
+                            <button class="button button--secondary admin-logout-icon" type="submit" aria-label="@Localizer["AdminLogout"]" title="@Localizer["AdminLogout"]">
+                                <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false"><path d="M10 17l5-5-5-5M15 12H3m9-9h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6" /></svg>
+                            </button>
                         </form>
                     </div>
                 </Authorized>
@@ -68,6 +80,7 @@
     {
         activeSection = section;
         CloseMenu();
+        Navigation.NavigateTo($"/#{section}");
     }
 
     private bool IsCurrent(string section)

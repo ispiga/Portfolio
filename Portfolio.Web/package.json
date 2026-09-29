@@ -3,7 +3,11 @@
   "private": true,
   "scripts": {
     "css:build": "tailwindcss -i ./Styles/tailwind.css -o ./wwwroot/css/tailwind.css --minify",
-    "css:watch": "tailwindcss -i ./Styles/tailwind.css -o ./wwwroot/css/tailwind.css --watch"
+    "css:watch": "tailwindcss -i ./Styles/tailwind.css -o ./wwwroot/css/tailwind.css --watch",
+    "assets:copy": "node ./scripts/copy-pdfjs.mjs"
+  },
+  "dependencies": {
+    "pdfjs-dist": "4.10.38"
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.1.13",

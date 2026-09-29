@@ -10,9 +10,11 @@ namespace Portfolio.Web.Authentication;
 internal sealed class AdminAuthenticationStateProvider(
     ILoggerFactory loggerFactory,
     IServiceScopeFactory serviceScopeFactory,
-    IOptions<IdentityOptions> identityOptions) : RevalidatingServerAuthenticationStateProvider(loggerFactory)
+    IOptions<IdentityOptions> identityOptions,
+    AdminSessionActivityStore activityStore,
+    AdminSessionExpirationState expirationState) : RevalidatingServerAuthenticationStateProvider(loggerFactory)
 {
-    protected override TimeSpan RevalidationInterval => TimeSpan.FromMinutes(1);
+    protected override TimeSpan RevalidationInterval => TimeSpan.FromSeconds(30);
 
     protected override async Task<bool> ValidateAuthenticationStateAsync(
         AuthenticationState authenticationState,
@@ -25,7 +27,14 @@ internal sealed class AdminAuthenticationStateProvider(
             return true;
         }
 
-        if (AdminSession.HasExpired(principal, DateTimeOffset.UtcNow))
+        if (AdminSession.TryGetSessionId(principal, out var sessionId)
+            && activityStore.HasExpired(sessionId))
+        {
+            expirationState.MarkExpired();
+            return false;
+        }
+
+        if (AdminSession.HasExpired(principal, DateTimeOffset.UtcNow, activityStore))
         {
             return false;
         }

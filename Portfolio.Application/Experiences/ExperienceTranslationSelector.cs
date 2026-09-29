@@ -30,6 +30,15 @@ public static class ExperienceTranslationSelector
             translation.Summary,
             experience.StartDate,
             experience.EndDate,
-            experience.DisplayOrder);
+            experience.DisplayOrder,
+            experience.Attachments
+                .Where(attachment => attachment.IsPublic)
+                .OrderBy(attachment => attachment.CreatedAt)
+                .ThenBy(attachment => attachment.Id)
+                .Select(attachment => new ExperienceAttachmentPreviewReadModel(
+                    attachment.Id,
+                    attachment.OriginalFileName,
+                    attachment.ContentType))
+                .ToArray());
     }
 }

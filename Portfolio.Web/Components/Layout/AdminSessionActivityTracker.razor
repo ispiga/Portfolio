@@ -1,0 +1,48 @@
+@implements IAsyncDisposable
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IJSRuntime JS
+
+<form id="admin-session-activity-form" action="/admin/session/activity" method="post" hidden>
+    <AntiforgeryToken />
+</form>
+
+@code {
+    private IJSObjectReference? module;
+    private bool initialized;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (initialized)
+        {
+            return;
+        }
+
+        initialized = true;
+        var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        if (authenticationState.User.Identity?.IsAuthenticated != true)
+        {
+            return;
+        }
+
+        module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/admin-session-activity.js");
+        await module.InvokeVoidAsync("startMonitoring", "admin-session-activity-form");
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (module is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await module.InvokeVoidAsync("stopMonitoring");
+            await module.DisposeAsync();
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+    }
+}

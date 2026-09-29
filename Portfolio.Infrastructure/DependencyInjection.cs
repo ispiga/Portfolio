@@ -12,6 +12,7 @@ using Portfolio.Application.Projects;
 using Portfolio.Infrastructure.Email;
 using Portfolio.Infrastructure.Identity;
 using Portfolio.Infrastructure.Services;
+using Portfolio.Infrastructure.Storage;
 
 namespace Portfolio.Infrastructure;
 
@@ -40,6 +41,15 @@ public static class DependencyInjection
         services.AddScoped<ICertificationQueryService, CertificationQueryService>();
         services.AddScoped<IBlogPostQueryService, BlogPostQueryService>();
         services.AddScoped<IExperienceQueryService, ExperienceQueryService>();
+        services.AddScoped<IExperienceAdministrationService, ExperienceAdministrationService>();
+        services.AddOptions<ExperienceAttachmentStorageOptions>()
+            .Bind(configuration.GetSection(ExperienceAttachmentStorageOptions.SectionName))
+            .ValidateDataAnnotations()
+            .Validate(options => options.AllowedExtensions.Length > 0
+                && options.AllowedExtensions.All(extension => extension is ".pdf" or ".jpg" or ".jpeg" or ".png"),
+                "Only PDF, JPEG and PNG experience attachments are supported.")
+            .ValidateOnStart();
+        services.AddScoped<IExperienceAttachmentService, ExperienceAttachmentStorageService>();
         services.AddScoped<IProjectQueryService, ProjectQueryService>();
 
         return services;

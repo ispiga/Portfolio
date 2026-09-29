@@ -15,6 +15,7 @@ public sealed class ExperienceQueryService(
         var experiences = await context.Experiences
             .AsNoTracking()
             .Include(experience => experience.Translations)
+            .Include(experience => experience.Attachments.Where(attachment => attachment.IsPublic))
             .OrderBy(experience => experience.DisplayOrder)
             .ThenBy(experience => experience.Id)
             .ToListAsync(cancellationToken);

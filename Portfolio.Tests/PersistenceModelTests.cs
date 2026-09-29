@@ -24,7 +24,7 @@ public sealed class PersistenceModelTests
             .ToArray();
 
         Assert.All(
-            ["BlogPost", "BlogPostTranslation", "Certification", "CertificationTranslation", "Experience", "ExperienceTranslation", "Project", "ProjectTranslation"],
+            ["BlogPost", "BlogPostTranslation", "Certification", "CertificationTranslation", "Experience", "ExperienceAttachment", "ExperienceTranslation", "Project", "ProjectTranslation"],
             entityName => Assert.Contains(entityName, entityNames));
         Assert.All(
             ["PortfolioUser", "IdentityRole", "IdentityRoleClaim`1", "IdentityUserClaim`1", "IdentityUserLogin`1", "IdentityUserRole`1", "IdentityUserToken`1"],
@@ -55,6 +55,25 @@ public sealed class PersistenceModelTests
             .Single(constraint => constraint.Name == "CK_ExperienceTranslations_LanguageCode");
         Assert.Contains("es-ES", languageConstraint.Sql);
         Assert.Contains("en-US", languageConstraint.Sql);
+    }
+
+    [Fact]
+    public void Experience_attachments_are_private_by_default_and_restrict_experience_deletion()
+    {
+        using var context = CreateContext();
+
+        var attachmentEntity = context.Model.FindEntityType(typeof(ExperienceAttachment))!;
+        var designTimeAttachmentEntity = context.GetService<IDesignTimeModel>().Model
+            .FindEntityType(typeof(ExperienceAttachment))!;
+        var isPublic = designTimeAttachmentEntity.FindProperty(nameof(ExperienceAttachment.IsPublic))!;
+
+        Assert.Equal("ExperienceAttachments", attachmentEntity.GetTableName());
+        Assert.Equal(false, isPublic.GetDefaultValue());
+        Assert.Equal(DeleteBehavior.Restrict, attachmentEntity.GetForeignKeys().Single().DeleteBehavior);
+        Assert.Contains(
+            attachmentEntity.GetIndexes(),
+            index => index.Properties.Select(property => property.Name)
+                .SequenceEqual([nameof(ExperienceAttachment.ExperienceId), nameof(ExperienceAttachment.CreatedAt)]));
     }
 
     [Fact]

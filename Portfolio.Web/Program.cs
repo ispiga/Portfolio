@@ -1,5 +1,5 @@
 using System.Globalization;
-using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -17,6 +17,8 @@ builder.Services.AddPortfolioPersistence(builder.Configuration);
 builder.Services.AddPortfolioIdentity();
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddMudServices();
+builder.Services.AddSingleton<AdminSessionActivityStore>();
+builder.Services.AddScoped<AdminSessionExpirationState>();
 builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
     .AddCookie(IdentityConstants.ApplicationScheme, options =>
     {
@@ -26,6 +28,7 @@ builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
         options.LoginPath = "/admin/login";
         options.AccessDeniedPath = "/admin/access-denied";
+        options.Cookie.MaxAge = AdminSession.Duration;
         AdminSession.ConfigureCookie(options);
     });
 
@@ -54,6 +57,33 @@ var localizationOptions = new RequestLocalizationOptions()
 app.UseRequestLocalization(localizationOptions);
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.Use(async (context, next) =>
+{
+    if (context.User.Identity?.IsAuthenticated == true
+        && context.User.IsInRole(PortfolioAuthorization.AdministratorRole)
+        && context.Request.Path.StartsWithSegments("/admin")
+        && context.Request.Path != "/admin/session/activity"
+        && AdminSession.TryGetSessionId(context.User, out var sessionId))
+    {
+        var store = context.RequestServices.GetRequiredService<AdminSessionActivityStore>();
+        var now = DateTimeOffset.UtcNow;
+        if (!store.IsActive(sessionId, now))
+        {
+            context.Items[AdminSession.ExpirationSignOutItem] = true;
+            await context.SignOutAsync(IdentityConstants.ApplicationScheme);
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            return;
+        }
+
+        if (store.TryRenew(sessionId, now, TimeSpan.FromSeconds(30), out var expiresAt))
+        {
+            await AdminSession.RenewAsync(context, expiresAt);
+        }
+    }
+
+    await next();
+});
 
 app.MapGet("/culture/set", (HttpContext context, string culture, string? redirectUri) =>
 {
@@ -85,6 +115,7 @@ app.UseAntiforgery();
 
 app.MapStaticAssets();
 app.MapAdminAuthentication();
+app.MapExperienceAttachmentEndpoints();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 

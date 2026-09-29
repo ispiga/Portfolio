@@ -1,4 +1,13 @@
 @inherits LayoutComponentBase
+@implements IDisposable
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.Extensions.Localization
+@using Portfolio.Web.Authentication
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject AdminSessionExpirationState ExpirationState
+@inject IStringLocalizer<SharedResource> Localizer
+@inject NavigationManager Navigation
 
 <div class="site-layout">
     <header>
@@ -9,3 +18,62 @@
     </main>
     <PortfolioFooter />
 </div>
+
+@if (showExpirationDialog)
+{
+    <div class="session-expired-backdrop">
+        <section class="session-expired-dialog" role="alertdialog" aria-modal="true" aria-labelledby="session-expired-title" aria-describedby="session-expired-message">
+            <h2 id="session-expired-title">@Localizer["AdminSessionExpiredTitle"]</h2>
+            <p id="session-expired-message">@Localizer["AdminSessionExpiredMessage"]</p>
+            <button class="button button--primary" type="button" @onclick="DismissExpiration">@Localizer["Close"]</button>
+        </section>
+    </div>
+}
+
+@code {
+    private bool showExpirationDialog;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ExpirationState.Expired += OnSessionExpired;
+        Navigation.LocationChanged += OnLocationChanged;
+        var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        if (IsHome && authenticationState.User.Identity?.IsAuthenticated != true && ExpirationState.IsExpired)
+        {
+            showExpirationDialog = true;
+        }
+    }
+
+    private void OnSessionExpired()
+    {
+        if (!IsHome)
+        {
+            return;
+        }
+
+        _ = InvokeAsync(() =>
+        {
+            showExpirationDialog = true;
+            StateHasChanged();
+        });
+    }
+
+    private bool IsHome => string.IsNullOrEmpty(Navigation.ToBaseRelativePath(Navigation.Uri).Split('#', 2)[0]);
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs args)
+    {
+        if (IsHome && ExpirationState.IsExpired)
+        {
+            showExpirationDialog = true;
+            _ = InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void DismissExpiration() => showExpirationDialog = false;
+
+    public void Dispose()
+    {
+        ExpirationState.Expired -= OnSessionExpired;
+        Navigation.LocationChanged -= OnLocationChanged;
+    }
+}

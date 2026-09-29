@@ -3164,3 +3164,23 @@ Implementa la primera entrega de la Fase 7 del proyecto Portfolio: ASP.NET Core 
 17.	No añadas funcionalidades no solicitadas.
 18.	Valida los cambios con compilación y pruebas.
 19.	Al finalizar, resume: • Archivos modificados y creados. • Migraciones generadas. • Rutas disponibles. • Pruebas ejecutadas. • Decisiones pendientes para la siguiente entrega.
+
+
+# ****************************************
+# PROMPT PARA REALIZAR LA FASE 7 - PARTE 2
+# ****************************************
+
+Desarrolla la segunda entrega de la Fase 7 del proyecto Portfolio: el módulo administrativo de Experiencias.
+Considera la primera entrega de Fase 7 ya finalizada y conserva sus decisiones de arquitectura, Identity, autorización y diseño.
+El alcance inicial debe incluir:
+- CRUD de experiencias en el área administrativa, protegido por la política AdministratorOnly.
+- Edición de contenido localizado en es-ES y en-US desde un único formulario, con aviso visible cuando falte una traducción.
+- Gestión del orden de presentación.
+- Validación de datos en servidor y mensajes localizados.
+- Actualización de la parte pública para mostrar las experiencias según las reglas de publicación existentes.
+- Pruebas para autorización, validación, persistencia, edición de traducciones, aviso de traducción ausente y orden.
+Mantén la arquitectura por capas existente: los componentes Blazor no deben acceder directamente al DbContext; utiliza los servicios y patrones actuales.
+Respeta los tokens semánticos, la accesibilidad, el tema compartido y el idioma. No permitas registro público de usuarios.
+Adjuntos: la especificación indica que deben estudiarse varios adjuntos por experiencia, pero que aún hay que acordar metadatos, límites y reglas de acceso.
+Antes de implementar almacenamiento o modificar el modelo para adjuntos, analiza las opciones compatibles con la especificación y pregúntame las decisiones que falten. No inventes requisitos ni expongas documentos potencialmente sensibles.
+Trabaja solo en el módulo de Experiencias; no adelantes CRUD de proyectos, certificaciones o blog. Añade las migraciones necesarias únicamente después de inspeccionar el modelo y validar el impacto. Actualiza PORTFOLIO_PROJECT.md al terminar y ejecuta la compilación y las pruebas pertinentes. No leas ni muestres secretos.

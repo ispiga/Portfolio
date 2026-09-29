@@ -1,6 +1,7 @@
 @using Microsoft.Extensions.Localization
 @using System.Globalization
 @using Portfolio.Application.Experiences
+@using Portfolio.Web.Components.Shared
 @inject IStringLocalizer<SharedResource> Localizer
 @inject IExperienceQueryService ExperienceQueryService
 
@@ -35,7 +36,29 @@
                         <div>
                             <h3>@experience.RoleTitle</h3>
                             <p class="experience-card__company">@experience.CompanyName</p>
-                            <p>@experience.Summary</p>
+                            <p id="experience-description-@experience.Id" class="experience-card__description @(expandedDescriptions.Contains(experience.Id) ? "is-expanded" : string.Empty)">@experience.Summary</p>
+                            <button class="button button--secondary experience-card__description-toggle"
+                                    type="button"
+                                    aria-expanded="@expandedDescriptions.Contains(experience.Id)"
+                                    aria-controls="experience-description-@experience.Id"
+                                    @onclick="() => ToggleDescription(experience.Id)">
+                                @Localizer[expandedDescriptions.Contains(experience.Id) ? "ExperienceDescriptionCollapse" : "ExperienceDescriptionExpand"]
+                            </button>
+                            @if (experience.Attachments is { Count: > 0 } publicAttachments)
+                            {
+                                <section class="experience-public-attachments" aria-label="@Localizer["ExperiencePublicAttachments"]">
+                                    <h4>@Localizer["ExperiencePublicAttachments"]</h4>
+                                    <div class="experience-public-attachments__grid">
+                                        @foreach (var attachment in publicAttachments)
+                                        {
+                                            <ExperienceAttachmentPreview @key="attachment.Id"
+                                                                         OriginalFileName="attachment.OriginalFileName"
+                                                                         ContentType="attachment.ContentType"
+                                                                         ContentUrl="@($"/experience-attachments/{attachment.Id}")" />
+                                        }
+                                    </div>
+                                </section>
+                            }
                         </div>
                     </article>
                 </li>
@@ -53,6 +76,15 @@
 
 @code {
     private IReadOnlyList<ExperienceReadModel>? experiences;
+    private readonly HashSet<Guid> expandedDescriptions = [];
+
+    private void ToggleDescription(Guid experienceId)
+    {
+        if (!expandedDescriptions.Add(experienceId))
+        {
+            expandedDescriptions.Remove(experienceId);
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {

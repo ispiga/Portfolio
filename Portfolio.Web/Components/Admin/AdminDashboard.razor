@@ -34,8 +34,10 @@
                     <MudPaper Elevation="1" Class="pa-5 admin-module-card">
                         <MudText Typo="Typo.h6" Tag="@("h3")">@Localizer[module.Title]</MudText>
                         <MudText Typo="Typo.body2">@Localizer[module.Description]</MudText>
-                        <MudText Typo="Typo.caption" Class="admin-module-card__status">@Localizer["AdminModuleNotAvailable"]</MudText>
-                        <MudButton Href="@module.Path" Disabled="true" Variant="Variant.Outlined">@Localizer["AdminOpenModule"]</MudButton>
+                        <MudText Typo="Typo.caption" Class="admin-module-card__status">@Localizer[module.IsAvailable ? "ExperienceModuleAvailable" : "AdminModuleNotAvailable"]</MudText>
+                        <MudButton Href="@module.Path" Disabled="@(!module.IsAvailable)" Variant="Variant.Outlined">
+                            @Localizer[module.IsAvailable ? "ExperienceManageAction" : "AdminOpenModule"]
+                        </MudButton>
                     </MudPaper>
                 </MudItem>
             }
@@ -57,10 +59,10 @@
 
     private static readonly AdminModule[] Modules =
     [
-        new("AdminExperiences", "AdminExperiencesDescription", "/admin/experiences"),
-        new("AdminProjects", "AdminProjectsDescription", "/admin/projects"),
-        new("AdminCertifications", "AdminCertificationsDescription", "/admin/certifications"),
-        new("AdminBlog", "AdminBlogDescription", "/admin/blog")
+        new("AdminExperiences", "AdminExperiencesDescription", "/admin/experiences", true),
+        new("AdminProjects", "AdminProjectsDescription", "/admin/projects", false),
+        new("AdminCertifications", "AdminCertificationsDescription", "/admin/certifications", false),
+        new("AdminBlog", "AdminBlogDescription", "/admin/blog", false)
     ];
 
     protected override async Task OnInitializedAsync()
@@ -69,5 +71,5 @@
         userName = authenticationState.User.Identity?.Name ?? string.Empty;
     }
 
-    private sealed record AdminModule(string Title, string Description, string Path);
+    private sealed record AdminModule(string Title, string Description, string Path, bool IsAvailable);
 }

@@ -1232,7 +1232,7 @@ La persistencia se ha preparado de forma incremental a partir de las secciones q
 
 La conexión se obtiene de `ConnectionStrings:Portfolio`. `Portfolio.Web/appsettings.json` y `appsettings.Development.json` no contienen nombres de servidores ni credenciales específicas de una máquina. El proyecto Web utiliza `UserSecretsId` para que cada entorno de desarrollo configure su propia instancia SQL Server mediante User Secrets. En otros entornos, especialmente producción, la cadena debe suministrarse mediante variables de entorno, secretos de Docker u otro mecanismo seguro de configuración.
 
-La primera migración es `InitialPortfolioContent`. Crea las tablas iniciales sin datos de contenido. Posteriormente, `AddProjectTranslations` separó los campos traducibles de proyectos en `ProjectTranslations`, `AddProjectPreviewImagePath` añadió la ruta opcional de la imagen de vista previa, `AddCertificationTranslations` separó los campos traducibles de certificaciones, `AddCertificationImagePath` añadió su imagen opcional, `AddExperienceTranslations` separó los campos traducibles de experiencia, `AddBlogPostTranslations` separó los campos traducibles de artículos y `AddBlogPostFeaturedImage` añadió la imagen destacada común y su texto alternativo localizado. Las migraciones se han aplicado en la base de datos `PortfolioDb` del entorno local de desarrollo. Las migraciones permanecen en `Portfolio.Infrastructure/Migrations` y `dotnet ef` utiliza la configuración del proyecto Web, incluido el User Secret de desarrollo.
+La primera migración es `InitialPortfolioContent`. Crea las tablas iniciales sin datos de contenido. Posteriormente, `AddProjectTranslations` separó los campos traducibles de proyectos en `ProjectTranslations`, `AddProjectPreviewImagePath` añadió la ruta opcional de la imagen de vista previa, `AddCertificationTranslations` separó los campos traducibles de certificaciones, `AddCertificationImagePath` añadió su imagen opcional, `AddExperienceTranslations` separó los campos traducibles de experiencia, `AddBlogPostTranslations` separó los campos traducibles de artículos, `AddBlogPostFeaturedImage` añadió la imagen destacada común y su texto alternativo localizado, `AddExperienceAttachments` añade metadatos de los adjuntos, y `ExpandExperienceDescription` amplía la descripción de experiencia a 2.000 caracteres. Cada base destino debe actualizarse manualmente con `dotnet ef database update` después de verificar que la configuración apunta al destino correcto. Las migraciones permanecen en `Portfolio.Infrastructure/Migrations` y `dotnet ef` utiliza la configuración del proyecto Web; no se deben incluir valores de User Secrets en documentación ni en archivos versionados.
 
 La configuración local no se versiona con valores específicos. El procedimiento para inicializar, consultar o modificar `ConnectionStrings:Portfolio` mediante `dotnet user-secrets` está documentado en el `README.md` raíz.
 
@@ -1261,6 +1261,21 @@ El modelo actual de persistencia se documenta a continuación. Estos campos son 
 | `DisplayOrder` | Orden manual dentro de la línea temporal. |
 
 Los campos `RoleTitle`, `CompanyName` y `Summary` se almacenan en `ExperienceTranslations`, junto con `LanguageCode`.
+
+#### `ExperienceAttachments`
+
+| Columna | Explicación |
+| --- | --- |
+| `Id` | Identificador interno del adjunto. |
+| `ExperienceId` | Experiencia asociada; la FK restringe su borrado mientras conserve adjuntos. |
+| `OriginalFileName` | Nombre saneado mostrado en administración. |
+| `StorageKey` | Clave relativa opaca generada por el sistema; no es una ruta pública. |
+| `ContentType` | Tipo MIME validado (`application/pdf`, `image/jpeg` o `image/png`). |
+| `SizeBytes` | Tamaño verificado del archivo. |
+| `CreatedAt` | Fecha de recepción UTC. |
+| `IsPublic` | Privado por defecto (`false`); la publicación o revocación es explícita por adjunto. |
+
+Los binarios se guardan fuera de SQL Server en un directorio persistente configurable y fuera de `wwwroot`; la ruta pública anónima solo sirve adjuntos publicados y la ruta administrativa protegida por `AdministratorOnly` permite al administrador autenticado ver adjuntos privados y públicos. Ambas respuestas son en línea y usan `no-store` y `nosniff`. Límites iniciales: cinco archivos por experiencia, 10 MiB por archivo y PDF/JPG/JPEG/PNG. El tamaño, cantidad y directorio se configuran bajo `Portfolio:ExperienceAttachments` (`Directory`, `MaximumFileCount`, `MaximumFileSizeBytes` y `AllowedExtensions`); los valores predeterminados son `App_Data/ExperienceAttachments`, `5` y `10485760` bytes. Los tipos permitidos también se comprueban por MIME y firma; añadir formatos requiere ampliar explícitamente su validación, sin cambiar el esquema. Nunca guardar documentos potencialmente sensibles en `wwwroot` ni proporcionarles acceso público implícito.
 
 #### `Certifications`
 
@@ -1470,25 +1485,41 @@ El orden podrá modificarse cuando una decisión técnica lo justifique, pero no
 La Fase 7 se implementará por entregas funcionales, con pruebas y revisión antes de continuar:
 
 1. **Fundamentos administrativos:** ASP.NET Core Identity, login/logout, autorización de `/admin`, creación segura del único administrador y estructura del Dashboard. No habrá registro público. TinyMCE no forma parte de esta entrega.
-2. **Experiencia:** CRUD, edición de `es-ES` y `en-US`, aviso visible de la traducción que falte y orden de presentación. Se definirá la gestión de varios adjuntos por experiencia, como diplomas o cartas de recomendación. La entidad `Experience` actual no tiene media; el modelo se ampliará solo después de acordar metadatos, cantidad y reglas de acceso. Los documentos potencialmente sensibles serán privados por defecto y solo se expondrán con autorización explícita.
+2. **Experiencia:** CRUD, edición de `es-ES` y `en-US` desde un único formulario, aviso visible de la traducción ausente y orden manual. Completada en la segunda entrega. Los adjuntos usan `ExperienceAttachments` y un directorio persistente configurable, con nombres internos generados, metadatos mínimos y acceso privado por defecto. Decisiones acordadas: hasta cinco archivos por experiencia, 10 MiB cada uno, PDF/JPG/JPEG/PNG; el administrador puede publicar o revocar cada archivo explícitamente. Los adjuntos publicados se muestran en la web pública y los privados solo en administración autorizada. El límite, tamaño y ubicación pueden cambiar mediante configuración; incorporar otros formatos requiere ampliar el validador MIME/firma.
 3. **Proyectos:** CRUD, edición localizada, aviso de traducciones ausentes, orden/destacado y gestión de las imágenes asociadas.
 4. **Certificaciones:** CRUD, edición localizada, aviso de traducciones ausentes, fechas, credenciales, orden e imágenes o documentos acordados.
 5. **Blog:** listado de artículos con acción para crear, editar o eliminar. La acción «Editar» seleccionará el artículo por su identificador y cargará ese contenido en el editor; no hace falta un desplegable separado para escogerlo. La edición localizada se realizará desde el mismo formulario mediante pestañas o controles de idioma. TinyMCE 8 se usará únicamente para `BlogPostTranslation.Content`, por ser el campo de texto enriquecido; experiencia, proyectos y certificaciones usarán campos estructurados y controles de texto normales. El formulario incluirá un estado editorial explícito y permitirá guardar cambios aunque el artículo tenga todos sus campos rellenos pero todavía se encuentre en redacción.
 
-El almacenamiento de archivos se implementará como infraestructura reutilizable al aparecer la primera necesidad y se aprovechará en los módulos siguientes. Será configurable para desarrollo y QNAP, mantendrá los binarios fuera de SQL Server y aplicará validaciones de tipo/tamaño, nombres seguros y reglas explícitas de publicación/acceso.
+El almacenamiento de archivos se implementará como infraestructura reutilizable al aparecer la primera necesidad y se aprovechará en los módulos siguientes. El primer proveedor es un directorio persistente configurable (local para desarrollo y montable desde QNAP), mantiene los binarios fuera de SQL Server y valida tipo, firma, tamaño y nombres seguros. Cada módulo seguirá definiendo reglas explícitas de publicación/acceso antes de exponer archivos.
 
 ### Entrega 1 implementada — Fundamentos administrativos
 
 - `PortfolioDbContext` deriva de `IdentityDbContext<PortfolioUser>` y conserva la persistencia en `Portfolio.Infrastructure`.
-- ASP.NET Core Identity autentica mediante cookie `Portfolio.Admin.Authentication`, `HttpOnly`, `SameSite=Lax` y `Secure`, con expiración fija de 30 minutos y sin renovación deslizante. La cookie incorpora una marca de expiración validada también en las solicitudes HTTP; los circuitos Blazor revalidan cada minuto la expiración y el security stamp.
+- ASP.NET Core Identity autentica mediante cookie `Portfolio.Admin.Authentication`, `HttpOnly`, `SameSite=Lax` y `Secure`, con expiración tras 15 minutos de inactividad. La actividad autenticada de administración renueva la expiración con un intervalo mínimo entre renovaciones; el tracker del layout detecta escritura, teclado, puntero, scroll y tacto mediante una solicitud POST protegida por antiforgery. El servidor valida la expiración y los circuitos Blazor revalidan cada 30 segundos la actividad y el security stamp. La cookie no usa renovación deslizante por solicitudes ajenas a la administración.
 - La política `AdministratorOnly` exige el rol `Administrator`. No existe registro público.
-- Rutas implementadas: `GET /admin/login`, `POST /admin/login/submit`, `POST /admin/logout`, `GET /admin/access-denied` y `GET /admin` (Dashboard). El POST de login usa una ruta separada para evitar colisiones con el endpoint Razor Component; login y logout validan antiforgery, y logout requiere la política administrativa. El login permite mostrar u ocultar la contraseña.
-- El Dashboard muestra la identidad autenticada, navegación separada, resumen inicial de contenido y accesos deshabilitados para experiencias, proyectos, certificaciones y blog. No incluye CRUD.
+- Rutas implementadas: `GET /admin/login`, `POST /admin/login/submit`, `POST /admin/logout`, `POST /admin/session/activity`, `GET /admin/access-denied` y `GET /admin` (Dashboard). El POST de login usa una ruta separada para evitar colisiones con el endpoint Razor Component; login, actividad y logout validan antiforgery, y actividad/logout requieren la política administrativa. El login permite mostrar u ocultar la contraseña.
+- En esta primera entrega, el Dashboard mostraba la identidad autenticada, navegación separada, resumen inicial de contenido y accesos deshabilitados para experiencias, proyectos, certificaciones y blog. No incluía CRUD.
 - El login y el Dashboard utilizan recursos compartidos para `es-ES` y `en-US`. Los navbars público y administrativo comparten selectores compactos de tema e idioma; las opciones incluyen iconos, con etiquetas accesibles no visibles. El tema administrativo utiliza los tokens semánticos compartidos también en los paneles MudBlazor.
 - Si hay una sesión administrativa, el navbar público muestra únicamente la acción para cerrar sesión, sin mostrar el correo. El cierre de sesión está al final y alineado a la derecha en ambos navbars.
 - `Portfolio.AdminProvisioning` aprovisiona de forma puntual el único administrador usando `UserManager`; pide y confirma la contraseña de forma oculta, y la almacena Identity como hash. Exige que la migración esté aplicada. En desarrollo comparte el `UserSecretsId` de Web; en despliegue acepta la cadena de conexión mediante configuración de entorno.
 - Migración generada: `20260925120731_AddAdministrativeIdentity` (`AddAdministrativeIdentity`), aplicada en la base de datos de desarrollo; debe aplicarse en cada nueva base de datos destino antes del aprovisionamiento.
-- Quedan para futuras entregas la gestión de usuarios, recuperación de contraseña, MFA y CRUD de contenidos. Los enlaces a los módulos de contenido permanecen deshabilitados.
+- Quedan para futuras entregas la gestión de usuarios, recuperación de contraseña, MFA y los módulos de proyectos, certificaciones y blog.
+
+### Entrega 2 implementada — Experiencias
+
+- CRUD administrativo en `/admin/experiences` y `/admin/experiences/edit`, protegido con `AdministratorOnly`; Experiencias es el único módulo de contenido habilitado. No se ha adelantado la gestión de proyectos, certificaciones ni blog.
+- Un único formulario permite editar fechas, orden y traducciones `es-ES`/`en-US`. El contenido español completo es obligatorio para conservar el fallback público; la traducción inglesa puede omitirse y el listado/editor muestran un aviso visible. Una traducción parcialmente introducida debe completarse antes de guardar.
+- La validación de servidor comprueba campos requeridos y longitudes, orden no negativo y fechas coherentes. Los mensajes se resuelven mediante los recursos compartidos `es-ES` y `en-US`.
+- La descripción se mantiene como texto plano con saltos de línea y un máximo de 2.000 caracteres por idioma. En la web pública se limita inicialmente a cuatro líneas con acción accesible para expandir y contraer.
+- El editor detecta cambios pendientes comparando el formulario con su estado inicial. Al pulsar enlaces de navegación internos marcados para protección o cerrar sesión desde cualquiera de los navbars, presenta el diálogo propio con opciones localizadas para seguir editando o salir sin guardar. El diálogo se ejecuta en el cliente y reutiliza el diseño visual del aviso de expiración de sesión; no depende de una invocación .NET sobre el circuito Interactive Server.
+- Al confirmar la salida se continúa con el destino del enlace original. En el caso de cerrar sesión, se reenvía el formulario como `POST` con antiforgery; cancelar el diálogo no navega ni envía el formulario. El listener de `beforeunload` conserva el aviso nativo para recarga y cierre de pestaña/ventana; `NavigationLock` confirma la navegación atrás cuando Blazor la procesa como externa. No se sustituye el diálogo nativo del navegador por uno personalizado.
+- La persistencia actualiza experiencia y traducciones en una única operación de EF Core. La eliminación se rechaza hasta retirar primero los adjuntos asociados.
+- La consulta pública conserva `DisplayOrder` (con desempate por identificador), la selección del idioma solicitado y el fallback a `es-ES`; no se introduce un estado de publicación que el modelo existente no tenía. Solo se muestra una traducción completa. Incluye metadatos únicamente de los adjuntos publicados.
+- Los adjuntos aceptados son PDF/JPG/JPEG/PNG, hasta cinco por experiencia y 10 MiB cada uno. Se guardan en un directorio persistente configurable fuera de `wwwroot`, con metadatos en SQL Server, nombres de almacenamiento opacos, validación de MIME y firma, y `IsPublic=false` al subir. La UI administrativa permite publicar o revocar individualmente con confirmación antes de publicar. La ruta anónima `/experience-attachments/{attachmentId}` sirve solo adjuntos publicados; `/admin/experiences/attachments/{attachmentId}` requiere `AdministratorOnly` y permite al administrador previsualizar adjuntos privados y públicos. Ambas son respuestas inline con `no-store`/`nosniff`.
+- Las imágenes se muestran como miniaturas y los PDF presentan la primera página mediante PDF.js vendorizado localmente, con apertura del documento completo en nueva pestaña. El paquete `pdfjs-dist` está fijado en npm y `assets:copy` copia el módulo, worker, CMaps, fuentes estándar y licencia a `wwwroot/js/vendor/pdfjs`.
+- Migración generada: `20260927175613_AddExperienceAttachments`. Añade exclusivamente la tabla de metadatos, el índice por experiencia/fecha y una FK restrictiva. Debe aplicarse explícitamente en cada base de datos destino antes de usar adjuntos; no fue aplicada durante esta entrega.
+- Migración generada: `20260928091703_ExpandExperienceDescription`. Amplía `ExperienceTranslations.Summary` de `nvarchar(1000)` a `nvarchar(2000)`. Debe aplicarse manualmente en las bases de datos destino antes de guardar descripciones por encima de 1.000 caracteres; no se aplicó a ninguna base en esta modificación.
+- Las pruebas cubren autorización de página/descarga, validación, CRUD y persistencia de traducciones, traducción ausente y fallback, orden, límites/tipos/firmas de adjuntos, privacidad, publicación, rutas HTTP, descripción ampliada y expiración/renovación de sesión. La suite completa tiene 62 pruebas superadas. La interacción visual del diálogo de cambios pendientes no cuenta con automatización de navegador en la suite actual.
 
 ### Avisos de traducción y estado editorial del blog
 
@@ -1591,6 +1622,7 @@ Antes de empezar la implementación visual, las decisiones principales están ce
 - [x] Migración inicial aplicada en la base de datos local de desarrollo
 - [x] Fase 6 — Funcionalidades completada, incluido el envío real del formulario de contacto
 - [x] Fase 7, entrega 1 — Identity, autorización administrativa, aprovisionamiento y Dashboard inicial
+- [x] Fase 7, entrega 2 — CRUD de experiencias, traducciones y adjuntos privados, gestión de cambios sin guardar y protección de navegación
 
 ---
 
@@ -1598,7 +1630,7 @@ Antes de empezar la implementación visual, las decisiones principales están ce
 
 La **Fase 6 — Funcionalidades** está finalizada, incluida la prueba real satisfactoria del formulario de contacto mediante Gmail SMTP y OAuth 2.0. No quedan tareas de código de esa fase pendientes.
 
-La primera entrega de la **Fase 7 — Administración** está finalizada: Identity, login/logout, autorización administrativa, aprovisionamiento seguro y Dashboard inicial. El siguiente objetivo es la entrega de **Experiencias**, siguiendo el alcance incremental y las decisiones sobre adjuntos privados descritas en el plan de Fase 7.
+La primera entrega de la **Fase 7 — Administración** está finalizada: Identity, login/logout, autorización administrativa, aprovisionamiento seguro y Dashboard inicial. La segunda entrega de **Experiencias** está finalizada y probada: CRUD localizado, adjuntos con acceso/publicación controlados, mejoras de descripción e interfaz y protección contra pérdida de cambios. El siguiente objetivo es el módulo administrativo de **Proyectos**, como una entrega independiente; no forma parte de la entrega de Experiencias.
 
 La administración permitirá editar `Español` y `English` desde el mismo formulario mediante pestañas o controles equivalentes; la cultura seleccionada en la Navbar pública no determinará el idioma de edición del panel. El panel mostrará una advertencia cuando falte una traducción, sin confundir ese aviso con el estado editorial del blog.
 

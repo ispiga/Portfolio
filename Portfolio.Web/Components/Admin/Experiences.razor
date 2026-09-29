@@ -1,0 +1,117 @@
+@page "/admin/experiences"
+@attribute [Authorize(Policy = PortfolioAuthorization.AdministratorPolicy)]
+@layout AdminLayout
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.Extensions.Localization
+@using Portfolio.Application.Experiences
+@using Portfolio.Infrastructure.Identity
+@inject IExperienceAdministrationService ExperienceService
+@inject IStringLocalizer<SharedResource> Localizer
+
+<PageTitle>@Localizer["ExperienceAdminTitle"]</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="admin-dashboard">
+    <header class="admin-dashboard__heading">
+        <MudText Typo="Typo.h1" Tag="@("h1")">@Localizer["ExperienceAdminTitle"]</MudText>
+        <MudText Typo="Typo.body1">@Localizer["ExperienceAdminDescription"]</MudText>
+    </header>
+
+    <MudButton Href="/admin/experiences/edit" Color="Color.Primary" Variant="Variant.Filled" Class="mb-4">
+        @Localizer["ExperienceCreate"]
+    </MudButton>
+
+    @if (experiences is null)
+    {
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary" aria-label="@Localizer["Loading"]" />
+    }
+    else if (experiences.Count == 0)
+    {
+        <MudPaper Elevation="1" Class="pa-5"><MudText>@Localizer["ExperienceAdminEmpty"]</MudText></MudPaper>
+    }
+    else
+    {
+        <MudTable Items="experiences" Hover="true" Breakpoint="Breakpoint.Sm">
+            <HeaderContent>
+                <MudTh>@Localizer["ExperienceOrder"]</MudTh>
+                <MudTh>@Localizer["ExperienceSpanish"]</MudTh>
+                <MudTh>@Localizer["ExperienceCompany"]</MudTh>
+                <MudTh>@Localizer["ExperienceTranslations"]</MudTh>
+                <MudTh><span class="visually-hidden">@Localizer["Actions"]</span></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="@Localizer["ExperienceOrder"]">@context.DisplayOrder</MudTd>
+                <MudTd DataLabel="@Localizer["ExperienceSpanish"]">@context.SpanishRoleTitle</MudTd>
+                <MudTd DataLabel="@Localizer["ExperienceCompany"]">@context.SpanishCompanyName</MudTd>
+                <MudTd DataLabel="@Localizer["ExperienceTranslations"]">
+                    @if (!context.HasSpanishTranslation)
+                    {
+                        <MudChip T="string" Color="Color.Warning" Variant="Variant.Outlined">@Localizer["ExperienceTranslationMissingSpanish"]</MudChip>
+                    }
+                    @if (!context.HasEnglishTranslation)
+                    {
+                        <MudChip T="string" Color="Color.Warning" Variant="Variant.Outlined">@Localizer["ExperienceTranslationMissingEnglish"]</MudChip>
+                    }
+                </MudTd>
+                <MudTd>
+                    <MudButton Href="@($"/admin/experiences/edit/{context.Id}")" Variant="Variant.Outlined" Color="Color.Primary">
+                        @Localizer["Edit"]
+                    </MudButton>
+                    <MudButton OnClick="@(() => RequestDelete(context.Id))" Variant="Variant.Outlined" Color="Color.Error">
+                        @Localizer["Delete"]
+                    </MudButton>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    }
+
+    @if (deleteId is { } pendingDeleteId)
+    {
+        <MudAlert Severity="Severity.Warning" Class="mt-4" Role="alert">
+            @Localizer["ExperienceDeleteConfirmation"]
+            <MudButton OnClick="@(() => ConfirmDeleteAsync(pendingDeleteId))" Color="Color.Error" Variant="Variant.Filled">@Localizer["Delete"]</MudButton>
+            <MudButton OnClick="CancelDelete" Variant="Variant.Outlined">@Localizer["Cancel"]</MudButton>
+        </MudAlert>
+    }
+    @if (operationMessage is not null)
+    {
+        <MudAlert Severity="@operationSeverity" Class="mt-4" Role="status">@operationMessage</MudAlert>
+    }
+</MudContainer>
+
+@code {
+    private IReadOnlyList<ExperienceAdminListItem>? experiences;
+    private Guid? deleteId;
+    private string? operationMessage;
+    private Severity operationSeverity = Severity.Info;
+
+    protected override async Task OnInitializedAsync() => await ReloadAsync();
+
+    private async Task ReloadAsync() => experiences = await ExperienceService.GetExperiencesAsync();
+
+    private void RequestDelete(Guid id)
+    {
+        deleteId = id;
+        operationMessage = null;
+    }
+
+    private void CancelDelete() => deleteId = null;
+
+    private async Task ConfirmDeleteAsync(Guid id)
+    {
+        var result = await ExperienceService.DeleteAsync(id);
+        deleteId = null;
+        if (result == ExperienceDeleteResult.Deleted)
+        {
+            operationMessage = Localizer["ExperienceDeleted"];
+            operationSeverity = Severity.Success;
+            await ReloadAsync();
+        }
+        else
+        {
+            operationMessage = Localizer[result == ExperienceDeleteResult.HasAttachments
+                ? "ExperienceDeleteHasAttachments"
+                : "ExperienceNotFound"];
+            operationSeverity = Severity.Error;
+        }
+    }
+}

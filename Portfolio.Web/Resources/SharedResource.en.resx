@@ -1,139 +1,714 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
-  <resheader name="version"><value>2.0</value></resheader>
-  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
-  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
-  <data name="HomeTitle" xml:space="preserve"><value>Portfolio</value></data>
-  <data name="HomeDescription" xml:space="preserve"><value>Application under construction</value></data>
-  <data name="PortfolioName" xml:space="preserve"><value>Portfolio</value></data>
-  <data name="MainNavigation" xml:space="preserve"><value>Main navigation</value></data>
-  <data name="About" xml:space="preserve"><value>About me</value></data>
-  <data name="Projects" xml:space="preserve"><value>Projects</value></data>
-  <data name="Certificates" xml:space="preserve"><value>Certificates</value></data>
-  <data name="Blog" xml:space="preserve"><value>Blog</value></data>
-  <data name="Contact" xml:space="preserve"><value>Contact</value></data>
-  <data name="OpenMenu" xml:space="preserve"><value>Open menu</value></data>
-  <data name="CloseMenu" xml:space="preserve"><value>Close menu</value></data>
-  <data name="Theme" xml:space="preserve"><value>Theme</value></data>
-  <data name="ThemeSystem" xml:space="preserve"><value>System</value></data>
-  <data name="ThemeLight" xml:space="preserve"><value>Light</value></data>
-  <data name="ThemeDark" xml:space="preserve"><value>Dark</value></data>
-  <data name="Language" xml:space="preserve"><value>Language</value></data>
-  <data name="LanguageSpanish" xml:space="preserve"><value>Español</value></data>
-  <data name="LanguageEnglish" xml:space="preserve"><value>English</value></data>
-  <data name="Copyright" xml:space="preserve"><value>© {0} — All rights reserved.</value></data>
-  <data name="HeroEyebrow" xml:space="preserve"><value>Professional portfolio</value></data>
-  <data name="HeroTitle" xml:space="preserve"><value>Building digital solutions with .NET</value></data>
-  <data name="HeroDescription" xml:space="preserve"><value>An initial structure to present experience, projects and technical knowledge.</value></data>
-  <data name="HeroCta" xml:space="preserve"><value>Let's talk</value></data>
-  <data name="TechnologyVisualLabel" xml:space="preserve"><value>Technology visual composition</value></data>
-  <data name="TechnologyCore" xml:space="preserve"><value>&lt;/&gt;</value></data>
-  <data name="TechnologyDotNet" xml:space="preserve"><value>.NET</value></data>
-  <data name="TechnologyCSharp" xml:space="preserve"><value>C#</value></data>
-  <data name="TechnologySql" xml:space="preserve"><value>SQL</value></data>
-  <data name="TechnologyWeb" xml:space="preserve"><value>Web</value></data>
-  <data name="AboutEyebrow" xml:space="preserve"><value>Profile</value></data>
-  <data name="AboutTitle" xml:space="preserve"><value>About me</value></data>
-  <data name="AboutPlaceholder" xml:space="preserve"><value>This section will be completed with the definitive professional profile, specialisation and technical approach.</value></data>
-  <data name="AboutAreasLabel" xml:space="preserve"><value>Main areas of work</value></data>
-  <data name="AreaBackend" xml:space="preserve"><value>Backend</value></data>
-  <data name="AreaBackendDescription" xml:space="preserve"><value>C# and .NET development</value></data>
-  <data name="AreaFrontend" xml:space="preserve"><value>Frontend</value></data>
-  <data name="AreaFrontendDescription" xml:space="preserve"><value>Blazor, HTML and CSS</value></data>
-  <data name="AreaData" xml:space="preserve"><value>Data</value></data>
-  <data name="AreaDataDescription" xml:space="preserve"><value>Data and analytics</value></data>
-  <data name="AreaDevOps" xml:space="preserve"><value>DevOps</value></data>
-  <data name="AreaDevOpsDescription" xml:space="preserve"><value>Automation and delivery</value></data>
-  <data name="ExperienceEyebrow" xml:space="preserve"><value>Career</value></data>
-  <data name="ExperienceTitle" xml:space="preserve"><value>Experience</value></data>
-  <data name="ExperienceEmpty" xml:space="preserve"><value>Professional experience will be added when the definitive information is available.</value></data>
-	<data name="ExperienceCurrent" xml:space="preserve"><value>Present</value></data>
-  <data name="ExperienceDateSeparator" xml:space="preserve"><value>—</value></data>
-  <data name="ProjectsEyebrow" xml:space="preserve"><value>Selected work</value></data>
-  <data name="ProjectsTitle" xml:space="preserve"><value>Projects</value></data>
-  <data name="ProjectsIntro" xml:space="preserve"><value>A selection of projects will be available soon.</value></data>
-	<data name="ProjectsEmpty" xml:space="preserve"><value>There are no projects available to show yet.</value></data>
-  <data name="ProjectPlaceholderTitle" xml:space="preserve"><value>Project to be published</value></data>
-  <data name="ProjectPlaceholderDescription" xml:space="preserve"><value>The card will show its purpose, technologies and links when real content is available.</value></data>
-  <data name="TechnologiesLabel" xml:space="preserve"><value>Project technologies</value></data>
-  <data name="ProjectTechnologyPlaceholder" xml:space="preserve"><value>Technologies to be defined</value></data>
-  <data name="ProjectStatusPlaceholder" xml:space="preserve"><value>Coming soon</value></data>
-  <data name="ProjectVisualPlaceholder" xml:space="preserve"><value>Project preview</value></data>
-	<data name="ProjectFeatured" xml:space="preserve"><value>Featured project</value></data>
-  <data name="ProjectRepository" xml:space="preserve"><value>View repository</value></data>
-  <data name="ProjectDemo" xml:space="preserve"><value>View demo</value></data>
-  <data name="CertificatesEyebrow" xml:space="preserve"><value>Learning</value></data>
-  <data name="CertificatesTitle" xml:space="preserve"><value>Certifications</value></data>
-	<data name="CertificationsEmpty" xml:space="preserve"><value>There are no certifications available to show yet.</value></data>
-  <data name="CertificationIssuedOn" xml:space="preserve"><value>Obtained:</value></data>
-  <data name="CertificationCredential" xml:space="preserve"><value>View credential</value></data>
-  <data name="CertificationPlaceholderTitle" xml:space="preserve"><value>Certification to be published</value></data>
-  <data name="CertificationPlaceholderDescription" xml:space="preserve"><value>Certification details will be shown when available.</value></data>
-  <data name="BlogEyebrow" xml:space="preserve"><value>Ideas and learning</value></data>
-  <data name="BlogTitle" xml:space="preserve"><value>Latest published article</value></data>
-  <data name="BlogPlaceholderVisual" xml:space="preserve"><value>Featured article</value></data>
-	<data name="BlogFeatured" xml:space="preserve"><value>Featured article</value></data>
-  <data name="BlogPublishedOn" xml:space="preserve"><value>Published:</value></data>
-  <data name="BlogEmpty" xml:space="preserve"><value>There are no published articles to feature yet.</value></data>
-  <data name="ContactEyebrow" xml:space="preserve"><value>Let's connect</value></data>
-  <data name="ContactTitle" xml:space="preserve"><value>Contact</value></data>
-	<data name="ContactIntro" xml:space="preserve"><value>Do you have an idea or an opportunity? Send me a message.</value></data>
-  <data name="ContactFormNote" xml:space="preserve"><value>I will reply to your message as soon as possible.</value></data>
-  <data name="ContactName" xml:space="preserve"><value>Name</value></data>
-  <data name="ContactEmail" xml:space="preserve"><value>Email</value></data>
-  <data name="ContactMessage" xml:space="preserve"><value>Message</value></data>
-	<data name="ContactSubmit" xml:space="preserve"><value>Send message</value></data>
-  <data name="ContactSending" xml:space="preserve"><value>Sending message…</value></data>
-  <data name="ContactSuccess" xml:space="preserve"><value>Your message was sent successfully.</value></data>
-  <data name="ContactError" xml:space="preserve"><value>The message could not be sent. Please try again later.</value></data>
-  <data name="ContactValidationError" xml:space="preserve"><value>Review the indicated fields before sending the form.</value></data>
-  <data name="ContactRequired" xml:space="preserve"><value>This field is required.</value></data>
-  <data name="ContactEmailInvalid" xml:space="preserve"><value>Enter a valid email address.</value></data>
-  <data name="ContactNameMaxLength" xml:space="preserve"><value>The name cannot exceed 100 characters.</value></data>
-  <data name="ContactEmailMaxLength" xml:space="preserve"><value>The email cannot exceed 254 characters.</value></data>
-  <data name="ContactMessageMaxLength" xml:space="preserve"><value>The message cannot exceed 4000 characters.</value></data>
-  <data name="ContactHoneypotLabel" xml:space="preserve"><value>Company</value></data>
-  <data name="AdminAreaLabel" xml:space="preserve"><value>Administration</value></data>
-  <data name="AdminNavigation" xml:space="preserve"><value>Administrative navigation</value></data>
-  <data name="AdminDashboard" xml:space="preserve"><value>Dashboard</value></data>
-  <data name="AdminDashboardTitle" xml:space="preserve"><value>Administration dashboard</value></data>
-  <data name="AdminLoginTitle" xml:space="preserve"><value>Administrator sign in</value></data>
-  <data name="AdminLoginDescription" xml:space="preserve"><value>Sign in with the authorized administrator account.</value></data>
-  <data name="AdminEmailLabel" xml:space="preserve"><value>Email address</value></data>
-  <data name="AdminEmailRequired" xml:space="preserve"><value>Enter your email address.</value></data>
-  <data name="AdminEmailInvalid" xml:space="preserve"><value>Enter a valid email address.</value></data>
-  <data name="AdminPasswordLabel" xml:space="preserve"><value>Password</value></data>
-  <data name="AdminPasswordRequired" xml:space="preserve"><value>Enter your password.</value></data>
-	<data name="ShowPassword" xml:space="preserve"><value>Show password</value></data>
-  <data name="HidePassword" xml:space="preserve"><value>Hide password</value></data>
-  <data name="AdminLoginButton" xml:space="preserve"><value>Sign in</value></data>
-  <data name="AdminLoginFailed" xml:space="preserve"><value>Sign-in failed. Check your credentials and try again.</value></data>
-  <data name="AdminValidationSummary" xml:space="preserve"><value>Review the indicated fields before continuing.</value></data>
-  <data name="AdminLoggedOut" xml:space="preserve"><value>You have signed out successfully.</value></data>
-  <data name="AdminLogout" xml:space="preserve"><value>Sign out</value></data>
-  <data name="AdminWelcome" xml:space="preserve"><value>Signed in as {0}.</value></data>
-  <data name="AdminIdentityTitle" xml:space="preserve"><value>Identity</value></data>
-  <data name="AdminIdentityLabel" xml:space="preserve"><value>Authenticated user</value></data>
-  <data name="AdminRoleLabel" xml:space="preserve"><value>Administrator</value></data>
-  <data name="AdminActionsTitle" xml:space="preserve"><value>Content areas</value></data>
-  <data name="AdminExperiences" xml:space="preserve"><value>Experience</value></data>
-  <data name="AdminExperiencesDescription" xml:space="preserve"><value>Manage professional experience.</value></data>
-  <data name="AdminProjects" xml:space="preserve"><value>Projects</value></data>
-  <data name="AdminProjectsDescription" xml:space="preserve"><value>Manage portfolio projects.</value></data>
-  <data name="AdminCertifications" xml:space="preserve"><value>Certifications</value></data>
-  <data name="AdminCertificationsDescription" xml:space="preserve"><value>Manage certifications and credentials.</value></data>
-  <data name="AdminBlog" xml:space="preserve"><value>Blog</value></data>
-  <data name="AdminBlogDescription" xml:space="preserve"><value>Manage articles and posts.</value></data>
-  <data name="AdminModuleNotAvailable" xml:space="preserve"><value>Planned for a future delivery</value></data>
-  <data name="AdminOpenModule" xml:space="preserve"><value>Coming soon</value></data>
-  <data name="AdminContentSummaryTitle" xml:space="preserve"><value>Content status</value></data>
-  <data name="AdminContentSummary" xml:space="preserve"><value>Authentication and the administration structure are ready. Content management is not enabled yet.</value></data>
-  <data name="AdminPublicSiteAction" xml:space="preserve"><value>View public site</value></data>
-  <data name="AdminAccessDeniedTitle" xml:space="preserve"><value>Access denied</value></data>
-  <data name="AdminAccessDeniedMessage" xml:space="preserve"><value>Your account is not authorized to access this area.</value></data>
-  <data name="AdminLoginRequiredTitle" xml:space="preserve"><value>Sign in to continue</value></data>
-  <data name="AdminLoginRequiredMessage" xml:space="preserve"><value>This area requires an authorized administrator account.</value></data>
-  <data name="AdminLoginLink" xml:space="preserve"><value>Go to administrator sign in</value></data>
-  <data name="AdminReturnHome" xml:space="preserve"><value>Return to the public site</value></data>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="HomeTitle" xml:space="preserve">
+    <value>Portfolio</value>
+  </data>
+  <data name="HomeDescription" xml:space="preserve">
+    <value>Application under construction</value>
+  </data>
+  <data name="HeroEyebrow" xml:space="preserve">
+    <value>Professional portfolio</value>
+  </data>
+  <data name="HeroTitle" xml:space="preserve">
+    <value>Building digital solutions with .NET</value>
+  </data>
+  <data name="HeroDescription" xml:space="preserve">
+    <value>An initial structure to present experience, projects and technical knowledge.</value>
+  </data>
+  <data name="HeroCta" xml:space="preserve">
+    <value>Let's talk</value>
+  </data>
+  <data name="TechnologyVisualLabel" xml:space="preserve">
+    <value>Technology visual composition</value>
+  </data>
+  <data name="TechnologyCore" xml:space="preserve">
+    <value>&lt;/&gt;</value>
+  </data>
+  <data name="TechnologyDotNet" xml:space="preserve">
+    <value>.NET</value>
+  </data>
+  <data name="TechnologyCSharp" xml:space="preserve">
+    <value>C#</value>
+  </data>
+  <data name="TechnologySql" xml:space="preserve">
+    <value>SQL</value>
+  </data>
+  <data name="TechnologyWeb" xml:space="preserve">
+    <value>Web</value>
+  </data>
+  <data name="AboutEyebrow" xml:space="preserve">
+    <value>Profile</value>
+  </data>
+  <data name="AboutTitle" xml:space="preserve">
+    <value>About me</value>
+  </data>
+  <data name="AboutPlaceholder" xml:space="preserve">
+    <value>This section will be completed with the definitive professional profile, specialisation and technical approach.</value>
+  </data>
+  <data name="AboutAreasLabel" xml:space="preserve">
+    <value>Main areas of work</value>
+  </data>
+  <data name="AreaBackend" xml:space="preserve">
+    <value>Backend</value>
+  </data>
+  <data name="AreaBackendDescription" xml:space="preserve">
+    <value>C# and .NET development</value>
+  </data>
+  <data name="AreaFrontend" xml:space="preserve">
+    <value>Frontend</value>
+  </data>
+  <data name="AreaFrontendDescription" xml:space="preserve">
+    <value>Blazor, HTML and CSS</value>
+  </data>
+  <data name="AreaData" xml:space="preserve">
+    <value>Data</value>
+  </data>
+  <data name="AreaDataDescription" xml:space="preserve">
+    <value>Data and analytics</value>
+  </data>
+  <data name="AreaDevOps" xml:space="preserve">
+    <value>DevOps</value>
+  </data>
+  <data name="AreaDevOpsDescription" xml:space="preserve">
+    <value>Automation and delivery</value>
+  </data>
+  <data name="ExperienceEyebrow" xml:space="preserve">
+    <value>Career</value>
+  </data>
+  <data name="ExperienceTitle" xml:space="preserve">
+    <value>Experience</value>
+  </data>
+  <data name="ExperienceEmpty" xml:space="preserve">
+    <value>Professional experience will be added when the definitive information is available.</value>
+  </data>
+  <data name="ExperienceCurrent" xml:space="preserve">
+    <value>Present</value>
+  </data>
+  <data name="ExperienceDateSeparator" xml:space="preserve">
+    <value>—</value>
+  </data>
+  <data name="ProjectsEyebrow" xml:space="preserve">
+    <value>Selected work</value>
+  </data>
+  <data name="ProjectsTitle" xml:space="preserve">
+    <value>Projects</value>
+  </data>
+  <data name="ProjectsIntro" xml:space="preserve">
+    <value>A selection of projects will be available soon.</value>
+  </data>
+  <data name="ProjectsEmpty" xml:space="preserve">
+    <value>There are no projects available to show yet.</value>
+  </data>
+  <data name="ProjectPlaceholderTitle" xml:space="preserve">
+    <value>Project to be published</value>
+  </data>
+  <data name="ProjectPlaceholderDescription" xml:space="preserve">
+    <value>The card will show its purpose, technologies and links when real content is available.</value>
+  </data>
+  <data name="TechnologiesLabel" xml:space="preserve">
+    <value>Project technologies</value>
+  </data>
+  <data name="ProjectTechnologyPlaceholder" xml:space="preserve">
+    <value>Technologies to be defined</value>
+  </data>
+  <data name="ProjectStatusPlaceholder" xml:space="preserve">
+    <value>Coming soon</value>
+  </data>
+  <data name="ProjectVisualPlaceholder" xml:space="preserve">
+    <value>Project preview</value>
+  </data>
+  <data name="ProjectFeatured" xml:space="preserve">
+    <value>Featured project</value>
+  </data>
+  <data name="ProjectRepository" xml:space="preserve">
+    <value>View repository</value>
+  </data>
+  <data name="ProjectDemo" xml:space="preserve">
+    <value>View demo</value>
+  </data>
+  <data name="CertificatesEyebrow" xml:space="preserve">
+    <value>Learning</value>
+  </data>
+  <data name="CertificatesTitle" xml:space="preserve">
+    <value>Certifications</value>
+  </data>
+  <data name="CertificationsEmpty" xml:space="preserve">
+    <value>There are no certifications available to show yet.</value>
+  </data>
+  <data name="CertificationIssuedOn" xml:space="preserve">
+    <value>Obtained:</value>
+  </data>
+  <data name="CertificationCredential" xml:space="preserve">
+    <value>View credential</value>
+  </data>
+  <data name="CertificationPlaceholderTitle" xml:space="preserve">
+    <value>Certification to be published</value>
+  </data>
+  <data name="CertificationPlaceholderDescription" xml:space="preserve">
+    <value>Certification details will be shown when available.</value>
+  </data>
+  <data name="BlogEyebrow" xml:space="preserve">
+    <value>Ideas and learning</value>
+  </data>
+  <data name="BlogTitle" xml:space="preserve">
+    <value>Latest published article</value>
+  </data>
+  <data name="BlogPlaceholderVisual" xml:space="preserve">
+    <value>Featured article</value>
+  </data>
+  <data name="BlogFeatured" xml:space="preserve">
+    <value>Featured article</value>
+  </data>
+  <data name="BlogPublishedOn" xml:space="preserve">
+    <value>Published:</value>
+  </data>
+  <data name="BlogEmpty" xml:space="preserve">
+    <value>There are no published articles to feature yet.</value>
+  </data>
+  <data name="ContactEyebrow" xml:space="preserve">
+    <value>Let's connect</value>
+  </data>
+  <data name="ContactTitle" xml:space="preserve">
+    <value>Contact</value>
+  </data>
+  <data name="ContactIntro" xml:space="preserve">
+    <value>Do you have an idea or an opportunity? Send me a message.</value>
+  </data>
+  <data name="ContactFormNote" xml:space="preserve">
+    <value>I will reply to your message as soon as possible.</value>
+  </data>
+  <data name="ContactName" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="ContactEmail" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="ContactMessage" xml:space="preserve">
+    <value>Message</value>
+  </data>
+  <data name="ContactSubmit" xml:space="preserve">
+    <value>Send message</value>
+  </data>
+  <data name="ContactSending" xml:space="preserve">
+    <value>Sending message…</value>
+  </data>
+  <data name="ContactSuccess" xml:space="preserve">
+    <value>Your message was sent successfully.</value>
+  </data>
+  <data name="ContactError" xml:space="preserve">
+    <value>The message could not be sent. Please try again later.</value>
+  </data>
+  <data name="ContactValidationError" xml:space="preserve">
+    <value>Review the indicated fields before sending the form.</value>
+  </data>
+  <data name="ContactRequired" xml:space="preserve">
+    <value>This field is required.</value>
+  </data>
+  <data name="ContactEmailInvalid" xml:space="preserve">
+    <value>Enter a valid email address.</value>
+  </data>
+  <data name="ContactNameMaxLength" xml:space="preserve">
+    <value>The name cannot exceed 100 characters.</value>
+  </data>
+  <data name="ContactEmailMaxLength" xml:space="preserve">
+    <value>The email cannot exceed 254 characters.</value>
+  </data>
+  <data name="ContactMessageMaxLength" xml:space="preserve">
+    <value>The message cannot exceed 4000 characters.</value>
+  </data>
+  <data name="ContactHoneypotLabel" xml:space="preserve">
+    <value>Company</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="LanguageSpanish" xml:space="preserve">
+    <value>Español</value>
+  </data>
+  <data name="LanguageEnglish" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="AdminAreaLabel" xml:space="preserve">
+    <value>Administration</value>
+  </data>
+  <data name="AdminNavigation" xml:space="preserve">
+    <value>Administrative navigation</value>
+  </data>
+  <data name="AdminDashboard" xml:space="preserve">
+    <value>Dashboard</value>
+  </data>
+  <data name="AdminDashboardTitle" xml:space="preserve">
+    <value>Administration dashboard</value>
+  </data>
+  <data name="AdminLoginTitle" xml:space="preserve">
+    <value>Administrator sign in</value>
+  </data>
+  <data name="AdminLoginDescription" xml:space="preserve">
+    <value>Sign in with the authorized administrator account.</value>
+  </data>
+  <data name="AdminEmailLabel" xml:space="preserve">
+    <value>Email address</value>
+  </data>
+  <data name="AdminEmailRequired" xml:space="preserve">
+    <value>Enter your email address.</value>
+  </data>
+  <data name="AdminEmailInvalid" xml:space="preserve">
+    <value>Enter a valid email address.</value>
+  </data>
+  <data name="AdminPasswordLabel" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="AdminPasswordRequired" xml:space="preserve">
+    <value>Enter your password.</value>
+  </data>
+  <data name="ShowPassword" xml:space="preserve">
+    <value>Show password</value>
+  </data>
+  <data name="HidePassword" xml:space="preserve">
+    <value>Hide password</value>
+  </data>
+  <data name="AdminLoginButton" xml:space="preserve">
+    <value>Sign in</value>
+  </data>
+  <data name="AdminLoginFailed" xml:space="preserve">
+    <value>Sign-in failed. Check your credentials and try again.</value>
+  </data>
+  <data name="AdminValidationSummary" xml:space="preserve">
+    <value>Review the indicated fields before continuing.</value>
+  </data>
+  <data name="AdminLoggedOut" xml:space="preserve">
+    <value>You have signed out successfully.</value>
+  </data>
+  <data name="AdminLogout" xml:space="preserve">
+    <value>Sign out</value>
+  </data>
+  <data name="AdminSessionExpiredTitle" xml:space="preserve">
+    <value>Administrator session expired</value>
+  </data>
+  <data name="AdminSessionExpiredMessage" xml:space="preserve">
+    <value>Your administrator session expired due to inactivity. Sign in again if you need to access the administration area.</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="AdminWelcome" xml:space="preserve">
+    <value>Signed in as {0}.</value>
+  </data>
+  <data name="AdminIdentityTitle" xml:space="preserve">
+    <value>Identity</value>
+  </data>
+  <data name="AdminIdentityLabel" xml:space="preserve">
+    <value>Authenticated user</value>
+  </data>
+  <data name="AdminRoleLabel" xml:space="preserve">
+    <value>Administrator</value>
+  </data>
+  <data name="AdminActionsTitle" xml:space="preserve">
+    <value>Content areas</value>
+  </data>
+  <data name="AdminExperiences" xml:space="preserve">
+    <value>Experience</value>
+  </data>
+  <data name="AdminExperiencesDescription" xml:space="preserve">
+    <value>Manage professional experience.</value>
+  </data>
+  <data name="AdminProjects" xml:space="preserve">
+    <value>Projects</value>
+  </data>
+  <data name="AdminProjectsDescription" xml:space="preserve">
+    <value>Manage portfolio projects.</value>
+  </data>
+  <data name="AdminCertifications" xml:space="preserve">
+    <value>Certifications</value>
+  </data>
+  <data name="AdminCertificationsDescription" xml:space="preserve">
+    <value>Manage certifications and credentials.</value>
+  </data>
+  <data name="AdminBlog" xml:space="preserve">
+    <value>Blog</value>
+  </data>
+  <data name="AdminBlogDescription" xml:space="preserve">
+    <value>Manage articles and posts.</value>
+  </data>
+  <data name="AdminModuleNotAvailable" xml:space="preserve">
+    <value>Planned for a future delivery</value>
+  </data>
+  <data name="AdminOpenModule" xml:space="preserve">
+    <value>Coming soon</value>
+  </data>
+  <data name="AdminContentSummaryTitle" xml:space="preserve">
+    <value>Content status</value>
+  </data>
+  <data name="AdminContentSummary" xml:space="preserve">
+    <value>Experience management is available. The remaining modules will be enabled in future deliveries.</value>
+  </data>
+  <data name="AdminPublicSiteAction" xml:space="preserve">
+    <value>View public site</value>
+  </data>
+  <data name="AdminAccessDeniedTitle" xml:space="preserve">
+    <value>Access denied</value>
+  </data>
+  <data name="AdminAccessDeniedMessage" xml:space="preserve">
+    <value>Your account is not authorized to access this area.</value>
+  </data>
+  <data name="AdminLoginRequiredTitle" xml:space="preserve">
+    <value>Sign in to continue</value>
+  </data>
+  <data name="AdminLoginRequiredMessage" xml:space="preserve">
+    <value>This area requires an authorized administrator account.</value>
+  </data>
+  <data name="AdminLoginLink" xml:space="preserve">
+    <value>Go to administrator sign in</value>
+  </data>
+  <data name="AdminReturnHome" xml:space="preserve">
+    <value>Return to the public site</value>
+  </data>
+  <data name="PortfolioName" xml:space="preserve">
+    <value>Portfolio</value>
+  </data>
+  <data name="MainNavigation" xml:space="preserve">
+    <value>Main navigation</value>
+  </data>
+  <data name="About" xml:space="preserve">
+    <value>About me</value>
+  </data>
+  <data name="Projects" xml:space="preserve">
+    <value>Projects</value>
+  </data>
+  <data name="Certificates" xml:space="preserve">
+    <value>Certificates</value>
+  </data>
+  <data name="Blog" xml:space="preserve">
+    <value>Blog</value>
+  </data>
+  <data name="Contact" xml:space="preserve">
+    <value>Contact</value>
+  </data>
+  <data name="OpenMenu" xml:space="preserve">
+    <value>Open menu</value>
+  </data>
+  <data name="CloseMenu" xml:space="preserve">
+    <value>Close menu</value>
+  </data>
+  <data name="Theme" xml:space="preserve">
+    <value>Theme</value>
+  </data>
+  <data name="ThemeSystem" xml:space="preserve">
+    <value>System</value>
+  </data>
+  <data name="ThemeLight" xml:space="preserve">
+    <value>Light</value>
+  </data>
+  <data name="ThemeDark" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="Copyright" xml:space="preserve">
+    <value>© {0} — All rights reserved.</value>
+  </data>
+  <data name="ExperienceModuleAvailable" xml:space="preserve">
+    <value>Available</value>
+  </data>
+  <data name="ExperienceManageAction" xml:space="preserve">
+    <value>Manage experience</value>
+  </data>
+  <data name="ExperienceAdminTitle" xml:space="preserve">
+    <value>Professional experience</value>
+  </data>
+  <data name="ExperienceAdminDescription" xml:space="preserve">
+    <value>Manage dates, display order, and Spanish and English content.</value>
+  </data>
+  <data name="ExperienceAdminEmpty" xml:space="preserve">
+    <value>There are no experiences yet.</value>
+  </data>
+  <data name="ExperienceCreate" xml:space="preserve">
+    <value>New experience</value>
+  </data>
+  <data name="ExperienceEdit" xml:space="preserve">
+    <value>Edit experience</value>
+  </data>
+  <data name="ExperienceDetails" xml:space="preserve">
+    <value>Experience details</value>
+  </data>
+  <data name="ExperienceStartDate" xml:space="preserve">
+    <value>Start date</value>
+  </data>
+  <data name="ExperienceStartDateRequired" xml:space="preserve">
+    <value>Enter a valid start date.</value>
+  </data>
+  <data name="ExperienceEndDate" xml:space="preserve">
+    <value>End date (optional)</value>
+  </data>
+  <data name="ExperienceOrder" xml:space="preserve">
+    <value>Display order</value>
+  </data>
+  <data name="ExperienceSpanish" xml:space="preserve">
+    <value>Spanish</value>
+  </data>
+  <data name="ExperienceEnglish" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="ExperienceCompany" xml:space="preserve">
+    <value>Company</value>
+  </data>
+  <data name="ExperienceRole" xml:space="preserve">
+    <value>Role</value>
+  </data>
+  <data name="ExperienceSummary" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="ExperienceDescriptionExpand" xml:space="preserve">
+    <value>Show more</value>
+  </data>
+  <data name="ExperienceDescriptionCollapse" xml:space="preserve">
+    <value>Show less</value>
+  </data>
+  <data name="ExperienceTranslations" xml:space="preserve">
+    <value>Translations</value>
+  </data>
+  <data name="ExperienceTranslationMissingSpanish" xml:space="preserve">
+    <value>A complete Spanish translation is missing.</value>
+  </data>
+  <data name="ExperienceTranslationMissingEnglish" xml:space="preserve">
+    <value>A complete English translation is missing.</value>
+  </data>
+  <data name="ExperienceFieldRequired" xml:space="preserve">
+    <value>Complete this field to save the translation.</value>
+  </data>
+  <data name="ExperienceFieldTooLong" xml:space="preserve">
+    <value>The content exceeds the maximum allowed length.</value>
+  </data>
+  <data name="ExperienceEndDateBeforeStart" xml:space="preserve">
+    <value>The end date cannot be earlier than the start date.</value>
+  </data>
+  <data name="ExperienceDisplayOrderInvalid" xml:space="preserve">
+    <value>Order must be a number greater than or equal to zero.</value>
+  </data>
+  <data name="ExperienceNotFound" xml:space="preserve">
+    <value>The experience could not be found.</value>
+  </data>
+  <data name="ExperienceDeleteConfirmation" xml:space="preserve">
+    <value>Delete this experience? This action cannot be undone.</value>
+  </data>
+  <data name="ExperienceDeleteHasAttachments" xml:space="preserve">
+    <value>Delete private attachments before deleting this experience.</value>
+  </data>
+  <data name="ExperienceDeleted" xml:space="preserve">
+    <value>The experience was deleted.</value>
+  </data>
+  <data name="ExperienceSaving" xml:space="preserve">
+    <value>Saving…</value>
+  </data>
+  <data name="ExperienceAttachments" xml:space="preserve">
+    <value>Private attachments</value>
+  </data>
+  <data name="ExperienceAttachmentRules" xml:space="preserve">
+    <value>Up to {0} files per experience, {1} MB maximum per file. Formats: PDF, JPG and PNG. Files stay private until you explicitly confirm publication.</value>
+  </data>
+  <data name="ExperienceAttachmentUpload" xml:space="preserve">
+    <value>Select file</value>
+  </data>
+  <data name="ExperienceAttachmentPrivate" xml:space="preserve">
+    <value>Private</value>
+  </data>
+  <data name="ExperienceAttachmentPublic" xml:space="preserve">
+    <value>Public</value>
+  </data>
+  <data name="ExperienceAttachmentPrivateDescription" xml:space="preserve">
+    <value>Only administrators can view this file.</value>
+  </data>
+  <data name="ExperienceAttachmentPublicDescription" xml:space="preserve">
+    <value>Any visitor can view and copy this file.</value>
+  </data>
+  <data name="ExperienceAttachmentPublishConfirmation" xml:space="preserve">
+    <value>Publishing “{0}” lets any visitor access, save, or capture the document. Confirm that you are authorized to publish it and that it contains no sensitive information.</value>
+  </data>
+  <data name="ExperienceAttachmentPublish" xml:space="preserve">
+    <value>Confirm publication</value>
+  </data>
+  <data name="ExperienceAttachmentPublished" xml:space="preserve">
+    <value>The file is now public and appears with the experience.</value>
+  </data>
+  <data name="ExperienceAttachmentMadePrivate" xml:space="preserve">
+    <value>The file is private again and no longer appears on the public site.</value>
+  </data>
+  <data name="ExperienceAttachmentOpen" xml:space="preserve">
+    <value>Open document: {0}</value>
+  </data>
+  <data name="ExperiencePublicAttachments" xml:space="preserve">
+    <value>Public documents</value>
+  </data>
+  <data name="ExperienceAttachmentUploaded" xml:space="preserve">
+    <value>The file was stored privately.</value>
+  </data>
+  <data name="ExperienceAttachmentDeleted" xml:space="preserve">
+    <value>The file was deleted.</value>
+  </data>
+  <data name="ExperienceAttachmentErrorTooLarge" xml:space="preserve">
+    <value>The file exceeds the maximum allowed size.</value>
+  </data>
+  <data name="ExperienceAttachmentErrorUnsupportedType" xml:space="preserve">
+    <value>Unsupported format. Select a valid PDF, JPG or PNG.</value>
+  </data>
+  <data name="ExperienceAttachmentErrorInvalidContent" xml:space="preserve">
+    <value>The file content is not a valid PDF, JPG or PNG.</value>
+  </data>
+  <data name="ExperienceAttachmentErrorTooManyFiles" xml:space="preserve">
+    <value>The maximum number of files for this experience has been reached.</value>
+  </data>
+  <data name="ExperienceAttachmentErrorExperienceNotFound" xml:space="preserve">
+    <value>The experience could not be found.</value>
+  </data>
+  <data name="ExperienceAttachmentErrorNotFound" xml:space="preserve">
+    <value>The file could not be found.</value>
+  </data>
+  <data name="ExperienceAttachmentErrorNone" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Loading</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="ExperienceUnsavedChangesConfirmation" xml:space="preserve">
+    <value>Your experience edits will be lost if you leave without saving. Do you want to leave without saving?</value>
+  </data>
+  <data name="ExperienceUnsavedChangesTitle" xml:space="preserve">
+    <value>Unsaved changes</value>
+  </data>
+  <data name="StayOnPage" xml:space="preserve">
+    <value>Keep editing</value>
+  </data>
+  <data name="DiscardChanges" xml:space="preserve">
+    <value>Leave without saving</value>
+  </data>
 </root>

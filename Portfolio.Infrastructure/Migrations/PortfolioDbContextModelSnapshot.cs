@@ -294,6 +294,48 @@ namespace Portfolio.Infrastructure.Migrations
                     b.ToTable("Experiences", (string)null);
                 });
 
+            modelBuilder.Entity("Portfolio.Domain.Entities.ExperienceAttachment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("ExperienceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsPublic")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("OriginalFileName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<long>("SizeBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("StorageKey")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExperienceId", "CreatedAt");
+
+                    b.ToTable("ExperienceAttachments", (string)null);
+                });
+
             modelBuilder.Entity("Portfolio.Domain.Entities.ExperienceTranslation", b =>
                 {
                     b.Property<Guid>("ExperienceId")
@@ -315,8 +357,8 @@ namespace Portfolio.Infrastructure.Migrations
 
                     b.Property<string>("Summary")
                         .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.HasKey("ExperienceId", "LanguageCode");
 
@@ -531,6 +573,17 @@ namespace Portfolio.Infrastructure.Migrations
                     b.Navigation("Certification");
                 });
 
+            modelBuilder.Entity("Portfolio.Domain.Entities.ExperienceAttachment", b =>
+                {
+                    b.HasOne("Portfolio.Domain.Entities.Experience", "Experience")
+                        .WithMany("Attachments")
+                        .HasForeignKey("ExperienceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Experience");
+                });
+
             modelBuilder.Entity("Portfolio.Domain.Entities.ExperienceTranslation", b =>
                 {
                     b.HasOne("Portfolio.Domain.Entities.Experience", "Experience")
@@ -565,6 +618,8 @@ namespace Portfolio.Infrastructure.Migrations
 
             modelBuilder.Entity("Portfolio.Domain.Entities.Experience", b =>
                 {
+                    b.Navigation("Attachments");
+
                     b.Navigation("Translations");
                 });
 

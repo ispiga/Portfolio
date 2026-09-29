@@ -43,9 +43,10 @@
 ## Administration and Identity
 
 - Do not add public user registration. Provision the initial administrator through `Portfolio.AdminProvisioning`; keep web Identity services for sign-in, sign-out and authorization only.
-- Preserve the fixed 30-minute administrator session, HTTP cookie expiry validation, and Blazor circuit revalidation.
+- Preserve the 15-minute administrator inactivity timeout, renew it only on authenticated activity, and keep HTTP cookie expiry validation and Blazor circuit revalidation aligned.
 - Keep logout as an antiforgery-protected POST and expose it in both public and admin navigation when the administrator is authenticated; do not display the admin email in the public navbar.
 - Keep theme and language selectors available in both layouts and accessible when their visible labels are omitted.
+- In the Experience editor, preserve unsaved-change protection: use the localized application dialog for marked internal navigation and logout, and the browser-native `beforeunload`/navigation confirmation for document exits such as refresh, close and back. Do not call .NET through JS interop to show that dialog when the Interactive Server circuit may be disconnected; keep logout as an antiforgery-protected POST after confirmation.
 
 ## Contact email
 

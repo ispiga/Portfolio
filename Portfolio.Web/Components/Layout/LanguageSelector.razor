@@ -7,11 +7,12 @@
     <label class="visually-hidden" for="language-select">@Localizer["Language"]</label>
     <select id="language-select" class="language-selector__control" aria-label="@Localizer["Language"]" value="@currentCulture" @onchange="OnLanguageChanged">
         <option value="es-ES">🇪🇸 @Localizer["LanguageSpanish"]</option>
-        <option value="en-US">🇺🇸 @Localizer["LanguageEnglish"]</option>
+        <option value="en-US">@EnglandFlag @Localizer["LanguageEnglish"]</option>
     </select>
 </div>
 
 @code {
+    private const string EnglandFlag = "\U0001F3F4\U000E0067\U000E0062\U000E0065\U000E006E\U000E0067\U000E007F";
     private string currentCulture = CultureInfo.CurrentUICulture.Name;
 
     private void OnLanguageChanged(ChangeEventArgs args)

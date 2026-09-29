@@ -1,0 +1,469 @@
+@page "/admin/experiences/edit"
+@page "/admin/experiences/edit/{Id:guid}"
+@attribute [Authorize(Policy = PortfolioAuthorization.AdministratorPolicy)]
+@layout AdminLayout
+@implements IAsyncDisposable
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.Extensions.Localization
+@using Portfolio.Application.Experiences
+@using Portfolio.Infrastructure.Identity
+@using Portfolio.Web.Components.Shared
+@using Microsoft.JSInterop
+@inject IExperienceAdministrationService ExperienceService
+@inject IExperienceAttachmentService AttachmentService
+@inject IStringLocalizer<SharedResource> Localizer
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+<PageTitle>@Localizer[IsNew ? "ExperienceCreate" : "ExperienceEdit"]</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="admin-dashboard">
+    <header class="admin-dashboard__heading">
+        <MudText Typo="Typo.h1" Tag="@("h1")">@Localizer[IsNew ? "ExperienceCreate" : "ExperienceEdit"]</MudText>
+    </header>
+
+    @if (loadFailed)
+    {
+        <MudAlert Severity="Severity.Error" Role="alert">@Localizer["ExperienceNotFound"]</MudAlert>
+    }
+    else if (!loaded)
+    {
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary" aria-label="@Localizer["Loading"]" />
+    }
+    else
+    {
+        <NavigationLock ConfirmExternalNavigation="@HasUnsavedChanges" />
+        <EditForm id="experience-edit-form" Model="model" OnSubmit="SaveAsync">
+            <MudPaper Elevation="1" Class="pa-5 mb-4">
+                <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["ExperienceDetails"]</MudText>
+                <div class="experience-admin-grid">
+                    <div class="admin-field">
+                        <label for="experience-start-date">@Localizer["ExperienceStartDate"]</label>
+                        <InputDate id="experience-start-date" @bind-Value="model.StartDate" class="mud-input-slot" />
+                        @FieldErrors("StartDate")
+                    </div>
+                    <div class="admin-field">
+                        <label for="experience-end-date">@Localizer["ExperienceEndDate"]</label>
+                        <InputDate id="experience-end-date" @bind-Value="model.EndDate" class="mud-input-slot" />
+                        @FieldErrors("EndDate")
+                    </div>
+                    <div class="admin-field">
+                        <label for="experience-display-order">@Localizer["ExperienceOrder"]</label>
+                        <InputNumber id="experience-display-order" @bind-Value="model.DisplayOrder" class="mud-input-slot" min="0" />
+                        @FieldErrors("DisplayOrder")
+                    </div>
+                </div>
+            </MudPaper>
+
+            <MudPaper Elevation="1" Class="pa-5 mb-4">
+                <MudText Typo="Typo.h2" Tag="@("h2")" id="experience-spanish-heading">@Localizer["ExperienceSpanish"]</MudText>
+                @if (!HasSpanishTranslation)
+                {
+                    <MudAlert Severity="Severity.Warning" Role="status">@Localizer["ExperienceTranslationMissingSpanish"]</MudAlert>
+                }
+                <div class="admin-field">
+                    <label for="experience-role-es">@Localizer["ExperienceRole"]</label>
+                    <InputText id="experience-role-es" @bind-Value="model.SpanishRoleTitle" @bind-Value:event="oninput" maxlength="200" autocomplete="organization-title" />
+                    @FieldErrors("Spanish.RoleTitle")
+                </div>
+                <div class="admin-field">
+                    <label for="experience-company-es">@Localizer["ExperienceCompany"]</label>
+                    <InputText id="experience-company-es" @bind-Value="model.SpanishCompanyName" @bind-Value:event="oninput" maxlength="200" autocomplete="organization" />
+                    @FieldErrors("Spanish.CompanyName")
+                </div>
+                <div class="admin-field">
+                    <label for="experience-summary-es">@Localizer["ExperienceSummary"]</label>
+                    <InputTextArea id="experience-summary-es" @bind-Value="model.SpanishSummary" @bind-Value:event="oninput" maxlength="@ExperienceEditValidator.MaximumSummaryLength" rows="8" />
+                    @FieldErrors("Spanish.Summary")
+                </div>
+            </MudPaper>
+
+            <MudPaper Elevation="1" Class="pa-5 mb-4">
+                <MudText Typo="Typo.h2" Tag="@("h2")" id="experience-english-heading">@Localizer["ExperienceEnglish"]</MudText>
+                @if (!HasEnglishTranslation)
+                {
+                    <MudAlert Severity="Severity.Warning" Role="status">@Localizer["ExperienceTranslationMissingEnglish"]</MudAlert>
+                }
+                <div class="admin-field">
+                    <label for="experience-role-en">@Localizer["ExperienceRole"]</label>
+                    <InputText id="experience-role-en" @bind-Value="model.EnglishRoleTitle" @bind-Value:event="oninput" maxlength="200" autocomplete="organization-title" />
+                    @FieldErrors("English.RoleTitle")
+                </div>
+                <div class="admin-field">
+                    <label for="experience-company-en">@Localizer["ExperienceCompany"]</label>
+                    <InputText id="experience-company-en" @bind-Value="model.EnglishCompanyName" @bind-Value:event="oninput" maxlength="200" autocomplete="organization" />
+                    @FieldErrors("English.CompanyName")
+                </div>
+                <div class="admin-field">
+                    <label for="experience-summary-en">@Localizer["ExperienceSummary"]</label>
+                    <InputTextArea id="experience-summary-en" @bind-Value="model.EnglishSummary" @bind-Value:event="oninput" maxlength="@ExperienceEditValidator.MaximumSummaryLength" rows="8" />
+                    @FieldErrors("English.Summary")
+                </div>
+            </MudPaper>
+
+            @if (saveError is not null)
+            {
+                <MudAlert Severity="Severity.Error" Role="alert">@saveError</MudAlert>
+            }
+            <div class="experience-admin-actions">
+                <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Disabled="saving">
+                    @Localizer[saving ? "ExperienceSaving" : "Save"]
+                </MudButton>
+                <NavLink class="button button--secondary" href="/admin/experiences" data-unsaved-navigation>@Localizer["Cancel"]</NavLink>
+            </div>
+        </EditForm>
+
+        @if (!IsNew && id is { } experienceId)
+        {
+            <MudPaper Elevation="1" Class="pa-5 mt-6">
+                <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["ExperienceAttachments"]</MudText>
+                <MudText Typo="Typo.body2">@Localizer["ExperienceAttachmentRules", AttachmentService.MaximumFileCount, AttachmentService.MaximumFileSizeBytes / 1024 / 1024]</MudText>
+                @if (attachments.Count > 0)
+                {
+                    <div class="experience-attachment-list">
+                        @foreach (var attachment in attachments)
+                        {
+                            <article class="experience-attachment-list__item">
+                                <ExperienceAttachmentPreview @key="attachment.Id"
+                                                             OriginalFileName="attachment.OriginalFileName"
+                                                             ContentType="attachment.ContentType"
+                                                             ContentUrl="@($"/admin/experiences/attachments/{attachment.Id}")" />
+                                <div class="experience-attachment-list__controls">
+                                    <span>@(attachment.SizeBytes / 1024) KB</span>
+                                    <label class="experience-attachment-visibility" for="@($"attachment-public-{attachment.Id}")">
+                                        <input id="@($"attachment-public-{attachment.Id}")"
+                                               type="checkbox"
+                                               checked="@attachment.IsPublic"
+                                               aria-describedby="@($"attachment-visibility-description-{attachment.Id}")"
+                                               @onchange="@(args => RequestAttachmentVisibilityAsync(attachment, args))" />
+                                        @Localizer[attachment.IsPublic ? "ExperienceAttachmentPublic" : "ExperienceAttachmentPrivate"]
+                                    </label>
+                                    <span id="@($"attachment-visibility-description-{attachment.Id}")" class="visually-hidden">
+                                        @Localizer[attachment.IsPublic ? "ExperienceAttachmentPublicDescription" : "ExperienceAttachmentPrivateDescription"]
+                                    </span>
+                                    <MudButton OnClick="@(() => DeleteAttachmentAsync(attachment.Id))" Color="Color.Error" Variant="Variant.Outlined">@Localizer["Delete"]</MudButton>
+                                </div>
+                            </article>
+                        }
+                    </div>
+                }
+                @if (pendingPublicAttachment is not null)
+                {
+                    <MudAlert Severity="Severity.Warning" Class="mt-3" Role="alert">
+                        @Localizer["ExperienceAttachmentPublishConfirmation", pendingPublicAttachment.OriginalFileName]
+                        <MudButton OnClick="ConfirmPublishAttachmentAsync" Color="Color.Warning" Variant="Variant.Filled">@Localizer["ExperienceAttachmentPublish"]</MudButton>
+                        <MudButton OnClick="CancelPublishAttachment" Variant="Variant.Outlined">@Localizer["Cancel"]</MudButton>
+                    </MudAlert>
+                }
+                @if (attachments.Count < AttachmentService.MaximumFileCount)
+                {
+                    <div class="admin-field">
+                        <label for="experience-attachment-upload">@Localizer["ExperienceAttachmentUpload"]</label>
+                        <InputFile id="experience-attachment-upload" OnChange="UploadAttachmentAsync" accept=".pdf,.jpg,.jpeg,.png" />
+                    </div>
+                }
+                @if (attachmentMessage is not null)
+                {
+                    <MudAlert Severity="@attachmentSeverity" Role="status">@attachmentMessage</MudAlert>
+                }
+            </MudPaper>
+        }
+    }
+</MudContainer>
+
+@code {
+    [Parameter]
+    public Guid? Id { get; set; }
+
+    private readonly ExperienceFormModel model = new();
+    private IReadOnlyList<ExperienceAttachmentReadModel> attachments = [];
+    private ExperienceAttachmentReadModel? pendingPublicAttachment;
+    private readonly Dictionary<string, string> fieldErrors = new(StringComparer.Ordinal);
+    private Guid? id;
+    private bool loaded;
+    private bool loadFailed;
+    private bool saving;
+    private bool hasSpanishTranslation;
+    private bool hasEnglishTranslation;
+    private string? saveError;
+    private ExperienceSnapshot? initialSnapshot;
+    private IJSObjectReference? unsavedChangesModule;
+    private bool unsavedChangesModuleInitialized;
+    private bool beforeUnloadEnabled;
+    private string? attachmentMessage;
+    private Severity attachmentSeverity = Severity.Info;
+    private bool IsNew => Id is null;
+    private bool HasSpanishTranslation => hasSpanishTranslation || TranslationIsFilled(model.SpanishRoleTitle, model.SpanishCompanyName, model.SpanishSummary);
+    private bool HasEnglishTranslation => hasEnglishTranslation || TranslationIsFilled(model.EnglishRoleTitle, model.EnglishCompanyName, model.EnglishSummary);
+    private bool HasUnsavedChanges => loaded && !loadFailed && initialSnapshot is not null && CaptureSnapshot() != initialSnapshot;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!loaded)
+        {
+            return;
+        }
+
+        unsavedChangesModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./js/experience-unsaved-changes.js?v=11");
+        if (!unsavedChangesModuleInitialized)
+        {
+            await unsavedChangesModule.InvokeVoidAsync(
+                "initialize",
+                "experience-edit-form",
+                Localizer["ExperienceUnsavedChangesTitle"].Value,
+                Localizer["ExperienceUnsavedChangesConfirmation"].Value,
+                Localizer["StayOnPage"].Value,
+                Localizer["DiscardChanges"].Value);
+            unsavedChangesModuleInitialized = true;
+        }
+
+        if (beforeUnloadEnabled != HasUnsavedChanges)
+        {
+            beforeUnloadEnabled = HasUnsavedChanges;
+            await unsavedChangesModule.InvokeVoidAsync("setEnabled", beforeUnloadEnabled);
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id is not { } experienceId)
+        {
+            model.StartDate = DateOnly.FromDateTime(DateTime.Today);
+            initialSnapshot = CaptureSnapshot();
+            loaded = true;
+            return;
+        }
+
+        id = experienceId;
+        var details = await ExperienceService.GetExperienceAsync(experienceId);
+        if (details is null)
+        {
+            loadFailed = true;
+            loaded = true;
+            return;
+        }
+
+        model.StartDate = details.StartDate;
+        model.EndDate = details.EndDate;
+        model.DisplayOrder = details.DisplayOrder;
+        model.SpanishRoleTitle = details.Spanish.RoleTitle;
+        model.SpanishCompanyName = details.Spanish.CompanyName;
+        model.SpanishSummary = details.Spanish.Summary;
+        model.EnglishRoleTitle = details.English.RoleTitle;
+        model.EnglishCompanyName = details.English.CompanyName;
+        model.EnglishSummary = details.English.Summary;
+        hasSpanishTranslation = details.HasSpanishTranslation;
+        hasEnglishTranslation = details.HasEnglishTranslation;
+        attachments = await AttachmentService.GetAttachmentsAsync(experienceId);
+        initialSnapshot = CaptureSnapshot();
+        loaded = true;
+    }
+
+    private async Task SaveAsync(EditContext _)
+    {
+        saving = true;
+        fieldErrors.Clear();
+        saveError = null;
+        var request = new ExperienceEditRequest(
+            id,
+            model.StartDate,
+            model.EndDate,
+            model.DisplayOrder,
+            new(model.SpanishRoleTitle, model.SpanishCompanyName, model.SpanishSummary),
+            new(model.EnglishRoleTitle, model.EnglishCompanyName, model.EnglishSummary));
+        var result = await ExperienceService.SaveAsync(request);
+        saving = false;
+
+        if (!result.Succeeded)
+        {
+            foreach (var error in result.Errors)
+            {
+                fieldErrors[error.Field] = error.ResourceKey;
+            }
+
+            if (result.Errors.Any(error => error.ResourceKey == "ExperienceNotFound"))
+            {
+                saveError = Localizer["ExperienceNotFound"];
+            }
+
+            hasSpanishTranslation = TranslationIsFilled(model.SpanishRoleTitle, model.SpanishCompanyName, model.SpanishSummary);
+            hasEnglishTranslation = TranslationIsFilled(model.EnglishRoleTitle, model.EnglishCompanyName, model.EnglishSummary);
+            return;
+        }
+
+        id = result.ExperienceId;
+        hasSpanishTranslation = true;
+        hasEnglishTranslation = TranslationIsFilled(model.EnglishRoleTitle, model.EnglishCompanyName, model.EnglishSummary);
+        initialSnapshot = CaptureSnapshot();
+        Navigation.NavigateTo($"/admin/experiences/edit/{id}");
+    }
+
+    private ExperienceSnapshot CaptureSnapshot() => new(
+        model.StartDate,
+        model.EndDate,
+        model.DisplayOrder,
+        model.SpanishRoleTitle,
+        model.SpanishCompanyName,
+        model.SpanishSummary,
+        model.EnglishRoleTitle,
+        model.EnglishCompanyName,
+        model.EnglishSummary);
+
+    private sealed record ExperienceSnapshot(
+        DateOnly StartDate,
+        DateOnly? EndDate,
+        int DisplayOrder,
+        string SpanishRoleTitle,
+        string SpanishCompanyName,
+        string SpanishSummary,
+        string EnglishRoleTitle,
+        string EnglishCompanyName,
+        string EnglishSummary);
+
+    public async ValueTask DisposeAsync()
+    {
+        if (unsavedChangesModule is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await unsavedChangesModule.InvokeVoidAsync("setEnabled", false);
+            await unsavedChangesModule.InvokeVoidAsync("dispose");
+            await unsavedChangesModule.DisposeAsync();
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+    }
+
+    private RenderFragment FieldErrors(string field) => builder =>
+    {
+        if (fieldErrors.TryGetValue(field, out var resourceKey))
+        {
+            builder.OpenElement(0, "p");
+            builder.AddAttribute(1, "class", "admin-field__error");
+            builder.AddAttribute(2, "role", "alert");
+            builder.AddContent(3, Localizer[resourceKey]);
+            builder.CloseElement();
+        }
+    };
+
+    private async Task UploadAttachmentAsync(InputFileChangeEventArgs args)
+    {
+        if (id is not { } experienceId)
+        {
+            return;
+        }
+
+        attachmentMessage = null;
+        try
+        {
+            var file = args.File;
+            await using var content = file.OpenReadStream(AttachmentService.MaximumFileSizeBytes);
+            var result = await AttachmentService.UploadAsync(
+                experienceId,
+                file.Name,
+                file.ContentType,
+                file.Size,
+                content);
+            if (result.Succeeded)
+            {
+                attachments = await AttachmentService.GetAttachmentsAsync(experienceId);
+                attachmentMessage = Localizer["ExperienceAttachmentUploaded"];
+                attachmentSeverity = Severity.Success;
+            }
+            else
+            {
+                attachmentMessage = Localizer[$"ExperienceAttachmentError{result.Error}"];
+                attachmentSeverity = Severity.Error;
+            }
+        }
+        catch (IOException)
+        {
+            attachmentMessage = Localizer["ExperienceAttachmentErrorTooLarge"];
+            attachmentSeverity = Severity.Error;
+        }
+    }
+
+    private Task RequestAttachmentVisibilityAsync(
+        ExperienceAttachmentReadModel attachment,
+        ChangeEventArgs args)
+    {
+        var isPublic = args.Value is bool value
+            ? value
+            : string.Equals(Convert.ToString(args.Value), "true", StringComparison.OrdinalIgnoreCase);
+        if (isPublic == attachment.IsPublic)
+        {
+            return Task.CompletedTask;
+        }
+
+        if (isPublic)
+        {
+            pendingPublicAttachment = attachment;
+            attachmentMessage = null;
+            return Task.CompletedTask;
+        }
+
+        return SetAttachmentVisibilityAsync(attachment.Id, isPublic);
+    }
+
+    private Task ConfirmPublishAttachmentAsync()
+    {
+        if (pendingPublicAttachment is not { } attachment)
+        {
+            return Task.CompletedTask;
+        }
+
+        pendingPublicAttachment = null;
+        return SetAttachmentVisibilityAsync(attachment.Id, isPublic: true);
+    }
+
+    private void CancelPublishAttachment() => pendingPublicAttachment = null;
+
+    private async Task SetAttachmentVisibilityAsync(Guid attachmentId, bool isPublic)
+    {
+        var changed = await AttachmentService.SetPublicAsync(attachmentId, isPublic);
+        if (changed && id is { } experienceId)
+        {
+            attachments = await AttachmentService.GetAttachmentsAsync(experienceId);
+            attachmentMessage = Localizer[isPublic ? "ExperienceAttachmentPublished" : "ExperienceAttachmentMadePrivate"];
+            attachmentSeverity = isPublic ? Severity.Warning : Severity.Success;
+        }
+        else
+        {
+            attachmentMessage = Localizer["ExperienceAttachmentErrorNotFound"];
+            attachmentSeverity = Severity.Error;
+        }
+    }
+
+    private async Task DeleteAttachmentAsync(Guid attachmentId)
+    {
+        if (!await AttachmentService.DeleteAsync(attachmentId) || id is not { } experienceId)
+        {
+            return;
+        }
+
+        attachments = await AttachmentService.GetAttachmentsAsync(experienceId);
+        attachmentMessage = Localizer["ExperienceAttachmentDeleted"];
+        attachmentSeverity = Severity.Success;
+    }
+
+    private static bool TranslationIsFilled(string role, string company, string summary) =>
+        !string.IsNullOrWhiteSpace(role) && !string.IsNullOrWhiteSpace(company) && !string.IsNullOrWhiteSpace(summary);
+
+    private sealed class ExperienceFormModel
+    {
+        public DateOnly StartDate { get; set; }
+        public DateOnly? EndDate { get; set; }
+        public int DisplayOrder { get; set; }
+        public string SpanishRoleTitle { get; set; } = string.Empty;
+        public string SpanishCompanyName { get; set; } = string.Empty;
+        public string SpanishSummary { get; set; } = string.Empty;
+        public string EnglishRoleTitle { get; set; } = string.Empty;
+        public string EnglishCompanyName { get; set; } = string.Empty;
+        public string EnglishSummary { get; set; } = string.Empty;
+    }
+}

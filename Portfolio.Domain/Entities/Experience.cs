@@ -11,4 +11,6 @@ public sealed class Experience
     public int DisplayOrder { get; set; }
 
     public ICollection<ExperienceTranslation> Translations { get; set; } = [];
+
+    public ICollection<ExperienceAttachment> Attachments { get; set; } = [];
 }

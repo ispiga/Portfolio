@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Portfolio.Application.Experiences;
 using Portfolio.Infrastructure;
 using Portfolio.Infrastructure.Identity;
 using Portfolio.Web.Authentication;
@@ -49,6 +50,8 @@ public sealed class AdminAuthenticationTests : IAsyncLifetime
             options.Cookie.SecurePolicy = CookieSecurePolicy.None;
         });
         builder.Services.AddPortfolioIdentity();
+        builder.Services.AddSingleton<AdminSessionActivityStore>();
+        builder.Services.AddSingleton<IExperienceAttachmentService, TestExperienceAttachmentService>();
         builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
             .AddCookie(IdentityConstants.ApplicationScheme, options =>
             {
@@ -64,6 +67,7 @@ public sealed class AdminAuthenticationTests : IAsyncLifetime
         app.UseAuthorization();
         app.UseAntiforgery();
         app.MapAdminAuthentication();
+        app.MapExperienceAttachmentEndpoints();
         app.MapGet("/admin/login", (HttpContext context, IAntiforgery antiforgery) =>
         {
             var tokens = antiforgery.GetAndStoreTokens(context);
@@ -86,6 +90,76 @@ public sealed class AdminAuthenticationTests : IAsyncLifetime
         await roleManager.CreateAsync(new IdentityRole(PortfolioAuthorization.AdministratorRole));
         await CreateUserAsync(AdministratorEmail, isAdministrator: true);
         await CreateUserAsync(RegularUserEmail, isAdministrator: false);
+    }
+
+    [Fact]
+    public async Task Experience_attachment_download_requires_administrator_policy()
+    {
+        using var response = await SendAsync(new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/admin/experiences/attachments/{TestExperienceAttachmentService.AttachmentId}"));
+
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        Assert.Equal("/admin/login", response.Headers.Location?.AbsolutePath);
+        Assert.Equal(
+            PortfolioAuthorization.AdministratorPolicy,
+            typeof(Experiences).GetCustomAttribute<AuthorizeAttribute>()?.Policy);
+        Assert.Equal(
+            PortfolioAuthorization.AdministratorPolicy,
+            typeof(ExperienceEditor).GetCustomAttribute<AuthorizeAttribute>()?.Policy);
+    }
+
+    [Fact]
+    public async Task Administrator_can_download_private_attachment_without_caching()
+    {
+        using var login = await LoginAsync(AdministratorEmail, TestPassword);
+        Assert.Equal(HttpStatusCode.Redirect, login.StatusCode);
+
+        using var response = await SendAsync(new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/admin/experiences/attachments/{TestExperienceAttachmentService.AttachmentId}"));
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("no-store", response.Headers.CacheControl?.ToString());
+        Assert.Equal("nosniff", Assert.Single(response.Headers.GetValues("X-Content-Type-Options")));
+        Assert.Equal("%PDF-1.7", await response.Content.ReadAsStringAsync());
+    }
+
+    [Fact]
+    public async Task Authenticated_non_administrator_cannot_download_private_attachment()
+    {
+        using var login = await LoginAsync(RegularUserEmail, TestPassword);
+        Assert.Equal(HttpStatusCode.Redirect, login.StatusCode);
+
+        using var response = await SendAsync(new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/admin/experiences/attachments/{TestExperienceAttachmentService.AttachmentId}"));
+
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        Assert.Equal("/admin/access-denied", response.Headers.Location?.AbsolutePath);
+    }
+
+    [Fact]
+    public async Task Anonymous_visitor_can_view_public_attachment_inline()
+    {
+        using var response = await SendAsync(new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/experience-attachments/{TestExperienceAttachmentService.PublicAttachmentId}"));
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("inline", response.Content.Headers.ContentDisposition?.DispositionType);
+        Assert.Equal("no-store", response.Headers.CacheControl?.ToString());
+        Assert.Equal("%PDF-1.7", await response.Content.ReadAsStringAsync());
+    }
+
+    [Fact]
+    public async Task Anonymous_visitor_cannot_view_private_attachment_through_public_route()
+    {
+        using var response = await SendAsync(new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/experience-attachments/{TestExperienceAttachmentService.AttachmentId}"));
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
     [Fact]
@@ -176,7 +250,7 @@ public sealed class AdminAuthenticationTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Login_cookie_contains_a_fixed_expiry_and_is_rejected_after_expiration()
+    public async Task Login_cookie_uses_a_fifteen_minute_inactivity_expiry_and_is_rejected_after_expiration()
     {
         using var login = await LoginAsync(AdministratorEmail, TestPassword);
         var setCookie = Assert.Single(login.Headers.GetValues("Set-Cookie"));
@@ -192,6 +266,8 @@ public sealed class AdminAuthenticationTests : IAsyncLifetime
         Assert.NotNull(authenticationTicket);
         var principal = authenticationTicket!.Principal;
         Assert.False(AdminSession.HasExpired(principal, DateTimeOffset.UtcNow));
+        Assert.True(AdminSession.TryGetSessionId(principal, out var sessionId));
+        Assert.Equal(TimeSpan.FromMinutes(15), AdminSession.Duration);
 
         var expiredIdentity = new ClaimsIdentity(principal.Identity);
         expiredIdentity.RemoveClaim(expiredIdentity.FindFirst(AdminSession.ExpiresAtClaim)!);
@@ -204,10 +280,44 @@ public sealed class AdminAuthenticationTests : IAsyncLifetime
             IdentityConstants.ApplicationScheme);
         cookies["Portfolio.Test.Authentication"] = WebEncoders.Base64UrlEncode(
             cookieProtector.Protect(TicketSerializer.Default.Serialize(expiredTicket)));
+        app.Services.GetRequiredService<AdminSessionActivityStore>().Remove(sessionId);
 
         using var expired = await SendAsync(new HttpRequestMessage(HttpMethod.Get, "/admin"));
         Assert.Equal(HttpStatusCode.Redirect, expired.StatusCode);
         Assert.Equal("/admin/login", expired.Headers.Location?.AbsolutePath);
+    }
+
+    [Fact]
+    public async Task Authenticated_activity_renews_expiry_but_respects_the_rate_limit()
+    {
+        using var login = await LoginAsync(AdministratorEmail, TestPassword);
+        var cookie = Assert.Single(login.Headers.GetValues("Set-Cookie")).Split(';', 2)[0];
+        cookies["Portfolio.Test.Authentication"] = cookie[("Portfolio.Test.Authentication=".Length)..];
+        var ticket = cookieProtector.Unprotect(WebEncoders.Base64UrlDecode(cookies["Portfolio.Test.Authentication"]));
+        var authenticationTicket = TicketSerializer.Default.Deserialize(ticket)!;
+        var principal = authenticationTicket.Principal;
+        Assert.True(AdminSession.TryGetSessionId(principal, out var sessionId));
+        var store = app.Services.GetRequiredService<AdminSessionActivityStore>();
+        var now = DateTimeOffset.UtcNow;
+        store.Start(sessionId, now.AddMinutes(15));
+
+        Assert.True(store.TryRenew(sessionId, now.AddSeconds(31), TimeSpan.FromSeconds(30), out var renewedExpiry));
+        Assert.Equal(now.AddSeconds(31).AddMinutes(15), renewedExpiry);
+        Assert.False(store.TryRenew(sessionId, now.AddSeconds(40), TimeSpan.FromSeconds(30), out _));
+        Assert.False(AdminSession.HasExpired(principal, now.AddSeconds(32), store));
+        Assert.True(AdminSession.HasExpired(principal, renewedExpiry, store));
+    }
+
+    [Fact]
+    public void Expiration_state_is_not_marked_by_intentional_sign_out()
+    {
+        var state = new AdminSessionExpirationState();
+
+        Assert.False(state.IsExpired);
+        state.MarkExpired();
+        state.MarkExpired();
+
+        Assert.True(state.IsExpired);
     }
 
     [Fact]
@@ -241,6 +351,9 @@ public sealed class AdminAuthenticationTests : IAsyncLifetime
         var response = await PostFormAsync("/admin/logout", new Dictionary<string, string>());
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         response.Dispose();
+
+        using var activity = await PostFormAsync("/admin/session/activity", new Dictionary<string, string>());
+        Assert.Equal(HttpStatusCode.BadRequest, activity.StatusCode);
     }
 
     [Fact]
@@ -327,5 +440,60 @@ public sealed class AdminAuthenticationTests : IAsyncLifetime
 
         request.Dispose();
         return response;
+    }
+
+    private sealed class TestExperienceAttachmentService : IExperienceAttachmentService
+    {
+        public static Guid AttachmentId { get; } = Guid.Parse("7a7e7cd2-c353-415d-968b-8e851341a5d9");
+        public static Guid PublicAttachmentId { get; } = Guid.Parse("e41a5042-18b9-4c55-bf5e-b5744d6438e0");
+        public int MaximumFileCount => 5;
+        public long MaximumFileSizeBytes => 10 * 1024 * 1024;
+
+        public Task<IReadOnlyList<ExperienceAttachmentReadModel>> GetAttachmentsAsync(
+            Guid experienceId,
+            CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<ExperienceAttachmentReadModel>>([]);
+
+        public Task<ExperienceAttachmentOperationResult> UploadAsync(
+            Guid experienceId,
+            string fileName,
+            string contentType,
+            long fileSize,
+            Stream content,
+            CancellationToken cancellationToken = default) => throw new NotSupportedException();
+
+        public Task<bool> DeleteAsync(Guid attachmentId, CancellationToken cancellationToken = default) =>
+            Task.FromResult(false);
+
+        public Task<bool> SetPublicAsync(Guid attachmentId, bool isPublic, CancellationToken cancellationToken = default) =>
+            Task.FromResult(true);
+
+        public Task<ExperienceAttachmentContent?> OpenReadAsync(
+            Guid attachmentId,
+            CancellationToken cancellationToken = default)
+        {
+            if (attachmentId != AttachmentId && attachmentId != PublicAttachmentId)
+            {
+                return Task.FromResult<ExperienceAttachmentContent?>(null);
+            }
+
+            var attachment = new ExperienceAttachmentReadModel(
+                attachmentId,
+                Guid.NewGuid(),
+                "private.pdf",
+                "application/pdf",
+                8,
+                DateTimeOffset.UtcNow,
+                attachmentId == PublicAttachmentId);
+            return Task.FromResult<ExperienceAttachmentContent?>(new(
+                attachment,
+                new MemoryStream(System.Text.Encoding.ASCII.GetBytes("%PDF-1.7"))));
+        }
+
+        public Task<ExperienceAttachmentContent?> OpenPublicReadAsync(
+            Guid attachmentId,
+            CancellationToken cancellationToken = default) =>
+            attachmentId == PublicAttachmentId
+                ? OpenReadAsync(attachmentId, cancellationToken)
+                : Task.FromResult<ExperienceAttachmentContent?>(null);
     }
 }
