@@ -12,8 +12,14 @@ async function getPdfJs() {
 export async function renderFirstPage(url, canvas) {
     disposePreview(canvas);
     const pdfjs = await getPdfJs();
+    const response = await fetch(url, { credentials: "same-origin" });
+    if (!response.ok) {
+        throw new Error(`Unable to load PDF preview: ${response.status}`);
+    }
+
+    const data = new Uint8Array(await response.arrayBuffer());
     const loadingTask = pdfjs.getDocument({
-        url,
+        data,
         cMapUrl: new URL("./vendor/pdfjs/cmaps/", import.meta.url).toString(),
         cMapPacked: true,
         standardFontDataUrl: new URL("./vendor/pdfjs/standard_fonts/", import.meta.url).toString()

@@ -47,6 +47,7 @@
 - Keep logout as an antiforgery-protected POST and expose it in both public and admin navigation when the administrator is authenticated; do not display the admin email in the public navbar.
 - Keep theme and language selectors available in both layouts and accessible when their visible labels are omitted.
 - In the Experience editor, preserve unsaved-change protection: use the localized application dialog for marked internal navigation and logout, and the browser-native `beforeunload`/navigation confirmation for document exits such as refresh, close and back. Do not call .NET through JS interop to show that dialog when the Interactive Server circuit may be disconnected; keep logout as an antiforgery-protected POST after confirmation.
+- Preserve the Experience editor's existing save flow and unsaved-change behavior. Show its localized success message only after the experience and all pending attachment changes have saved successfully; do not report success when validation or persistence fails. Keep attachment display-name/visibility edits within unsaved-change tracking, ask for confirmation before deleting an attachment or publishing it, and do not trigger the document-exit warning as part of a successful save. Avoid `@bind-Value:event="oninput"` on the editor's `InputText`/`InputTextArea` controls; the existing binding pattern avoids a Blazor event-argument type mismatch in Interactive Server.
 
 ## Contact email
 

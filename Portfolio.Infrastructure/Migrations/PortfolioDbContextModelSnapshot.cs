@@ -308,6 +308,11 @@ namespace Portfolio.Infrastructure.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
                     b.Property<Guid>("ExperienceId")
                         .HasColumnType("uniqueidentifier");
 

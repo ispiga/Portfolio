@@ -61,6 +61,7 @@ public sealed class ExperienceAttachmentStorageTests : IDisposable
         Assert.False(first.Attachment.IsPublic);
         var saved = Assert.Single(await service.GetAttachmentsAsync(experienceId));
         Assert.Equal("recommendation.pdf", saved.OriginalFileName);
+        Assert.Equal("recommendation.pdf", saved.DisplayName);
         Assert.False(saved.IsPublic);
         Assert.Equal(payload.Length, saved.SizeBytes);
         Assert.Null(await service.OpenPublicReadAsync(saved.Id));
@@ -87,6 +88,45 @@ public sealed class ExperienceAttachmentStorageTests : IDisposable
         {
             Assert.Equal(payload, await ReadAllAsync(download.Content));
         }
+    }
+
+    [Fact]
+    public async Task Display_name_can_be_changed_without_changing_the_original_file_name()
+    {
+        var payload = System.Text.Encoding.ASCII.GetBytes("%PDF-1.7\nprivate attachment");
+        var result = await service.UploadAsync(
+            experienceId,
+            "recommendation.pdf",
+            "application/pdf",
+            payload.Length,
+            new MemoryStream(payload));
+
+        Assert.True(result.Succeeded);
+        Assert.NotNull(result.Attachment);
+
+        Assert.True(await service.UpdateDisplayNameAsync(result.Attachment.Id, "  Carta de recomendación  "));
+
+        var saved = Assert.Single(await service.GetAttachmentsAsync(experienceId));
+        Assert.Equal("recommendation.pdf", saved.OriginalFileName);
+        Assert.Equal("Carta de recomendación", saved.DisplayName);
+    }
+
+    [Fact]
+    public async Task Display_name_update_rejects_blank_or_too_long_names()
+    {
+        var payload = System.Text.Encoding.ASCII.GetBytes("%PDF-1.7\nprivate attachment");
+        var result = await service.UploadAsync(
+            experienceId,
+            "recommendation.pdf",
+            "application/pdf",
+            payload.Length,
+            new MemoryStream(payload));
+
+        Assert.True(result.Succeeded);
+        Assert.NotNull(result.Attachment);
+
+        Assert.False(await service.UpdateDisplayNameAsync(result.Attachment.Id, "   "));
+        Assert.False(await service.UpdateDisplayNameAsync(result.Attachment.Id, new string('x', 256)));
     }
 
     [Fact]

@@ -18,6 +18,11 @@ public interface IExperienceAttachmentService
         Stream content,
         CancellationToken cancellationToken = default);
 
+    Task<bool> UpdateDisplayNameAsync(
+        Guid attachmentId,
+        string displayName,
+        CancellationToken cancellationToken = default);
+
     Task<bool> DeleteAsync(Guid attachmentId, CancellationToken cancellationToken = default);
 
     Task<bool> SetPublicAsync(Guid attachmentId, bool isPublic, CancellationToken cancellationToken = default);

@@ -4,6 +4,7 @@ public sealed record ExperienceAttachmentReadModel(
     Guid Id,
     Guid ExperienceId,
     string OriginalFileName,
+    string DisplayName,
     string ContentType,
     long SizeBytes,
     DateTimeOffset CreatedAt,
@@ -11,7 +12,7 @@ public sealed record ExperienceAttachmentReadModel(
 
 public sealed record ExperienceAttachmentPreviewReadModel(
     Guid Id,
-    string OriginalFileName,
+    string DisplayName,
     string ContentType);
 
 public sealed record ExperienceAttachmentContent(

@@ -183,6 +183,7 @@ public sealed class ExperienceAdministrationTests
                     Id = Guid.NewGuid(),
                     ExperienceId = created.ExperienceId!.Value,
                     OriginalFileName = "public-certificate.pdf",
+                    DisplayName = "public-certificate.pdf",
                     StorageKey = "experience/public.pdf",
                     ContentType = "application/pdf",
                     SizeBytes = 20,
@@ -194,6 +195,7 @@ public sealed class ExperienceAdministrationTests
                     Id = Guid.NewGuid(),
                     ExperienceId = created.ExperienceId.Value,
                     OriginalFileName = "private-letter.pdf",
+                    DisplayName = "private-letter.pdf",
                     StorageKey = "experience/private.pdf",
                     ContentType = "application/pdf",
                     SizeBytes = 20,
@@ -205,7 +207,7 @@ public sealed class ExperienceAdministrationTests
 
         var result = Assert.Single(await new ExperienceQueryService(factory).GetExperiencesAsync());
 
-        Assert.Equal("public-certificate.pdf", Assert.Single(result.Attachments!).OriginalFileName);
+        Assert.Equal("public-certificate.pdf", Assert.Single(result.Attachments!).DisplayName);
     }
 
     private static ExperienceEditRequest ValidRequest() => new(

@@ -66,9 +66,12 @@ public sealed class PersistenceModelTests
         var designTimeAttachmentEntity = context.GetService<IDesignTimeModel>().Model
             .FindEntityType(typeof(ExperienceAttachment))!;
         var isPublic = designTimeAttachmentEntity.FindProperty(nameof(ExperienceAttachment.IsPublic))!;
+        var displayName = designTimeAttachmentEntity.FindProperty(nameof(ExperienceAttachment.DisplayName))!;
 
         Assert.Equal("ExperienceAttachments", attachmentEntity.GetTableName());
         Assert.Equal(false, isPublic.GetDefaultValue());
+        Assert.False(displayName.IsNullable);
+        Assert.Equal(255, displayName.GetMaxLength());
         Assert.Equal(DeleteBehavior.Restrict, attachmentEntity.GetForeignKeys().Single().DeleteBehavior);
         Assert.Contains(
             attachmentEntity.GetIndexes(),

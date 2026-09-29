@@ -52,8 +52,8 @@
                                         @foreach (var attachment in publicAttachments)
                                         {
                                             <ExperienceAttachmentPreview @key="attachment.Id"
-                                                                         OriginalFileName="attachment.OriginalFileName"
-                                                                         ContentType="attachment.ContentType"
+                                                                         DisplayName="@attachment.DisplayName"
+                                                                         ContentType="@attachment.ContentType"
                                                                          ContentUrl="@($"/experience-attachments/{attachment.Id}")" />
                                         }
                                     </div>

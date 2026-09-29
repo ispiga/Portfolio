@@ -3,7 +3,7 @@
 @inject IJSRuntime JSRuntime
 @inject IStringLocalizer<SharedResource> Localizer
 
-<a class="experience-attachment-preview" href="@ContentUrl" target="_blank" rel="noopener noreferrer" aria-label="@Localizer["ExperienceAttachmentOpen", OriginalFileName]">
+<a class="experience-attachment-preview" href="@ContentUrl" target="_blank" rel="noopener noreferrer" aria-label="@Localizer["ExperienceAttachmentOpen", DisplayName]">
     @if (ContentType == "application/pdf")
     {
         @if (previewFailed)
@@ -20,12 +20,12 @@
     {
         <img src="@ContentUrl" alt="" loading="lazy" />
     }
-    <span class="experience-attachment-preview__name">@OriginalFileName</span>
+    <span class="experience-attachment-preview__name">@DisplayName</span>
 </a>
 
 @code {
     [Parameter, EditorRequired]
-    public string OriginalFileName { get; set; } = string.Empty;
+    public string DisplayName { get; set; } = string.Empty;
 
     [Parameter, EditorRequired]
     public string ContentType { get; set; } = string.Empty;

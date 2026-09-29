@@ -399,15 +399,6 @@
   <data name="AdminLogout" xml:space="preserve">
     <value>Cerrar sesión</value>
   </data>
-  <data name="AdminSessionExpiredTitle" xml:space="preserve">
-    <value>Sesión de administrador expirada</value>
-  </data>
-  <data name="AdminSessionExpiredMessage" xml:space="preserve">
-    <value>Tu sesión de administrador ha expirado por inactividad. Si necesitas acceder de nuevo a la administración, inicia sesión otra vez.</value>
-  </data>
-  <data name="Close" xml:space="preserve">
-    <value>Cerrar</value>
-  </data>
   <data name="AdminWelcome" xml:space="preserve">
     <value>Sesión iniciada como {0}.</value>
   </data>
@@ -612,11 +603,14 @@
   <data name="ExperienceDeleted" xml:space="preserve">
     <value>La experiencia se ha eliminado.</value>
   </data>
+  <data name="ExperienceSaved" xml:space="preserve">
+    <value>La experiencia se ha guardado correctamente.</value>
+  </data>
   <data name="ExperienceSaving" xml:space="preserve">
     <value>Guardando…</value>
   </data>
   <data name="ExperienceAttachments" xml:space="preserve">
-    <value>Documentos adjuntos privados</value>
+    <value>Documentos adjuntos</value>
   </data>
   <data name="ExperienceAttachmentRules" xml:space="preserve">
     <value>Hasta {0} archivos por experiencia, {1} MB como máximo por archivo. Formatos: PDF, JPG y PNG. Son privados hasta que confirmes su publicación.</value>
@@ -699,6 +693,15 @@
   <data name="Cancel" xml:space="preserve">
     <value>Cancelar</value>
   </data>
+  <data name="AdminSessionExpiredTitle" xml:space="preserve">
+    <value>Sesión de administrador expirada</value>
+  </data>
+  <data name="AdminSessionExpiredMessage" xml:space="preserve">
+    <value>Tu sesión de administrador ha expirado por inactividad. Si necesitas acceder de nuevo a la administración, inicia sesión otra vez.</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Cerrar</value>
+  </data>
   <data name="ExperienceUnsavedChangesConfirmation" xml:space="preserve">
     <value>La edición de la experiencia se perderá si no guarda los cambios. ¿Desea salir sin guardar?</value>
   </data>
@@ -710,5 +713,26 @@
   </data>
   <data name="DiscardChanges" xml:space="preserve">
     <value>Salir sin guardar</value>
+  </data>
+  <data name="ExperienceAttachmentDisplayName" xml:space="preserve">
+    <value>Nombre para mostrar</value>
+  </data>
+  <data name="ExperienceAttachmentSaveName" xml:space="preserve">
+    <value>Guardar nombre</value>
+  </data>
+  <data name="ExperienceAttachmentNameUpdated" xml:space="preserve">
+    <value>Se ha actualizado el nombre del adjunto.</value>
+  </data>
+  <data name="ExperienceAttachmentSaveChanges" xml:space="preserve">
+    <value>Guardar cambios</value>
+  </data>
+  <data name="ExperienceAttachmentChangesSaved" xml:space="preserve">
+    <value>Se han guardado los cambios del adjunto.</value>
+  </data>
+  <data name="ExperienceAttachmentPublicationPending" xml:space="preserve">
+    <value>La visibilidad quedará pendiente hasta que guardes los cambios del adjunto o de la experiencia.</value>
+  </data>
+  <data name="ExperienceAttachmentDeleteConfirmation" xml:space="preserve">
+    <value>¿Seguro que quieres eliminar «{0}»? Esta acción no se puede deshacer.</value>
   </data>
 </root>

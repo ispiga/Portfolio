@@ -399,15 +399,6 @@
   <data name="AdminLogout" xml:space="preserve">
     <value>Sign out</value>
   </data>
-  <data name="AdminSessionExpiredTitle" xml:space="preserve">
-    <value>Administrator session expired</value>
-  </data>
-  <data name="AdminSessionExpiredMessage" xml:space="preserve">
-    <value>Your administrator session expired due to inactivity. Sign in again if you need to access the administration area.</value>
-  </data>
-  <data name="Close" xml:space="preserve">
-    <value>Close</value>
-  </data>
   <data name="AdminWelcome" xml:space="preserve">
     <value>Signed in as {0}.</value>
   </data>
@@ -612,11 +603,14 @@
   <data name="ExperienceDeleted" xml:space="preserve">
     <value>The experience was deleted.</value>
   </data>
+  <data name="ExperienceSaved" xml:space="preserve">
+    <value>The experience was saved successfully.</value>
+  </data>
   <data name="ExperienceSaving" xml:space="preserve">
     <value>Saving…</value>
   </data>
   <data name="ExperienceAttachments" xml:space="preserve">
-    <value>Private attachments</value>
+    <value>Attachments</value>
   </data>
   <data name="ExperienceAttachmentRules" xml:space="preserve">
     <value>Up to {0} files per experience, {1} MB maximum per file. Formats: PDF, JPG and PNG. Files stay private until you explicitly confirm publication.</value>
@@ -699,6 +693,15 @@
   <data name="Cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
+  <data name="AdminSessionExpiredTitle" xml:space="preserve">
+    <value>Administrator session expired</value>
+  </data>
+  <data name="AdminSessionExpiredMessage" xml:space="preserve">
+    <value>Your administrator session expired due to inactivity. Sign in again if you need to access the administration area.</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
   <data name="ExperienceUnsavedChangesConfirmation" xml:space="preserve">
     <value>Your experience edits will be lost if you leave without saving. Do you want to leave without saving?</value>
   </data>
@@ -710,5 +713,26 @@
   </data>
   <data name="DiscardChanges" xml:space="preserve">
     <value>Leave without saving</value>
+  </data>
+  <data name="ExperienceAttachmentDisplayName" xml:space="preserve">
+    <value>Display name</value>
+  </data>
+  <data name="ExperienceAttachmentSaveName" xml:space="preserve">
+    <value>Save name</value>
+  </data>
+  <data name="ExperienceAttachmentNameUpdated" xml:space="preserve">
+    <value>The attachment name was updated.</value>
+  </data>
+  <data name="ExperienceAttachmentSaveChanges" xml:space="preserve">
+    <value>Save changes</value>
+  </data>
+  <data name="ExperienceAttachmentChangesSaved" xml:space="preserve">
+    <value>The attachment changes were saved.</value>
+  </data>
+  <data name="ExperienceAttachmentPublicationPending" xml:space="preserve">
+    <value>Visibility will remain pending until you save the attachment or experience changes.</value>
+  </data>
+  <data name="ExperienceAttachmentDeleteConfirmation" xml:space="preserve">
+    <value>Are you sure you want to delete “{0}”? This action cannot be undone.</value>
   </data>
 </root>

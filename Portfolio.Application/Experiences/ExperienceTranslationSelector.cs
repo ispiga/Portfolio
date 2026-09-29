@@ -37,7 +37,7 @@ public static class ExperienceTranslationSelector
                 .ThenBy(attachment => attachment.Id)
                 .Select(attachment => new ExperienceAttachmentPreviewReadModel(
                     attachment.Id,
-                    attachment.OriginalFileName,
+                    attachment.DisplayName,
                     attachment.ContentType))
                 .ToArray());
     }

@@ -461,6 +461,11 @@ public sealed class AdminAuthenticationTests : IAsyncLifetime
             Stream content,
             CancellationToken cancellationToken = default) => throw new NotSupportedException();
 
+        public Task<bool> UpdateDisplayNameAsync(
+            Guid attachmentId,
+            string displayName,
+            CancellationToken cancellationToken = default) => Task.FromResult(false);
+
         public Task<bool> DeleteAsync(Guid attachmentId, CancellationToken cancellationToken = default) =>
             Task.FromResult(false);
 
@@ -479,6 +484,7 @@ public sealed class AdminAuthenticationTests : IAsyncLifetime
             var attachment = new ExperienceAttachmentReadModel(
                 attachmentId,
                 Guid.NewGuid(),
+                "private.pdf",
                 "private.pdf",
                 "application/pdf",
                 8,

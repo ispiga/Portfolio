@@ -122,6 +122,7 @@ public sealed class ExperienceAttachmentStorageService(
                 Id = id,
                 ExperienceId = experienceId,
                 OriginalFileName = safeFileName,
+                DisplayName = safeFileName,
                 StorageKey = relativeStorageKey.Replace('\\', '/'),
                 ContentType = expectedContentType,
                 SizeBytes = fileSize,
@@ -148,6 +149,36 @@ public sealed class ExperienceAttachmentStorageService(
                 File.Delete(temporaryPath);
             }
         }
+    }
+
+    public async Task<bool> UpdateDisplayNameAsync(
+        Guid attachmentId,
+        string displayName,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(displayName))
+        {
+            return false;
+        }
+
+        var safeDisplayName = displayName.Trim();
+        if (safeDisplayName.Length > 255)
+        {
+            return false;
+        }
+
+        await using var context = await dbContextFactory.CreateDbContextAsync(cancellationToken);
+        var attachment = await context.ExperienceAttachments.SingleOrDefaultAsync(
+            candidate => candidate.Id == attachmentId,
+            cancellationToken);
+        if (attachment is null)
+        {
+            return false;
+        }
+
+        attachment.DisplayName = safeDisplayName;
+        await context.SaveChangesAsync(cancellationToken);
+        return true;
     }
 
     public async Task<bool> DeleteAsync(Guid attachmentId, CancellationToken cancellationToken = default)
@@ -295,6 +326,7 @@ public sealed class ExperienceAttachmentStorageService(
         attachment.Id,
         attachment.ExperienceId,
         attachment.OriginalFileName,
+        attachment.DisplayName,
         attachment.ContentType,
         attachment.SizeBytes,
         attachment.CreatedAt,
