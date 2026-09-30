@@ -36,7 +36,7 @@
                         <MudText Typo="Typo.body2">@Localizer[module.Description]</MudText>
                         <MudText Typo="Typo.caption" Class="admin-module-card__status">@Localizer[module.IsAvailable ? "ExperienceModuleAvailable" : "AdminModuleNotAvailable"]</MudText>
                         <MudButton Href="@module.Path" Disabled="@(!module.IsAvailable)" Variant="Variant.Outlined">
-                            @Localizer[module.IsAvailable ? "ExperienceManageAction" : "AdminOpenModule"]
+                            @Localizer[module.Action]
                         </MudButton>
                     </MudPaper>
                 </MudItem>
@@ -59,10 +59,10 @@
 
     private static readonly AdminModule[] Modules =
     [
-        new("AdminExperiences", "AdminExperiencesDescription", "/admin/experiences", true),
-        new("AdminProjects", "AdminProjectsDescription", "/admin/projects", false),
-        new("AdminCertifications", "AdminCertificationsDescription", "/admin/certifications", false),
-        new("AdminBlog", "AdminBlogDescription", "/admin/blog", false)
+        new("AdminExperiences", "AdminExperiencesDescription", "/admin/experiences", true, "ExperienceManageAction"),
+        new("AdminProjects", "AdminProjectsDescription", "/admin/projects", true, "ProjectManageAction"),
+        new("AdminCertifications", "AdminCertificationsDescription", "/admin/certifications", false, "AdminOpenModule"),
+        new("AdminBlog", "AdminBlogDescription", "/admin/blog", false, "AdminOpenModule")
     ];
 
     protected override async Task OnInitializedAsync()
@@ -71,5 +71,5 @@
         userName = authenticationState.User.Identity?.Name ?? string.Empty;
     }
 
-    private sealed record AdminModule(string Title, string Description, string Path, bool IsAvailable);
+    private sealed record AdminModule(string Title, string Description, string Path, bool IsAvailable, string Action);
 }

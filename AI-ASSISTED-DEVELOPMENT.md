@@ -3184,3 +3184,21 @@ Respeta los tokens semánticos, la accesibilidad, el tema compartido y el idioma
 Adjuntos: la especificación indica que deben estudiarse varios adjuntos por experiencia, pero que aún hay que acordar metadatos, límites y reglas de acceso.
 Antes de implementar almacenamiento o modificar el modelo para adjuntos, analiza las opciones compatibles con la especificación y pregúntame las decisiones que falten. No inventes requisitos ni expongas documentos potencialmente sensibles.
 Trabaja solo en el módulo de Experiencias; no adelantes CRUD de proyectos, certificaciones o blog. Añade las migraciones necesarias únicamente después de inspeccionar el modelo y validar el impacto. Actualiza PORTFOLIO_PROJECT.md al terminar y ejecuta la compilación y las pruebas pertinentes. No leas ni muestres secretos.
+
+
+# ****************************************
+# PROMPT PARA REALIZAR LA FASE 7 - PARTE 3
+# ****************************************
+
+Implementa la entrega de Proyectos de la Fase 7 de este portfolio.
+Antes de hacer cambios, lee .github/copilot-instructions.md y consulta ../PORTFOLIO_PROJECT.md, especialmente las secciones sobre Proyectos, su modelo actual y las entregas de la Fase 7. Inspecciona también el código existente de proyectos y toma como referencia el CRUD de Experiencias para mantener la arquitectura, patrones visuales y prácticas del proyecto.
+El alcance de esta entrega es:
+• Crear el CRUD administrativo de proyectos, protegido por la autorización existente.
+• Permitir crear, consultar, editar y eliminar proyectos desde el área de administración.
+• Editar las traducciones es-ES y en-US desde un único formulario, avisando claramente si falta alguna traducción y respetando el fallback público a español.
+• Gestionar el orden, el estado destacado y la imagen de vista previa del proyecto.
+• Integrar los cambios con la sección pública de proyectos, respetando su diseño y localización actuales.
+• Reutilizar la infraestructura y los patrones existentes siempre que sea posible. No inventes categorías, etiquetas, tecnologías, relaciones ni requisitos no definidos en la especificación; si una decisión necesaria no está determinada por el código o el documento, consúltamela antes de implementarla.
+Mantén los cambios acotados a Proyectos y a las dependencias necesarias. No implementes todavía Certificaciones ni Blog, y no alteres el comportamiento existente de Experiencias, Identity o contacto.
+Sigue los requisitos existentes de localización, accesibilidad, tema, validación, persistencia y seguridad. Si la gestión de imágenes requiere cambios de esquema, genera la migración correspondiente y documenta si debe aplicarse manualmente; no apliques migraciones a bases de datos sin confirmar explícitamente el destino.
+Añade o actualiza pruebas para las reglas implementadas. Al terminar, compila la solución y ejecuta las pruebas pertinentes. Si la entrega queda completada, actualiza PORTFOLIO_PROJECT.md y .github/copilot-instructions.md para reflejar el estado real, sin marcar toda la Fase 7 como finalizada mientras queden entregas pendientes.

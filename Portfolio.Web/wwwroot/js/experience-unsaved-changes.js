@@ -3,6 +3,7 @@ let form;
 let dialog;
 let pendingAction;
 let dialogText;
+let ignoredChangeSelector;
 
 const logoutFormIds = new Set(["admin-header-logout-form", "public-navbar-logout-form"]);
 
@@ -15,10 +16,16 @@ function beforeUnload(event) {
     event.returnValue = "";
 }
 
-function trackFormChange() {
-    if (form) {
-        setEnabled(true);
+function trackFormChange(event) {
+    if (!form) {
+        return;
     }
+
+    if (ignoredChangeSelector && event.target instanceof Element && event.target.closest(ignoredChangeSelector)) {
+        return;
+    }
+
+    setEnabled(true);
 }
 
 function closeDialog() {
@@ -101,9 +108,10 @@ function confirmLogout(event) {
     showDialog({ type: "logout", formId: form.id }, ...dialogText);
 }
 
-export function initialize(formId, title, message, stayText, discardText) {
+export function initialize(formId, title, message, stayText, discardText, ignoredChangeSelectorValue) {
     form = document.getElementById(formId);
     dialogText = [title, message, stayText, discardText];
+    ignoredChangeSelector = ignoredChangeSelectorValue;
     form?.addEventListener("input", trackFormChange);
     form?.addEventListener("change", trackFormChange);
     document.addEventListener("click", confirmInternalAction, true);
@@ -134,5 +142,6 @@ export function dispose() {
     dialog = undefined;
     pendingAction = undefined;
     dialogText = undefined;
+    ignoredChangeSelector = undefined;
     setEnabled(false);
 }

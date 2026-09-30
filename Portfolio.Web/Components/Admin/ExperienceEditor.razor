@@ -251,7 +251,7 @@
             return;
         }
 
-        unsavedChangesModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./js/experience-unsaved-changes.js?v=11");
+        unsavedChangesModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./js/experience-unsaved-changes.js?v=12");
         if (!unsavedChangesModuleInitialized)
         {
             await unsavedChangesModule.InvokeVoidAsync(

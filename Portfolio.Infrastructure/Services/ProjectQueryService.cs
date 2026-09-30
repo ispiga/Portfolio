@@ -21,8 +21,17 @@ public sealed class ProjectQueryService(
 
         return projects
             .Select(project => ProjectTranslationSelector.Select(
-                project,
-                CultureInfo.CurrentUICulture.Name))
+                    project,
+                    CultureInfo.CurrentUICulture.Name) is { } selected
+                ? selected with
+                {
+                    PreviewImagePath = project.PreviewImagePath is null
+                        ? null
+                        : project.PreviewImagePath.StartsWith("/project-preview-images/", StringComparison.Ordinal)
+                            ? $"/project-preview-images/{project.Id}?v={Uri.EscapeDataString(Path.GetFileName(project.PreviewImagePath))}"
+                            : project.PreviewImagePath
+                }
+                : null)
             .OfType<ProjectReadModel>()
             .ToArray();
     }

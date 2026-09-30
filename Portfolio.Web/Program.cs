@@ -116,6 +116,7 @@ app.UseAntiforgery();
 app.MapStaticAssets();
 app.MapAdminAuthentication();
 app.MapExperienceAttachmentEndpoints();
+app.MapProjectPreviewImageEndpoints();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 

@@ -8,7 +8,7 @@ public sealed class ProjectTranslation
 
     public string Title { get; set; } = string.Empty;
 
-    public string Slug { get; set; } = string.Empty;
+    public string? Slug { get; set; }
 
     public string Summary { get; set; } = string.Empty;
 

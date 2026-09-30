@@ -114,7 +114,7 @@
   <data name="AdminModuleNotAvailable" xml:space="preserve"><value>Preparado para una próxima entrega</value></data>
   <data name="AdminOpenModule" xml:space="preserve"><value>Próximamente</value></data>
   <data name="AdminContentSummaryTitle" xml:space="preserve"><value>Estado del contenido</value></data>
-  <data name="AdminContentSummary" xml:space="preserve"><value>La autenticación y la estructura administrativa están listas. La gestión de contenido todavía no está habilitada.</value></data>
+	<data name="AdminContentSummary" xml:space="preserve"><value>La administración permite gestionar experiencias y proyectos. Las certificaciones y el blog continúan pendientes.</value></data>
   <data name="AdminPublicSiteAction" xml:space="preserve"><value>Ver sitio público</value></data>
   <data name="AdminAccessDeniedTitle" xml:space="preserve"><value>Acceso denegado</value></data>
   <data name="AdminAccessDeniedMessage" xml:space="preserve"><value>Tu cuenta no tiene permisos para acceder a esta área.</value></data>

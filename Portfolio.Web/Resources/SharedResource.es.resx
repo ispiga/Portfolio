@@ -603,9 +603,6 @@
   <data name="ExperienceDeleted" xml:space="preserve">
     <value>La experiencia se ha eliminado.</value>
   </data>
-  <data name="ExperienceSaved" xml:space="preserve">
-    <value>La experiencia se ha guardado correctamente.</value>
-  </data>
   <data name="ExperienceSaving" xml:space="preserve">
     <value>Guardando…</value>
   </data>
@@ -708,6 +705,12 @@
   <data name="ExperienceUnsavedChangesTitle" xml:space="preserve">
     <value>Cambios sin guardar</value>
   </data>
+  <data name="ProjectUnsavedChangesConfirmation" xml:space="preserve">
+    <value>Los cambios del proyecto se perderán si sales sin guardar. ¿Quieres salir sin guardar?</value>
+  </data>
+  <data name="ProjectUnsavedChangesTitle" xml:space="preserve">
+    <value>Cambios sin guardar</value>
+  </data>
   <data name="StayOnPage" xml:space="preserve">
     <value>Seguir editando</value>
   </data>
@@ -734,5 +737,143 @@
   </data>
   <data name="ExperienceAttachmentDeleteConfirmation" xml:space="preserve">
     <value>¿Seguro que quieres eliminar «{0}»? Esta acción no se puede deshacer.</value>
+  </data>
+  <data name="ExperienceSaved" xml:space="preserve">
+    <value>La experiencia se ha guardado correctamente.</value>
+  </data>
+  <data name="ProjectAdminTitle" xml:space="preserve">
+    <value>Administrar proyectos</value>
+  </data>
+  <data name="ProjectAdminDescription" xml:space="preserve">
+    <value>Crea y administra los proyectos que se muestran en el portfolio.</value>
+  </data>
+  <data name="ProjectCreate" xml:space="preserve">
+    <value>Crear proyecto</value>
+  </data>
+  <data name="ProjectEdit" xml:space="preserve">
+    <value>Editar proyecto</value>
+  </data>
+  <data name="ProjectAdminEmpty" xml:space="preserve">
+    <value>Aún no hay proyectos. Puedes crear el primero.</value>
+  </data>
+  <data name="ProjectOrder" xml:space="preserve">
+    <value>Orden</value>
+  </data>
+  <data name="ProjectSpanish" xml:space="preserve">
+    <value>Proyecto</value>
+  </data>
+  <data name="ProjectEnglish" xml:space="preserve">
+    <value>Inglés</value>
+  </data>
+  <data name="ProjectTranslations" xml:space="preserve">
+    <value>Traducciones</value>
+  </data>
+  <data name="ProjectTranslationMissingSpanish" xml:space="preserve">
+    <value>Falta una traducción completa en español.</value>
+  </data>
+  <data name="ProjectTranslationMissingEnglish" xml:space="preserve">
+    <value>Falta una traducción completa en inglés; la web pública usará el español como alternativa.</value>
+  </data>
+  <data name="ProjectDetails" xml:space="preserve">
+    <value>Datos del proyecto</value>
+  </data>
+  <data name="ProjectRepositoryUrl" xml:space="preserve">
+    <value>URL del repositorio (opcional)</value>
+  </data>
+  <data name="ProjectDemoUrl" xml:space="preserve">
+    <value>URL de la demo (opcional)</value>
+  </data>
+  <data name="ProjectTitle" xml:space="preserve">
+    <value>Nombre</value>
+  </data>
+  <data name="ProjectSlug" xml:space="preserve">
+    <value>Slug (parte legible de la URL)</value>
+  </data>
+  <data name="ProjectSlugDisabled" xml:space="preserve">
+    <value>Deshabilitado hasta implementar las páginas de detalle</value>
+  </data>
+  <data name="ProjectSummary" xml:space="preserve">
+    <value>Descripción breve</value>
+  </data>
+  <data name="ProjectDescription" xml:space="preserve">
+    <value>Descripción (opcional)</value>
+  </data>
+  <data name="ProjectDisplayOrderInvalid" xml:space="preserve">
+    <value>El orden debe ser un número igual o mayor que cero.</value>
+  </data>
+  <data name="ProjectFieldRequired" xml:space="preserve">
+    <value>Completa este campo para guardar la traducción.</value>
+  </data>
+  <data name="ProjectFieldTooLong" xml:space="preserve">
+    <value>El contenido supera la longitud máxima permitida.</value>
+  </data>
+  <data name="ProjectSlugDisabled" xml:space="preserve">
+    <value>Deshabilitado</value>
+  </data>
+  <data name="ProjectUrlInvalid" xml:space="preserve">
+    <value>Introduce una URL completa que empiece por http:// o https://.</value>
+  </data>
+  <data name="ProjectNotFound" xml:space="preserve">
+    <value>No se ha encontrado el proyecto.</value>
+  </data>
+  <data name="ProjectDeleteConfirmation" xml:space="preserve">
+    <value>¿Quieres eliminar este proyecto? Esta acción no se puede deshacer.</value>
+  </data>
+  <data name="ProjectDeleted" xml:space="preserve">
+    <value>El proyecto se ha eliminado.</value>
+  </data>
+  <data name="ProjectSaveFailed" xml:space="preserve">
+    <value>No se ha podido guardar el proyecto. Revisa los campos indicados.</value>
+  </data>
+  <data name="ProjectSaved" xml:space="preserve">
+    <value>El proyecto se ha guardado correctamente.</value>
+  </data>
+  <data name="ProjectSaving" xml:space="preserve">
+    <value>Guardando…</value>
+  </data>
+  <data name="ProjectPreviewImage" xml:space="preserve">
+    <value>Imagen de vista previa</value>
+  </data>
+  <data name="ProjectImageRules" xml:space="preserve">
+    <value>Formatos JPG/JPEG y PNG. Tamaño máximo: {0} MiB.</value>
+  </data>
+  <data name="ProjectImageUpload" xml:space="preserve">
+    <value>Seleccionar imagen de vista previa</value>
+  </data>
+  <data name="ProjectPreviewImageAlt" xml:space="preserve">
+    <value>Vista previa del proyecto {0}</value>
+  </data>
+  <data name="ProjectImageDelete" xml:space="preserve">
+    <value>Eliminar imagen</value>
+  </data>
+  <data name="ProjectImageDeleteConfirmation" xml:space="preserve">
+    <value>¿Seguro que quieres eliminar la imagen de vista previa?</value>
+  </data>
+  <data name="ProjectImageUploaded" xml:space="preserve">
+    <value>La imagen de vista previa se ha guardado.</value>
+  </data>
+  <data name="ProjectImageDeleted" xml:space="preserve">
+    <value>La imagen de vista previa se ha eliminado.</value>
+  </data>
+  <data name="ProjectImageUnsupportedType" xml:space="preserve">
+    <value>Elige una imagen JPG, JPEG o PNG.</value>
+  </data>
+  <data name="ProjectImageTooLarge" xml:space="preserve">
+    <value>La imagen supera el tamaño máximo permitido.</value>
+  </data>
+  <data name="ProjectImageInvalidContent" xml:space="preserve">
+    <value>El contenido del archivo no es una imagen válida del tipo indicado.</value>
+  </data>
+  <data name="ProjectNotFeatured" xml:space="preserve">
+    <value>No destacado</value>
+  </data>
+  <data name="ProjectManageAction" xml:space="preserve">
+    <value>Gestionar proyectos</value>
+  </data>
+  <data name="ProjectDescriptionExpand" xml:space="preserve">
+    <value>Ver descripción completa</value>
+  </data>
+  <data name="ProjectDescriptionCollapse" xml:space="preserve">
+    <value>Ocultar descripción</value>
   </data>
 </root>

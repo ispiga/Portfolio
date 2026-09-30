@@ -2,7 +2,7 @@
 @using Portfolio.Application.Projects
 @inject IStringLocalizer<SharedResource> Localizer
 
-<article class="surface project-card">
+<article class="surface project-card @(Project.IsFeatured ? "project-card--featured" : string.Empty)">
     @if (!string.IsNullOrWhiteSpace(Project.PreviewImagePath))
     {
         <img class="project-card__image" src="@Project.PreviewImagePath" alt="@Project.Title" loading="lazy" />
@@ -20,6 +20,18 @@
 
         <h3>@Project.Title</h3>
         <p>@Project.Summary</p>
+
+        @if (!string.IsNullOrWhiteSpace(Project.Description))
+        {
+            <button type="button"
+                    class="project-card__description-toggle"
+                    aria-expanded="@descriptionExpanded"
+                    aria-controls="@DescriptionId"
+                    @onclick="ToggleDescription">
+                @Localizer[descriptionExpanded ? "ProjectDescriptionCollapse" : "ProjectDescriptionExpand"]
+            </button>
+            <p id="@DescriptionId" class="project-card__description" hidden="@(!descriptionExpanded)">@Project.Description</p>
+        }
 
         @if (!string.IsNullOrWhiteSpace(Project.RepositoryUrl) || !string.IsNullOrWhiteSpace(Project.DemoUrl))
         {
@@ -39,6 +51,12 @@
 </article>
 
 @code {
+    private bool descriptionExpanded;
+
+    private string DescriptionId => $"project-description-{Project.Id:N}";
+
     [Parameter, EditorRequired]
     public ProjectReadModel Project { get; set; } = null!;
+
+    private void ToggleDescription() => descriptionExpanded = !descriptionExpanded;
 }

@@ -17,7 +17,6 @@ public static class ProjectTranslationSelector
 
         if (translation is null
             || string.IsNullOrWhiteSpace(translation.Title)
-            || string.IsNullOrWhiteSpace(translation.Slug)
             || string.IsNullOrWhiteSpace(translation.Summary))
         {
             return null;

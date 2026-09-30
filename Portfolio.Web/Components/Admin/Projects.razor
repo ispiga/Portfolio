@@ -1,0 +1,112 @@
+@page "/admin/projects"
+@attribute [Authorize(Policy = PortfolioAuthorization.AdministratorPolicy)]
+@layout AdminLayout
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.Extensions.Localization
+@using Portfolio.Application.Projects
+@using Portfolio.Infrastructure.Identity
+@inject IProjectAdministrationService ProjectService
+@inject IProjectPreviewImageService ImageService
+@inject IStringLocalizer<SharedResource> Localizer
+
+<PageTitle>@Localizer["ProjectAdminTitle"]</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="admin-dashboard">
+    <header class="admin-dashboard__heading">
+        <MudText Typo="Typo.h1" Tag="@("h1")">@Localizer["ProjectAdminTitle"]</MudText>
+        <MudText Typo="Typo.body1">@Localizer["ProjectAdminDescription"]</MudText>
+    </header>
+    <MudButton Href="/admin/projects/edit" Color="Color.Primary" Variant="Variant.Filled" Class="mb-4">
+        @Localizer["ProjectCreate"]
+    </MudButton>
+
+    @if (projects is null)
+    {
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary" aria-label="@Localizer["Loading"]" />
+    }
+    else if (projects.Count == 0)
+    {
+        <MudPaper Elevation="1" Class="pa-5"><MudText>@Localizer["ProjectAdminEmpty"]</MudText></MudPaper>
+    }
+    else
+    {
+        <MudTable Items="projects" Hover="true" Breakpoint="Breakpoint.Sm">
+            <HeaderContent>
+                <MudTh>@Localizer["ProjectOrder"]</MudTh>
+                <MudTh>@Localizer["ProjectSpanish"]</MudTh>
+                <MudTh>@Localizer["ProjectFeatured"]</MudTh>
+                <MudTh>@Localizer["ProjectTranslations"]</MudTh>
+                <MudTh><span class="visually-hidden">@Localizer["Actions"]</span></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="@Localizer["ProjectOrder"]">@context.DisplayOrder</MudTd>
+                <MudTd DataLabel="@Localizer["ProjectSpanish"]">@context.SpanishTitle</MudTd>
+                <MudTd DataLabel="@Localizer["ProjectFeatured"]">@Localizer[context.IsFeatured ? "ProjectFeatured" : "ProjectNotFeatured"]</MudTd>
+                <MudTd DataLabel="@Localizer["ProjectTranslations"]">
+                    @if (!context.HasSpanishTranslation)
+                    {
+                        <MudChip T="string" Color="Color.Warning" Variant="Variant.Outlined">@Localizer["ProjectTranslationMissingSpanish"]</MudChip>
+                    }
+                    @if (!context.HasEnglishTranslation)
+                    {
+                        <MudChip T="string" Color="Color.Warning" Variant="Variant.Outlined">@Localizer["ProjectTranslationMissingEnglish"]</MudChip>
+                    }
+                </MudTd>
+                <MudTd>
+                    <MudButton Href="@($"/admin/projects/edit/{context.Id}")" Variant="Variant.Outlined" Color="Color.Primary">@Localizer["Edit"]</MudButton>
+                    <MudButton OnClick="@(() => RequestDelete(context.Id))" Variant="Variant.Outlined" Color="Color.Error">@Localizer["Delete"]</MudButton>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    }
+
+    @if (deleteId is { } pendingId)
+    {
+        <MudAlert Severity="Severity.Warning" Class="mt-4" Role="alert">
+            @Localizer["ProjectDeleteConfirmation"]
+            <MudButton OnClick="@(() => ConfirmDeleteAsync(pendingId))" Color="Color.Error" Variant="Variant.Filled">@Localizer["Delete"]</MudButton>
+            <MudButton OnClick="CancelDelete" Variant="Variant.Outlined">@Localizer["Cancel"]</MudButton>
+        </MudAlert>
+    }
+    @if (operationMessage is not null)
+    {
+        <MudAlert Severity="@operationSeverity" Class="mt-4" Role="status">@operationMessage</MudAlert>
+    }
+</MudContainer>
+
+@code {
+    private IReadOnlyList<ProjectAdminListItem>? projects;
+    private Guid? deleteId;
+    private string? operationMessage;
+    private Severity operationSeverity = Severity.Info;
+
+    protected override async Task OnInitializedAsync() => await ReloadAsync();
+
+    private async Task ReloadAsync() => projects = await ProjectService.GetProjectsAsync();
+
+    private void RequestDelete(Guid id)
+    {
+        deleteId = id;
+        operationMessage = null;
+    }
+
+    private void CancelDelete() => deleteId = null;
+
+    private async Task ConfirmDeleteAsync(Guid id)
+    {
+        await ImageService.DeleteAsync(id);
+        var result = await ProjectService.DeleteAsync(id);
+        deleteId = null;
+        if (result == ProjectDeleteResult.Deleted)
+        {
+            operationMessage = Localizer["ProjectDeleted"];
+            operationSeverity = Severity.Success;
+            await ReloadAsync();
+        }
+        else
+        {
+            operationMessage = Localizer["ProjectNotFound"];
+            operationSeverity = Severity.Error;
+        }
+    }
+}

@@ -603,9 +603,6 @@
   <data name="ExperienceDeleted" xml:space="preserve">
     <value>The experience was deleted.</value>
   </data>
-  <data name="ExperienceSaved" xml:space="preserve">
-    <value>The experience was saved successfully.</value>
-  </data>
   <data name="ExperienceSaving" xml:space="preserve">
     <value>Saving…</value>
   </data>
@@ -708,6 +705,12 @@
   <data name="ExperienceUnsavedChangesTitle" xml:space="preserve">
     <value>Unsaved changes</value>
   </data>
+  <data name="ProjectUnsavedChangesConfirmation" xml:space="preserve">
+    <value>Your project changes will be lost if you leave without saving. Do you want to leave without saving?</value>
+  </data>
+  <data name="ProjectUnsavedChangesTitle" xml:space="preserve">
+    <value>Unsaved changes</value>
+  </data>
   <data name="StayOnPage" xml:space="preserve">
     <value>Keep editing</value>
   </data>
@@ -734,5 +737,143 @@
   </data>
   <data name="ExperienceAttachmentDeleteConfirmation" xml:space="preserve">
     <value>Are you sure you want to delete “{0}”? This action cannot be undone.</value>
+  </data>
+  <data name="ExperienceSaved" xml:space="preserve">
+    <value>The experience was saved successfully.</value>
+  </data>
+  <data name="ProjectAdminTitle" xml:space="preserve">
+    <value>Manage projects</value>
+  </data>
+  <data name="ProjectAdminDescription" xml:space="preserve">
+    <value>Create and manage the projects displayed on the portfolio.</value>
+  </data>
+  <data name="ProjectCreate" xml:space="preserve">
+    <value>Create project</value>
+  </data>
+  <data name="ProjectEdit" xml:space="preserve">
+    <value>Edit project</value>
+  </data>
+  <data name="ProjectAdminEmpty" xml:space="preserve">
+    <value>There are no projects yet. Create the first one.</value>
+  </data>
+  <data name="ProjectOrder" xml:space="preserve">
+    <value>Order</value>
+  </data>
+  <data name="ProjectSpanish" xml:space="preserve">
+    <value>Project</value>
+  </data>
+  <data name="ProjectEnglish" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="ProjectTranslations" xml:space="preserve">
+    <value>Translations</value>
+  </data>
+  <data name="ProjectTranslationMissingSpanish" xml:space="preserve">
+    <value>A complete Spanish translation is missing.</value>
+  </data>
+  <data name="ProjectTranslationMissingEnglish" xml:space="preserve">
+    <value>A complete English translation is missing; the public site will use Spanish as a fallback.</value>
+  </data>
+  <data name="ProjectDetails" xml:space="preserve">
+    <value>Project details</value>
+  </data>
+  <data name="ProjectRepositoryUrl" xml:space="preserve">
+    <value>Repository URL (optional)</value>
+  </data>
+  <data name="ProjectDemoUrl" xml:space="preserve">
+    <value>Demo URL (optional)</value>
+  </data>
+  <data name="ProjectTitle" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="ProjectSlug" xml:space="preserve">
+    <value>Slug (readable part of the URL)</value>
+  </data>
+  <data name="ProjectSlugDisabled" xml:space="preserve">
+    <value>Disabled until project detail pages are implemented</value>
+  </data>
+  <data name="ProjectSummary" xml:space="preserve">
+    <value>Short description</value>
+  </data>
+  <data name="ProjectDescription" xml:space="preserve">
+    <value>Description (optional)</value>
+  </data>
+  <data name="ProjectDisplayOrderInvalid" xml:space="preserve">
+    <value>Order must be a number greater than or equal to zero.</value>
+  </data>
+  <data name="ProjectFieldRequired" xml:space="preserve">
+    <value>Complete this field to save the translation.</value>
+  </data>
+  <data name="ProjectFieldTooLong" xml:space="preserve">
+    <value>The content exceeds the maximum allowed length.</value>
+  </data>
+  <data name="ProjectSlugDisabled" xml:space="preserve">
+    <value>Disabled</value>
+  </data>
+  <data name="ProjectUrlInvalid" xml:space="preserve">
+    <value>Enter an absolute URL starting with http:// or https://.</value>
+  </data>
+  <data name="ProjectNotFound" xml:space="preserve">
+    <value>The project could not be found.</value>
+  </data>
+  <data name="ProjectDeleteConfirmation" xml:space="preserve">
+    <value>Delete this project? This action cannot be undone.</value>
+  </data>
+  <data name="ProjectDeleted" xml:space="preserve">
+    <value>The project was deleted.</value>
+  </data>
+  <data name="ProjectSaveFailed" xml:space="preserve">
+    <value>The project could not be saved. Review the fields shown.</value>
+  </data>
+  <data name="ProjectSaved" xml:space="preserve">
+    <value>The project was saved successfully.</value>
+  </data>
+  <data name="ProjectSaving" xml:space="preserve">
+    <value>Saving…</value>
+  </data>
+  <data name="ProjectPreviewImage" xml:space="preserve">
+    <value>Preview image</value>
+  </data>
+  <data name="ProjectImageRules" xml:space="preserve">
+    <value>JPG/JPEG and PNG formats. Maximum size: {0} MiB.</value>
+  </data>
+  <data name="ProjectImageUpload" xml:space="preserve">
+    <value>Select preview image</value>
+  </data>
+  <data name="ProjectPreviewImageAlt" xml:space="preserve">
+    <value>Preview image for project {0}</value>
+  </data>
+  <data name="ProjectImageDelete" xml:space="preserve">
+    <value>Delete image</value>
+  </data>
+  <data name="ProjectImageDeleteConfirmation" xml:space="preserve">
+    <value>Are you sure you want to delete the preview image?</value>
+  </data>
+  <data name="ProjectImageUploaded" xml:space="preserve">
+    <value>The preview image was saved.</value>
+  </data>
+  <data name="ProjectImageDeleted" xml:space="preserve">
+    <value>The preview image was deleted.</value>
+  </data>
+  <data name="ProjectImageUnsupportedType" xml:space="preserve">
+    <value>Choose a JPG, JPEG or PNG image.</value>
+  </data>
+  <data name="ProjectImageTooLarge" xml:space="preserve">
+    <value>The image exceeds the maximum allowed size.</value>
+  </data>
+  <data name="ProjectImageInvalidContent" xml:space="preserve">
+    <value>The file content is not a valid image of the declared type.</value>
+  </data>
+  <data name="ProjectNotFeatured" xml:space="preserve">
+    <value>Not featured</value>
+  </data>
+  <data name="ProjectManageAction" xml:space="preserve">
+    <value>Manage projects</value>
+  </data>
+  <data name="ProjectDescriptionExpand" xml:space="preserve">
+    <value>Show full description</value>
+  </data>
+  <data name="ProjectDescriptionCollapse" xml:space="preserve">
+    <value>Hide description</value>
   </data>
 </root>

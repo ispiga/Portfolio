@@ -164,21 +164,33 @@ public sealed class PersistenceModelTests
     }
 
     [Fact]
-    public void Project_translation_and_blog_post_translation_slugs_are_unique()
+    public void Blog_post_translation_slugs_are_unique()
     {
         using var context = CreateContext();
 
-        var projectSlugIndex = context.Model.FindEntityType(typeof(ProjectTranslation))!
-            .GetIndexes()
-            .Single(index => index.Properties.Select(property => property.Name)
-                .SequenceEqual([nameof(ProjectTranslation.LanguageCode), nameof(ProjectTranslation.Slug)]));
         var blogPostSlugIndex = context.Model.FindEntityType(typeof(BlogPostTranslation))!
             .GetIndexes()
             .Single(index => index.Properties.Select(property => property.Name)
                 .SequenceEqual([nameof(BlogPostTranslation.LanguageCode), nameof(BlogPostTranslation.Slug)]));
 
-        Assert.True(projectSlugIndex.IsUnique);
         Assert.True(blogPostSlugIndex.IsUnique);
+    }
+
+    [Fact]
+    public void Project_translation_slugs_are_optional_and_unique_when_present()
+    {
+        using var context = CreateContext();
+
+        var translationEntity = context.Model.FindEntityType(typeof(ProjectTranslation))!;
+        var slug = translationEntity.FindProperty(nameof(ProjectTranslation.Slug))!;
+        var slugIndex = translationEntity.GetIndexes()
+            .Single(index => index.Properties.Select(property => property.Name)
+                .SequenceEqual([nameof(ProjectTranslation.LanguageCode), nameof(ProjectTranslation.Slug)]));
+
+        Assert.True(slug.IsNullable);
+        Assert.Equal(200, slug.GetMaxLength());
+        Assert.True(slugIndex.IsUnique);
+        Assert.Equal("[Slug] IS NOT NULL", slugIndex.GetFilter());
     }
 
     [Fact]
@@ -350,11 +362,7 @@ public sealed class PersistenceModelTests
         Assert.Equal(
             [nameof(ProjectTranslation.ProjectId), nameof(ProjectTranslation.LanguageCode)],
             translationEntity.FindPrimaryKey()!.Properties.Select(property => property.Name));
-
-        var languageSlugIndex = translationEntity.GetIndexes()
-            .Single(index => index.Properties.Select(property => property.Name)
-                .SequenceEqual([nameof(ProjectTranslation.LanguageCode), nameof(ProjectTranslation.Slug)]));
-        Assert.True(languageSlugIndex.IsUnique);
+        Assert.Contains(nameof(ProjectTranslation.Slug), translationEntity.GetProperties().Select(property => property.Name));
 
         var foreignKey = translationEntity.GetForeignKeys().Single();
         Assert.Equal(DeleteBehavior.Cascade, foreignKey.DeleteBehavior);
@@ -515,14 +523,16 @@ public sealed class PersistenceModelTests
                     LanguageCode = "es-ES",
                     Title = "Proyecto",
                     Slug = "proyecto",
-                    Summary = "Resumen en español"
+                    Summary = "Resumen en español",
+                    Description = "Descripción extensa"
                 },
                 new ProjectTranslation
                 {
                     LanguageCode = "en-US",
                     Title = "Project",
                     Slug = "project",
-                    Summary = "English summary"
+                    Summary = "English summary",
+                    Description = "Project description"
                 }
             ]
         };
@@ -533,6 +543,7 @@ public sealed class PersistenceModelTests
         Assert.Equal("Project", result.Title);
         Assert.Equal("project", result.Slug);
         Assert.Equal("English summary", result.Summary);
+        Assert.Equal("Project description", result.Description);
         Assert.Equal(project.PreviewImagePath, result.PreviewImagePath);
         Assert.Equal(project.RepositoryUrl, result.RepositoryUrl);
         Assert.Equal(project.DemoUrl, result.DemoUrl);
@@ -574,7 +585,6 @@ public sealed class PersistenceModelTests
                 {
                     LanguageCode = "en-US",
                     Title = "",
-                    Slug = "project",
                     Summary = "Summary"
                 }
             ]

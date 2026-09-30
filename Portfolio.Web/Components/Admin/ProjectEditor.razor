@@ -1,0 +1,428 @@
+@page "/admin/projects/edit"
+@page "/admin/projects/edit/{Id:guid}"
+@attribute [Authorize(Policy = PortfolioAuthorization.AdministratorPolicy)]
+@layout AdminLayout
+@implements IAsyncDisposable
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.Extensions.Localization
+@using Microsoft.JSInterop
+@using Portfolio.Application.Projects
+@using Portfolio.Infrastructure.Identity
+@inject IProjectAdministrationService ProjectService
+@inject IProjectPreviewImageService ImageService
+@inject IStringLocalizer<SharedResource> Localizer
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+<PageTitle>@Localizer[IsNew ? "ProjectCreate" : "ProjectEdit"]</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="admin-dashboard">
+    <header class="admin-dashboard__heading">
+        <MudText Typo="Typo.h1" Tag="@("h1")">@Localizer[IsNew ? "ProjectCreate" : "ProjectEdit"]</MudText>
+    </header>
+
+    @if (loadFailed)
+    {
+        <MudAlert Severity="Severity.Error" Role="alert">@Localizer["ProjectNotFound"]</MudAlert>
+    }
+    else if (!loaded)
+    {
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary" aria-label="@Localizer["Loading"]" />
+    }
+    else
+    {
+        <NavigationLock ConfirmExternalNavigation="@HasUnsavedChanges" />
+        <EditForm id="project-edit-form" Model="model" OnSubmit="SaveAsync">
+            <MudPaper Elevation="1" Class="pa-5 mb-4">
+                <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["ProjectDetails"]</MudText>
+                <div class="experience-admin-grid">
+                    <div class="admin-field">
+                        <label for="project-order">@Localizer["ProjectOrder"]</label>
+                        <InputNumber id="project-order" @bind-Value="model.DisplayOrder" min="0" />
+                        @FieldErrors("DisplayOrder")
+                    </div>
+                    <div class="admin-field">
+                        <label for="project-repository">@Localizer["ProjectRepositoryUrl"]</label>
+                        <InputText id="project-repository" @bind-Value="model.RepositoryUrl" maxlength="500" inputmode="url" />
+                        @FieldErrors("RepositoryUrl")
+                    </div>
+                    <div class="admin-field">
+                        <label for="project-demo">@Localizer["ProjectDemoUrl"]</label>
+                        <InputText id="project-demo" @bind-Value="model.DemoUrl" maxlength="500" inputmode="url" />
+                        @FieldErrors("DemoUrl")
+                    </div>
+                    <div class="admin-field">
+                        <label for="project-featured">@Localizer["ProjectFeatured"]</label>
+                        <InputCheckbox id="project-featured" @bind-Value="model.IsFeatured" />
+                    </div>
+                </div>
+            </MudPaper>
+
+            <MudPaper Elevation="1" Class="pa-5 mb-4">
+                <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["ProjectSpanish"]</MudText>
+                @if (!TranslationIsFilled(model.SpanishTitle, model.SpanishSummary))
+                {
+                    <MudAlert Severity="Severity.Warning" Role="status">@Localizer["ProjectTranslationMissingSpanish"]</MudAlert>
+                }
+                <div class="admin-field">
+                    <label for="project-title-es">@Localizer["ProjectTitle"]</label>
+                    <InputText id="project-title-es" @bind-Value="model.SpanishTitle" maxlength="200" />
+                    @FieldErrors("Spanish.Title")
+                </div>
+                <div class="admin-field">
+                    <label for="project-slug-es">@Localizer["ProjectSlug"]</label>
+                    <input id="project-slug-es" value="@spanishSlugDisplay" disabled placeholder="@Localizer["ProjectSlugDisabled"]" />
+                </div>
+                <div class="admin-field">
+                    <label for="project-summary-es">@Localizer["ProjectSummary"]</label>
+                    <InputTextArea id="project-summary-es" @bind-Value="model.SpanishSummary" maxlength="500" rows="3" />
+                    @FieldErrors("Spanish.Summary")
+                </div>
+                <div class="admin-field">
+                    <label for="project-description-es">@Localizer["ProjectDescription"]</label>
+                    <InputTextArea id="project-description-es" @bind-Value="model.SpanishDescription" rows="8" />
+                    @FieldErrors("Spanish.Description")
+                </div>
+            </MudPaper>
+
+            <MudPaper Elevation="1" Class="pa-5 mb-4">
+                <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["ProjectEnglish"]</MudText>
+                @if (!TranslationIsFilled(model.EnglishTitle, model.EnglishSummary))
+                {
+                    <MudAlert Severity="Severity.Warning" Role="status">@Localizer["ProjectTranslationMissingEnglish"]</MudAlert>
+                }
+                <div class="admin-field">
+                    <label for="project-title-en">@Localizer["ProjectTitle"]</label>
+                    <InputText id="project-title-en" @bind-Value="model.EnglishTitle" maxlength="200" />
+                    @FieldErrors("English.Title")
+                </div>
+                <div class="admin-field">
+                    <label for="project-slug-en">@Localizer["ProjectSlug"]</label>
+                    <input id="project-slug-en" value="@englishSlugDisplay" disabled placeholder="@Localizer["ProjectSlugDisabled"]" />
+                </div>
+                <div class="admin-field">
+                    <label for="project-summary-en">@Localizer["ProjectSummary"]</label>
+                    <InputTextArea id="project-summary-en" @bind-Value="model.EnglishSummary" maxlength="500" rows="3" />
+                    @FieldErrors("English.Summary")
+                </div>
+                <div class="admin-field">
+                    <label for="project-description-en">@Localizer["ProjectDescription"]</label>
+                    <InputTextArea id="project-description-en" @bind-Value="model.EnglishDescription" rows="8" />
+                    @FieldErrors("English.Description")
+                </div>
+            </MudPaper>
+
+            @if (id is { } projectId)
+            {
+                <MudPaper Elevation="1" Class="pa-5 mb-4">
+                    <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["ProjectPreviewImage"]</MudText>
+                    <MudText Typo="Typo.body2">@Localizer["ProjectImageRules", ImageService.MaximumFileSizeBytes / 1024 / 1024]</MudText>
+                    @if (!string.IsNullOrWhiteSpace(model.PreviewImagePath))
+                    {
+                        <img class="project-card__image" src="@($"/project-preview-images/{projectId}?v={previewImageVersion}")" alt="@Localizer["ProjectPreviewImageAlt", model.SpanishTitle]" />
+                        <MudButton OnClick="RequestImageDelete" Color="Color.Error" Variant="Variant.Outlined">@Localizer["ProjectImageDelete"]</MudButton>
+                    }
+                    <div class="admin-field">
+                        <label for="project-preview-upload">@Localizer["ProjectImageUpload"]</label>
+                        <InputFile id="project-preview-upload" OnChange="UploadImageAsync" accept="image/jpeg,image/png,.jpg,.jpeg,.png" data-ignore-unsaved-changes />
+                    </div>
+                    @if (pendingImageDelete)
+                    {
+                        <MudAlert Severity="Severity.Warning" Role="alert">
+                            @Localizer["ProjectImageDeleteConfirmation"]
+                            <MudButton OnClick="DeleteImageAsync" Color="Color.Error" Variant="Variant.Filled">@Localizer["Delete"]</MudButton>
+                            <MudButton OnClick="CancelImageDelete" Variant="Variant.Outlined">@Localizer["Cancel"]</MudButton>
+                        </MudAlert>
+                    }
+                    @if (imageMessage is not null)
+                    {
+                        <MudAlert Severity="@imageSeverity" Role="status">@imageMessage</MudAlert>
+                    }
+                </MudPaper>
+            }
+
+            @if (saveError is not null)
+            {
+                <MudAlert Severity="Severity.Error" Role="alert">@saveError</MudAlert>
+            }
+            @if (saveSuccess is not null)
+            {
+                <MudAlert Severity="Severity.Success" Role="status">@saveSuccess</MudAlert>
+            }
+            <div class="experience-admin-actions">
+                <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Disabled="saving">
+                    @Localizer[saving ? "ProjectSaving" : "Save"]
+                </MudButton>
+                <NavLink class="button button--secondary" href="/admin/projects" data-unsaved-navigation>@Localizer["Cancel"]</NavLink>
+            </div>
+        </EditForm>
+    }
+</MudContainer>
+
+@code {
+    [Parameter]
+    public Guid? Id { get; set; }
+
+    private readonly ProjectFormModel model = new();
+    private readonly Dictionary<string, string> fieldErrors = new(StringComparer.Ordinal);
+    private Guid? id;
+    private bool loaded;
+    private bool loadFailed;
+    private bool saving;
+    private bool pendingImageDelete;
+    private string? saveError;
+    private string? saveSuccess;
+    private string? imageMessage;
+    private Severity imageSeverity = Severity.Info;
+    private ProjectSnapshot? initialSnapshot;
+    private IJSObjectReference? unsavedChangesModule;
+    private bool unsavedChangesModuleInitialized;
+    private bool beforeUnloadEnabled;
+    private long previewImageVersion;
+    private string? spanishSlugDisplay;
+    private string? englishSlugDisplay;
+    private bool IsNew => Id is null;
+    private bool HasUnsavedChanges => loaded
+        && !loadFailed
+        && initialSnapshot is not null
+        && CaptureSnapshot() != initialSnapshot;
+
+    private static bool TranslationIsFilled(string title, string summary) =>
+        !string.IsNullOrWhiteSpace(title) && !string.IsNullOrWhiteSpace(summary);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!loaded || loadFailed)
+        {
+            return;
+        }
+
+        unsavedChangesModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./js/experience-unsaved-changes.js?v=11");
+        if (!unsavedChangesModuleInitialized)
+        {
+            await unsavedChangesModule.InvokeVoidAsync(
+                "initialize",
+                "project-edit-form",
+                Localizer["ProjectUnsavedChangesTitle"].Value,
+                Localizer["ProjectUnsavedChangesConfirmation"].Value,
+                Localizer["StayOnPage"].Value,
+                Localizer["DiscardChanges"].Value,
+                "#project-preview-upload[data-ignore-unsaved-changes]");
+            unsavedChangesModuleInitialized = true;
+        }
+
+        if (beforeUnloadEnabled != HasUnsavedChanges)
+        {
+            beforeUnloadEnabled = HasUnsavedChanges;
+            await unsavedChangesModule.InvokeVoidAsync("setEnabled", beforeUnloadEnabled);
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id is null)
+        {
+            initialSnapshot = CaptureSnapshot();
+            loaded = true;
+            return;
+        }
+
+        var details = await ProjectService.GetProjectAsync(Id.Value);
+        if (details is null)
+        {
+            loadFailed = true;
+            loaded = true;
+            return;
+        }
+
+        id = details.Id;
+        model.RepositoryUrl = details.RepositoryUrl ?? string.Empty;
+        model.DemoUrl = details.DemoUrl ?? string.Empty;
+        model.PreviewImagePath = details.PreviewImagePath;
+        model.IsFeatured = details.IsFeatured;
+        model.DisplayOrder = details.DisplayOrder;
+        model.SpanishTitle = details.Spanish.Title;
+        spanishSlugDisplay = details.Spanish.Slug;
+        model.SpanishSummary = details.Spanish.Summary;
+        model.SpanishDescription = details.Spanish.Description ?? string.Empty;
+        model.EnglishTitle = details.English.Title;
+        englishSlugDisplay = details.English.Slug;
+        model.EnglishSummary = details.English.Summary;
+        model.EnglishDescription = details.English.Description ?? string.Empty;
+        initialSnapshot = CaptureSnapshot();
+        loaded = true;
+    }
+
+    private RenderFragment FieldErrors(string field) => builder =>
+    {
+        if (fieldErrors.TryGetValue(field, out var error))
+        {
+            builder.OpenElement(0, "span");
+            builder.AddAttribute(1, "class", "field-validation-error");
+            builder.AddAttribute(2, "role", "alert");
+            builder.AddContent(3, Localizer[error]);
+            builder.CloseElement();
+        }
+    };
+
+    private async Task SaveAsync(EditContext _)
+    {
+        saving = true;
+        saveError = null;
+        saveSuccess = null;
+        fieldErrors.Clear();
+        var result = await ProjectService.SaveAsync(new ProjectEditRequest(
+            id,
+            model.RepositoryUrl,
+            model.DemoUrl,
+            model.IsFeatured,
+            model.DisplayOrder,
+            new ProjectTranslationInput(model.SpanishTitle, null, model.SpanishSummary, model.SpanishDescription),
+            new ProjectTranslationInput(model.EnglishTitle, null, model.EnglishSummary, model.EnglishDescription)));
+        saving = false;
+
+        if (!result.Succeeded)
+        {
+            foreach (var error in result.Errors)
+            {
+                fieldErrors[error.Field] = error.ResourceKey;
+            }
+
+            saveError = Localizer["ProjectSaveFailed"];
+            return;
+        }
+
+        id = result.ProjectId;
+        initialSnapshot = CaptureSnapshot();
+        saveSuccess = Localizer["ProjectSaved"];
+        await DisableUnsavedChangesProtectionAsync();
+        if (IsNew)
+        {
+            Navigation.NavigateTo($"/admin/projects/edit/{id}", replace: true);
+        }
+    }
+
+    private ProjectSnapshot CaptureSnapshot() => new(
+        model.RepositoryUrl,
+        model.DemoUrl,
+        model.IsFeatured,
+        model.DisplayOrder,
+        model.SpanishTitle,
+        model.SpanishSummary,
+        model.SpanishDescription,
+        model.EnglishTitle,
+        model.EnglishSummary,
+        model.EnglishDescription);
+
+    private async Task DisableUnsavedChangesProtectionAsync()
+    {
+        beforeUnloadEnabled = false;
+        if (unsavedChangesModule is not null)
+        {
+            await unsavedChangesModule.InvokeVoidAsync("setEnabled", false);
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (unsavedChangesModule is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await unsavedChangesModule.InvokeVoidAsync("setEnabled", false);
+            await unsavedChangesModule.InvokeVoidAsync("dispose");
+            await unsavedChangesModule.DisposeAsync();
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+    }
+
+    private async Task UploadImageAsync(InputFileChangeEventArgs args)
+    {
+        if (id is not { } projectId)
+        {
+            return;
+        }
+
+        var file = args.File;
+        ProjectImageOperationResult result;
+        try
+        {
+            await using var stream = file.OpenReadStream(ImageService.MaximumFileSizeBytes);
+            result = await ImageService.UploadAsync(
+                projectId,
+                file.Name,
+                file.ContentType,
+                file.Size,
+                stream);
+        }
+        catch (IOException)
+        {
+            imageMessage = Localizer["ProjectImageTooLarge"];
+            imageSeverity = Severity.Error;
+            return;
+        }
+        imageSeverity = result.Error == ProjectImageError.None ? Severity.Success : Severity.Error;
+        imageMessage = result.Error switch
+        {
+            ProjectImageError.None => Localizer["ProjectImageUploaded"].Value,
+            ProjectImageError.UnsupportedType => Localizer["ProjectImageUnsupportedType"].Value,
+            ProjectImageError.TooLarge => Localizer["ProjectImageTooLarge"].Value,
+            ProjectImageError.InvalidContent => Localizer["ProjectImageInvalidContent"].Value,
+            _ => Localizer["ProjectNotFound"].Value
+        };
+        if (result.Error == ProjectImageError.None)
+        {
+            model.PreviewImagePath = result.ImagePath;
+            previewImageVersion++;
+        }
+    }
+
+    private void RequestImageDelete() => pendingImageDelete = true;
+    private void CancelImageDelete() => pendingImageDelete = false;
+
+    private async Task DeleteImageAsync()
+    {
+        if (id is { } projectId && await ImageService.DeleteAsync(projectId))
+        {
+            model.PreviewImagePath = null;
+            previewImageVersion++;
+            imageMessage = Localizer["ProjectImageDeleted"];
+            imageSeverity = Severity.Success;
+        }
+
+        pendingImageDelete = false;
+    }
+
+    private sealed class ProjectFormModel
+    {
+        public string RepositoryUrl { get; set; } = string.Empty;
+        public string DemoUrl { get; set; } = string.Empty;
+        public string? PreviewImagePath { get; set; }
+        public bool IsFeatured { get; set; }
+        public int DisplayOrder { get; set; }
+        public string SpanishTitle { get; set; } = string.Empty;
+        public string SpanishSummary { get; set; } = string.Empty;
+        public string SpanishDescription { get; set; } = string.Empty;
+        public string EnglishTitle { get; set; } = string.Empty;
+        public string EnglishSummary { get; set; } = string.Empty;
+        public string EnglishDescription { get; set; } = string.Empty;
+    }
+
+    private sealed record ProjectSnapshot(
+        string RepositoryUrl,
+        string DemoUrl,
+        bool IsFeatured,
+        int DisplayOrder,
+        string SpanishTitle,
+        string SpanishSummary,
+        string SpanishDescription,
+        string EnglishTitle,
+        string EnglishSummary,
+        string EnglishDescription);
+}

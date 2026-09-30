@@ -22,8 +22,7 @@ public sealed class ProjectTranslationConfiguration : IEntityTypeConfiguration<P
             .HasMaxLength(200)
             .IsRequired();
         builder.Property(translation => translation.Slug)
-            .HasMaxLength(200)
-            .IsRequired();
+            .HasMaxLength(200);
         builder.Property(translation => translation.Summary)
             .HasMaxLength(500)
             .IsRequired();
@@ -31,7 +30,8 @@ public sealed class ProjectTranslationConfiguration : IEntityTypeConfiguration<P
             .HasColumnType("nvarchar(max)");
 
         builder.HasIndex(translation => new { translation.LanguageCode, translation.Slug })
-            .IsUnique();
+            .IsUnique()
+            .HasFilter("[Slug] IS NOT NULL");
 
         builder.HasOne(translation => translation.Project)
             .WithMany(project => project.Translations)

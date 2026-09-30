@@ -51,6 +51,12 @@ public static class DependencyInjection
             .ValidateOnStart();
         services.AddScoped<IExperienceAttachmentService, ExperienceAttachmentStorageService>();
         services.AddScoped<IProjectQueryService, ProjectQueryService>();
+        services.AddScoped<IProjectAdministrationService, ProjectAdministrationService>();
+        services.AddOptions<ProjectPreviewImageStorageOptions>()
+            .Bind(configuration.GetSection(ProjectPreviewImageStorageOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+        services.AddScoped<IProjectPreviewImageService, ProjectPreviewImageStorageService>();
 
         return services;
     }
