@@ -10,5 +10,7 @@ public sealed class CertificationTranslation
 
     public string Issuer { get; set; } = string.Empty;
 
+    public string? Details { get; set; }
+
     public Certification Certification { get; set; } = null!;
 }

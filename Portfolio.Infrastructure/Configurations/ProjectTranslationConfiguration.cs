@@ -27,7 +27,7 @@ public sealed class ProjectTranslationConfiguration : IEntityTypeConfiguration<P
             .HasMaxLength(500)
             .IsRequired();
         builder.Property(translation => translation.Description)
-            .HasColumnType("nvarchar(max)");
+            .HasMaxLength(1000);
 
         builder.HasIndex(translation => new { translation.LanguageCode, translation.Slug })
             .IsUnique()

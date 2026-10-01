@@ -117,6 +117,7 @@ app.MapStaticAssets();
 app.MapAdminAuthentication();
 app.MapExperienceAttachmentEndpoints();
 app.MapProjectPreviewImageEndpoints();
+app.MapCertificationMediaEndpoints();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 

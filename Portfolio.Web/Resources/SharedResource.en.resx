@@ -253,7 +253,7 @@
     <value>There are no certifications available to show yet.</value>
   </data>
   <data name="CertificationIssuedOn" xml:space="preserve">
-    <value>Obtained:</value>
+    <value>Obtained</value>
   </data>
   <data name="CertificationCredential" xml:space="preserve">
     <value>View credential</value>
@@ -448,7 +448,7 @@
     <value>Content status</value>
   </data>
   <data name="AdminContentSummary" xml:space="preserve">
-    <value>Experience management is available. The remaining modules will be enabled in future deliveries.</value>
+    <value>Experience, project, and certification management is available. The blog will be enabled in a future delivery.</value>
   </data>
   <data name="AdminPublicSiteAction" xml:space="preserve">
     <value>View public site</value>
@@ -705,12 +705,6 @@
   <data name="ExperienceUnsavedChangesTitle" xml:space="preserve">
     <value>Unsaved changes</value>
   </data>
-  <data name="ProjectUnsavedChangesConfirmation" xml:space="preserve">
-    <value>Your project changes will be lost if you leave without saving. Do you want to leave without saving?</value>
-  </data>
-  <data name="ProjectUnsavedChangesTitle" xml:space="preserve">
-    <value>Unsaved changes</value>
-  </data>
   <data name="StayOnPage" xml:space="preserve">
     <value>Keep editing</value>
   </data>
@@ -786,12 +780,6 @@
   <data name="ProjectTitle" xml:space="preserve">
     <value>Name</value>
   </data>
-  <data name="ProjectSlug" xml:space="preserve">
-    <value>Slug (readable part of the URL)</value>
-  </data>
-  <data name="ProjectSlugDisabled" xml:space="preserve">
-    <value>Disabled until project detail pages are implemented</value>
-  </data>
   <data name="ProjectSummary" xml:space="preserve">
     <value>Short description</value>
   </data>
@@ -806,9 +794,6 @@
   </data>
   <data name="ProjectFieldTooLong" xml:space="preserve">
     <value>The content exceeds the maximum allowed length.</value>
-  </data>
-  <data name="ProjectSlugDisabled" xml:space="preserve">
-    <value>Disabled</value>
   </data>
   <data name="ProjectUrlInvalid" xml:space="preserve">
     <value>Enter an absolute URL starting with http:// or https://.</value>
@@ -875,5 +860,215 @@
   </data>
   <data name="ProjectDescriptionCollapse" xml:space="preserve">
     <value>Hide description</value>
+  </data>
+  <data name="ProjectSlug" xml:space="preserve">
+    <value>Slug (readable part of the URL)</value>
+  </data>
+  <data name="ProjectUnsavedChangesConfirmation" xml:space="preserve">
+    <value>Your project changes will be lost if you leave without saving. Do you want to leave without saving?</value>
+  </data>
+  <data name="ProjectUnsavedChangesTitle" xml:space="preserve">
+    <value>Unsaved changes</value>
+  </data>
+  <data name="ProjectSlugDisabled" xml:space="preserve">
+    <value>Disabled</value>
+  </data>
+  <data name="CertificationAdminTitle" xml:space="preserve">
+    <value>Manage certifications</value>
+  </data>
+  <data name="CertificationAdminDescription" xml:space="preserve">
+    <value>Create and manage the certifications displayed on the portfolio.</value>
+  </data>
+  <data name="CertificationAdminEmpty" xml:space="preserve">
+    <value>There are no certifications yet. Create the first one.</value>
+  </data>
+  <data name="CertificationCreate" xml:space="preserve">
+    <value>Create certification</value>
+  </data>
+  <data name="CertificationEdit" xml:space="preserve">
+    <value>Edit certification</value>
+  </data>
+  <data name="CertificationDetails" xml:space="preserve">
+    <value>Certification details</value>
+  </data>
+  <data name="CertificationIssuedOnField" xml:space="preserve">
+    <value>Date obtained (optional)</value>
+  </data>
+  <data name="CertificationOrder" xml:space="preserve">
+    <value>Order</value>
+  </data>
+  <data name="CertificationSpanish" xml:space="preserve">
+    <value>Spanish</value>
+  </data>
+  <data name="CertificationEnglish" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="CertificationName" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="CertificationIssuer" xml:space="preserve">
+    <value>Issuing organization</value>
+  </data>
+  <data name="CertificationCredentialUrl" xml:space="preserve">
+    <value>Credential URL (optional)</value>
+  </data>
+  <data name="CertificationMedia" xml:space="preserve">
+    <value>Files</value>
+  </data>
+  <data name="CertificationAttachmentCount" xml:space="preserve">
+    <value>{0} attachments</value>
+  </data>
+  <data name="CertificationCardImage" xml:space="preserve">
+    <value>Card image</value>
+  </data>
+  <data name="CertificationAttachments" xml:space="preserve">
+    <value>Public attachments</value>
+  </data>
+  <data name="CertificationAttachmentRules" xml:space="preserve">
+    <value>JPG/JPEG, PNG or PDF. Maximum size per file: {0} MiB.</value>
+  </data>
+  <data name="CertificationPublicFilesWarning" xml:space="preserve">
+    <value>Attachments are published when uploaded and will be accessible to any visitor.</value>
+  </data>
+  <data name="CertificationAttachmentUpload" xml:space="preserve">
+    <value>Select attachment</value>
+  </data>
+  <data name="CertificationTranslationMissingSpanish" xml:space="preserve">
+    <value>A complete Spanish translation is missing.</value>
+  </data>
+  <data name="CertificationTranslationMissingEnglish" xml:space="preserve">
+    <value>The English translation is missing; the public site will use Spanish as a fallback.</value>
+  </data>
+  <data name="CertificationFieldRequired" xml:space="preserve">
+    <value>Complete this field to save the translation.</value>
+  </data>
+  <data name="CertificationFieldTooLong" xml:space="preserve">
+    <value>The content exceeds the maximum allowed length.</value>
+  </data>
+  <data name="CertificationDisplayOrderInvalid" xml:space="preserve">
+    <value>Order must be a number greater than or equal to zero.</value>
+  </data>
+  <data name="CertificationUrlInvalid" xml:space="preserve">
+    <value>Enter an absolute URL starting with http:// or https://.</value>
+  </data>
+  <data name="CertificationNotFound" xml:space="preserve">
+    <value>The certification could not be found.</value>
+  </data>
+  <data name="CertificationDeleteConfirmation" xml:space="preserve">
+    <value>Delete this certification and its files? This action cannot be undone.</value>
+  </data>
+  <data name="CertificationDeleted" xml:space="preserve">
+    <value>The certification was deleted.</value>
+  </data>
+  <data name="CertificationSaveFailed" xml:space="preserve">
+    <value>The certification could not be saved. Review the fields shown.</value>
+  </data>
+  <data name="CertificationSaved" xml:space="preserve">
+    <value>The certification was saved successfully.</value>
+  </data>
+  <data name="CertificationSaving" xml:space="preserve">
+    <value>Saving…</value>
+  </data>
+  <data name="CertificationUnsavedChangesTitle" xml:space="preserve">
+    <value>Unsaved changes</value>
+  </data>
+  <data name="CertificationUnsavedChangesConfirmation" xml:space="preserve">
+    <value>Leaving now will discard the form changes. Do you want to continue?</value>
+  </data>
+  <data name="CertificationImageRules" xml:space="preserve">
+    <value>JPG/JPEG or PNG image. Maximum size: {0} MiB.</value>
+  </data>
+  <data name="CertificationImageUpload" xml:space="preserve">
+    <value>Select card image</value>
+  </data>
+  <data name="CertificationCardImageAlt" xml:space="preserve">
+    <value>Image for certification {0}</value>
+  </data>
+  <data name="CertificationImageDelete" xml:space="preserve">
+    <value>Delete image</value>
+  </data>
+  <data name="CertificationImageDeleteConfirmation" xml:space="preserve">
+    <value>Are you sure you want to delete the card image?</value>
+  </data>
+  <data name="CertificationImageUploaded" xml:space="preserve">
+    <value>The card image was saved.</value>
+  </data>
+  <data name="CertificationImageDeleted" xml:space="preserve">
+    <value>The card image was deleted.</value>
+  </data>
+  <data name="CertificationImageUnsupportedType" xml:space="preserve">
+    <value>Choose a JPG, JPEG or PNG image.</value>
+  </data>
+  <data name="CertificationImageTooLarge" xml:space="preserve">
+    <value>The image exceeds the maximum allowed size.</value>
+  </data>
+  <data name="CertificationImageInvalidContent" xml:space="preserve">
+    <value>The file content is not a valid image of the declared type.</value>
+  </data>
+  <data name="CertificationAttachmentUploaded" xml:space="preserve">
+    <value>The public attachment was saved.</value>
+  </data>
+  <data name="CertificationAttachmentDeleted" xml:space="preserve">
+    <value>The attachment was deleted.</value>
+  </data>
+  <data name="CertificationAttachmentDeleteConfirmation" xml:space="preserve">
+    <value>Are you sure you want to delete this public attachment? This action cannot be undone.</value>
+  </data>
+  <data name="CertificationAttachmentUnsupportedType" xml:space="preserve">
+    <value>Choose a PDF, JPG, JPEG or PNG file.</value>
+  </data>
+  <data name="CertificationAttachmentTooLarge" xml:space="preserve">
+    <value>The file exceeds the maximum allowed size.</value>
+  </data>
+  <data name="CertificationAttachmentInvalidContent" xml:space="preserve">
+    <value>The file content does not match its declared type.</value>
+  </data>
+  <data name="CertificationAttachmentOpen" xml:space="preserve">
+    <value>Open public attachment: {0}</value>
+  </data>
+  <data name="CertificationPublicAttachments" xml:space="preserve">
+    <value>Public certification attachments</value>
+  </data>
+  <data name="CertificationManageAction" xml:space="preserve">
+    <value>Manage certifications</value>
+  </data>
+  <data name="CertificationCredentialId" xml:space="preserve">
+    <value>Credential ID (optional)</value>
+  </data>
+  <data name="CertificationHours" xml:space="preserve">
+    <value>Duration in hours (optional)</value>
+  </data>
+  <data name="CertificationHoursInvalid" xml:space="preserve">
+    <value>Hours must be a whole number greater than or equal to zero.</value>
+  </data>
+  <data name="CertificationHoursUnit" xml:space="preserve">
+    <value>{0} hours</value>
+  </data>
+  <data name="CertificationCredentialIdLabel" xml:space="preserve">
+    <value>Credential ID</value>
+  </data>
+  <data name="CertificationDetailsField" xml:space="preserve">
+    <value>Details (optional)</value>
+  </data>
+  <data name="CertificationDetailsExpand" xml:space="preserve">
+    <value>View details</value>
+  </data>
+  <data name="CertificationDetailsCollapse" xml:space="preserve">
+    <value>Hide details</value>
+  </data>
+  <data name="CertificationAttachmentDisplayName" xml:space="preserve">
+    <value>Display name</value>
+  </data>
+  <data name="BytesUnit" xml:space="preserve">
+    <value>bytes</value>
+  </data>
+  <data name="CertificationAttachmentSaveChanges" xml:space="preserve">
+    <value>Save name</value>
+  </data>
+  <data name="CertificationAttachmentDisplayNameSaved" xml:space="preserve">
+    <value>The attachment display name was saved.</value>
+  </data>
+  <data name="CertificationAttachmentDisplayNameSaveFailed" xml:space="preserve">
+    <value>The name could not be saved. It must contain 1 to 255 characters.</value>
   </data>
 </root>

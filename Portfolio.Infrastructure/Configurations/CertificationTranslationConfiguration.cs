@@ -24,6 +24,8 @@ public sealed class CertificationTranslationConfiguration : IEntityTypeConfigura
         builder.Property(translation => translation.Issuer)
             .HasMaxLength(200)
             .IsRequired();
+        builder.Property(translation => translation.Details)
+            .HasMaxLength(1000);
 
         builder.HasOne(translation => translation.Certification)
             .WithMany(certification => certification.Translations)

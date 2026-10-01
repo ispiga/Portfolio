@@ -26,9 +26,35 @@ public static class CertificationTranslationSelector
             certification.Id,
             translation.Name,
             translation.Issuer,
+            string.IsNullOrWhiteSpace(translation.Details) ? null : translation.Details,
             certification.IssuedOn,
             certification.CredentialUrl,
-            certification.ImagePath,
-            certification.DisplayOrder);
+            certification.CredentialId,
+            certification.Hours,
+            GetPublicImagePath(certification),
+            certification.DisplayOrder,
+            certification.Attachments
+                .OrderBy(attachment => attachment.CreatedAt)
+                .ThenBy(attachment => attachment.Id)
+                .Select(attachment => new CertificationAttachmentReadModel(
+                    attachment.Id,
+                    attachment.CertificationId,
+                    attachment.OriginalFileName,
+                    attachment.DisplayName,
+                    attachment.ContentType,
+                    attachment.SizeBytes,
+                    attachment.CreatedAt))
+                .ToArray());
+    }
+
+    private static string? GetPublicImagePath(Certification certification)
+    {
+        if (string.IsNullOrWhiteSpace(certification.ImagePath)
+            || !certification.ImagePath.StartsWith("certifications/", StringComparison.Ordinal))
+        {
+            return certification.ImagePath;
+        }
+
+        return $"/certification-card-images/{certification.Id}?v={Uri.EscapeDataString(Path.GetFileName(certification.ImagePath))}";
     }
 }

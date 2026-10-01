@@ -57,6 +57,11 @@ public static class ProjectEditValidator
             return;
         }
 
+        if (translation.Description?.Length > 1000)
+        {
+            errors.Add(new($"{fieldPrefix}.{nameof(translation.Description)}", "ProjectFieldTooLong"));
+        }
+
         foreach (var field in fields)
         {
             if (string.IsNullOrWhiteSpace(field.Value))

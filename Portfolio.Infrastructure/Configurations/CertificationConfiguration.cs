@@ -12,6 +12,7 @@ public sealed class CertificationConfiguration : IEntityTypeConfiguration<Certif
         builder.HasKey(certification => certification.Id);
         builder.Property(certification => certification.IssuedOn).HasColumnType("date");
         builder.Property(certification => certification.CredentialUrl).HasMaxLength(500);
+        builder.Property(certification => certification.CredentialId).HasMaxLength(200);
         builder.Property(certification => certification.ImagePath).HasMaxLength(500);
     }
 }

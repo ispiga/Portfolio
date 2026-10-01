@@ -8,8 +8,10 @@
 <PageTitle>@Localizer["AdminLoginTitle"]</PageTitle>
 
 <main class="admin-login" id="main-content">
-    <section class="admin-login__card surface" aria-labelledby="admin-login-title">
-        <a class="admin-login__brand" href="/">@Localizer["PortfolioName"]</a>
+    <section class="admin-login__card surface" aria-labelledby="admin-login-title">   
+        <NavLink class="portfolio-logo" href="/" Match="NavLinkMatch.All" data-unsaved-navigation>
+            <span class="portfolio-logo__mark" aria-hidden="true">[ LOGO ]</span>
+        </NavLink>
         <h1 id="admin-login-title">@Localizer["AdminLoginTitle"]</h1>
         <p>@Localizer["AdminLoginDescription"]</p>
 

@@ -1,0 +1,625 @@
+@page "/admin/certifications/edit"
+@page "/admin/certifications/edit/{Id:guid}"
+@attribute [Authorize(Policy = PortfolioAuthorization.AdministratorPolicy)]
+@layout AdminLayout
+@implements IAsyncDisposable
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.Extensions.Localization
+@using System.Globalization
+@using Portfolio.Application.Certifications
+@using Portfolio.Infrastructure.Identity
+@inject ICertificationAdministrationService CertificationService
+@inject ICertificationMediaService MediaService
+@inject IStringLocalizer<SharedResource> Localizer
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+<PageTitle>@Localizer[Id is null ? "CertificationCreate" : "CertificationEdit"]</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="admin-dashboard">
+    <header class="admin-dashboard__heading">
+        <MudText Typo="Typo.h1" Tag="@("h1")">@Localizer[Id is null ? "CertificationCreate" : "CertificationEdit"]</MudText>
+    </header>
+
+    @if (loadFailed)
+    {
+        <MudAlert Severity="Severity.Error" Role="alert">@Localizer["CertificationNotFound"]</MudAlert>
+    }
+    else if (!loaded)
+    {
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary" aria-label="@Localizer["Loading"]" />
+    }
+    else
+    {
+        <NavigationLock ConfirmExternalNavigation="@HasUnsavedChanges" />
+        <EditForm id="certification-edit-form" Model="model" OnSubmit="SaveAsync">
+            <MudPaper Elevation="1" Class="pa-5 mb-4">
+                <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["CertificationDetails"]</MudText>
+                <div class="experience-admin-grid">
+                    <div class="admin-field">
+                        <label for="certification-issued-on">@Localizer["CertificationIssuedOnField"]</label>
+                        <InputDate id="certification-issued-on" @bind-Value="model.IssuedOn" />
+                    </div>
+                    <div class="admin-field">
+                        <label for="certification-order">@Localizer["CertificationOrder"]</label>
+                        <InputNumber id="certification-order" @bind-Value="model.DisplayOrder" min="0" />
+                        @FieldErrors("DisplayOrder")
+                    </div>
+                    <div class="admin-field">
+                        <label for="certification-credential">@Localizer["CertificationCredentialUrl"]</label>
+                        <InputText id="certification-credential" @bind-Value="model.CredentialUrl" maxlength="500" inputmode="url" />
+                        @FieldErrors("CredentialUrl")
+                    </div>
+                    <div class="admin-field">
+                        <label for="certification-credential-id">@Localizer["CertificationCredentialId"]</label>
+                        <InputText id="certification-credential-id" @bind-Value="model.CredentialId" maxlength="200" />
+                        @FieldErrors("CredentialId")
+                    </div>
+                    <div class="admin-field">
+                        <label for="certification-hours">@Localizer["CertificationHours"]</label>
+                        <InputNumber id="certification-hours" @bind-Value="model.Hours" min="0" />
+                        @FieldErrors("Hours")
+                    </div>
+                </div>
+            </MudPaper>
+
+            <MudPaper Elevation="1" Class="pa-5 mb-4">
+                <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["CertificationSpanish"]</MudText>
+                @if (!TranslationIsFilled(model.SpanishName, model.SpanishIssuer))
+                {
+                    <MudAlert Severity="Severity.Warning" Role="status">@Localizer["CertificationTranslationMissingSpanish"]</MudAlert>
+                }
+                <div class="admin-field">
+                    <label for="certification-name-es">@Localizer["CertificationName"]</label>
+                    <InputText id="certification-name-es" @bind-Value="model.SpanishName" maxlength="200" />
+                    @FieldErrors("Spanish.Name")
+                </div>
+                <div class="admin-field">
+                    <label for="certification-issuer-es">@Localizer["CertificationIssuer"]</label>
+                    <InputText id="certification-issuer-es" @bind-Value="model.SpanishIssuer" maxlength="200" />
+                    @FieldErrors("Spanish.Issuer")
+                </div>
+                <div class="admin-field">
+                    <label for="certification-details-es">@Localizer["CertificationDetailsField"]</label>
+                    <InputTextArea id="certification-details-es" @bind-Value="model.SpanishDetails" maxlength="1000" rows="6" />
+                    @FieldErrors("Spanish.Details")
+                </div>
+            </MudPaper>
+
+            <MudPaper Elevation="1" Class="pa-5 mb-4">
+                <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["CertificationEnglish"]</MudText>
+                @if (!TranslationIsFilled(model.EnglishName, model.EnglishIssuer))
+                {
+                    <MudAlert Severity="Severity.Warning" Role="status">@Localizer["CertificationTranslationMissingEnglish"]</MudAlert>
+                }
+                <div class="admin-field">
+                    <label for="certification-name-en">@Localizer["CertificationName"]</label>
+                    <InputText id="certification-name-en" @bind-Value="model.EnglishName" maxlength="200" />
+                    @FieldErrors("English.Name")
+                </div>
+                <div class="admin-field">
+                    <label for="certification-issuer-en">@Localizer["CertificationIssuer"]</label>
+                    <InputText id="certification-issuer-en" @bind-Value="model.EnglishIssuer" maxlength="200" />
+                    @FieldErrors("English.Issuer")
+                </div>
+                <div class="admin-field">
+                    <label for="certification-details-en">@Localizer["CertificationDetailsField"]</label>
+                    <InputTextArea id="certification-details-en" @bind-Value="model.EnglishDetails" maxlength="1000" rows="6" />
+                    @FieldErrors("English.Details")
+                </div>
+            </MudPaper>
+
+            @if (id is { } certificationId)
+            {
+                <MudPaper Elevation="1" Class="pa-5 mb-4">
+                    <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["CertificationCardImage"]</MudText>
+                    <MudText Typo="Typo.body2">@Localizer["CertificationImageRules", MediaService.MaximumFileSizeBytes / 1024 / 1024]</MudText>
+                    @if (!string.IsNullOrWhiteSpace(model.ImagePath))
+                    {
+                        <img class="certification-card__image certification-editor__image" src="@CardImageUrl" alt="@Localizer["CertificationCardImageAlt", model.SpanishName]" />
+                        <MudButton OnClick="RequestCardImageDelete" Color="Color.Error" Variant="Variant.Outlined">@Localizer["CertificationImageDelete"]</MudButton>
+                    }
+                    <div class="admin-field">
+                        <label for="certification-card-image-upload">@Localizer["CertificationImageUpload"]</label>
+                        <InputFile @key="imageInputVersion" id="certification-card-image-upload" class="certification-media-upload" OnChange="UploadCardImageAsync" accept="image/jpeg,image/png,.jpg,.jpeg,.png" data-ignore-unsaved-changes />
+                    </div>
+                    @if (pendingCardImageDelete)
+                    {
+                        <MudAlert Severity="Severity.Warning" Role="alert">
+                            @Localizer["CertificationImageDeleteConfirmation"]
+                            <MudButton OnClick="DeleteCardImageAsync" Color="Color.Error" Variant="Variant.Filled">@Localizer["Delete"]</MudButton>
+                            <MudButton OnClick="CancelCardImageDelete" Variant="Variant.Outlined">@Localizer["Cancel"]</MudButton>
+                        </MudAlert>
+                    }
+                    @if (imageMessage is not null)
+                    {
+                        <MudAlert Severity="@imageSeverity" Role="status">@imageMessage</MudAlert>
+                    }
+                </MudPaper>
+
+                <MudPaper Elevation="1" Class="pa-5 mb-4">
+                    <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["CertificationAttachments"]</MudText>
+                    <MudText Typo="Typo.body2">@Localizer["CertificationAttachmentRules", MediaService.MaximumFileSizeBytes / 1024 / 1024]</MudText>
+                    <MudAlert Severity="Severity.Warning" Role="note">@Localizer["CertificationPublicFilesWarning"]</MudAlert>
+                    <div class="admin-field">
+                        <label for="certification-attachment-upload">@Localizer["CertificationAttachmentUpload"]</label>
+                        <InputFile @key="attachmentInputVersion" id="certification-attachment-upload" class="certification-media-upload" OnChange="UploadAttachmentAsync" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png" data-ignore-unsaved-changes />
+                    </div>
+                    @if (attachments.Count > 0)
+                    {
+                        <div class="certification-attachment-list">
+                            @foreach (var attachment in attachments)
+                            {
+                                <div class="certification-attachment-list__item">
+                                    <CertificationAttachmentPreview DisplayName="@GetAttachmentDisplayNameDraft(attachment)" ContentType="@attachment.ContentType" ContentUrl="@($"/certification-attachments/{attachment.Id}")" />
+                                    <span class="certification-attachment-list__size">@(attachment.SizeBytes / 1024) KB</span>
+                                    <div class="certification-attachment-list__controls">
+                                        <div class="admin-field certification-attachment-name">
+                                            <label for="@($"certification-attachment-name-{attachment.Id}")">@Localizer["CertificationAttachmentDisplayName"]</label>
+                                            <input id="@($"certification-attachment-name-{attachment.Id}")"
+                                                   type="text"
+                                                   maxlength="255"
+                                                   required
+                                                   value="@GetAttachmentDisplayNameDraft(attachment)"
+                                                   @oninput="@(args => SetAttachmentDisplayNameDraft(attachment.Id, args))" />
+                                        </div>
+                                        <MudButton OnClick="@(() => SaveAttachmentDisplayNameAsync(attachment))"
+                                                   Color="Color.Primary"
+                                                   Variant="Variant.Outlined"
+                                                   Disabled="@(!CanSaveAttachmentDisplayName(attachment) || saving)">
+                                            @Localizer["CertificationAttachmentSaveChanges"]
+                                        </MudButton>
+                                        <MudButton OnClick="@(() => RequestAttachmentDelete(attachment.Id))" Color="Color.Error" Variant="Variant.Outlined">@Localizer["Delete"]</MudButton>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    @if (pendingAttachmentDelete is { } pendingAttachment)
+                    {
+                        <MudAlert Severity="Severity.Warning" Role="alert">
+                            @Localizer["CertificationAttachmentDeleteConfirmation"]
+                            <MudButton OnClick="@(() => DeleteAttachmentAsync(pendingAttachment))" Color="Color.Error" Variant="Variant.Filled">@Localizer["Delete"]</MudButton>
+                            <MudButton OnClick="CancelAttachmentDelete" Variant="Variant.Outlined">@Localizer["Cancel"]</MudButton>
+                        </MudAlert>
+                    }
+                    @if (attachmentMessage is not null)
+                    {
+                        <MudAlert Severity="@attachmentSeverity" Role="status">@attachmentMessage</MudAlert>
+                    }
+                </MudPaper>
+            }
+
+            @if (saveError is not null)
+            {
+                <MudAlert Severity="Severity.Error" Role="alert">@saveError</MudAlert>
+            }
+            @if (saveSuccess is not null)
+            {
+                <MudAlert Severity="Severity.Success" Role="status">@saveSuccess</MudAlert>
+            }
+            <div class="experience-admin-actions">
+                <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Disabled="saving">
+                    @Localizer[saving ? "CertificationSaving" : "Save"]
+                </MudButton>
+                <NavLink class="button button--secondary" href="/admin/certifications" data-unsaved-navigation>@Localizer["Cancel"]</NavLink>
+            </div>
+        </EditForm>
+    }
+</MudContainer>
+
+@code {
+    [Parameter]
+    public Guid? Id { get; set; }
+
+    private readonly CertificationFormModel model = new();
+    private readonly Dictionary<string, string> fieldErrors = new(StringComparer.Ordinal);
+    private readonly Dictionary<Guid, string> attachmentDisplayNameDrafts = [];
+    private IReadOnlyList<CertificationAttachmentReadModel> attachments = [];
+    private Guid? id;
+    private Guid? pendingAttachmentDelete;
+    private bool loaded;
+    private bool loadFailed;
+    private bool saving;
+    private bool pendingCardImageDelete;
+    private string? saveError;
+    private string? saveSuccess;
+    private string? imageMessage;
+    private string? attachmentMessage;
+    private Severity imageSeverity = Severity.Info;
+    private Severity attachmentSeverity = Severity.Info;
+    private CertificationSnapshot? initialSnapshot;
+    private IJSObjectReference? unsavedChangesModule;
+    private bool unsavedChangesModuleInitialized;
+    private bool beforeUnloadEnabled;
+    private int imageInputVersion;
+    private int attachmentInputVersion;
+    private bool HasUnsavedChanges => loaded
+        && !loadFailed
+        && initialSnapshot is not null
+        && (CaptureSnapshot() != initialSnapshot || HasPendingAttachmentDisplayNameChanges);
+
+    private bool HasPendingAttachmentDisplayNameChanges => attachments.Any(attachment =>
+        !string.Equals(
+            GetAttachmentDisplayNameDraft(attachment).Trim(),
+            attachment.DisplayName,
+            StringComparison.Ordinal));
+
+    private string? CardImageUrl => string.IsNullOrWhiteSpace(model.ImagePath)
+        ? null
+        : model.ImagePath.StartsWith("certifications/", StringComparison.Ordinal)
+            ? $"/certification-card-images/{id}?v={Uri.EscapeDataString(System.IO.Path.GetFileName(model.ImagePath))}"
+            : model.ImagePath;
+
+    private static bool TranslationIsFilled(string name, string issuer) =>
+        !string.IsNullOrWhiteSpace(name) && !string.IsNullOrWhiteSpace(issuer);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!loaded || loadFailed)
+        {
+            return;
+        }
+
+        unsavedChangesModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./js/experience-unsaved-changes.js?v=11");
+        if (!unsavedChangesModuleInitialized)
+        {
+            await unsavedChangesModule.InvokeVoidAsync(
+                "initialize",
+                "certification-edit-form",
+                Localizer["CertificationUnsavedChangesTitle"].Value,
+                Localizer["CertificationUnsavedChangesConfirmation"].Value,
+                Localizer["StayOnPage"].Value,
+                Localizer["DiscardChanges"].Value,
+                ".certification-media-upload[data-ignore-unsaved-changes]");
+            unsavedChangesModuleInitialized = true;
+        }
+
+        if (beforeUnloadEnabled != HasUnsavedChanges)
+        {
+            beforeUnloadEnabled = HasUnsavedChanges;
+            await unsavedChangesModule.InvokeVoidAsync("setEnabled", beforeUnloadEnabled);
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id is null)
+        {
+            initialSnapshot = CaptureSnapshot();
+            loaded = true;
+            return;
+        }
+
+        var details = await CertificationService.GetCertificationAsync(Id.Value);
+        if (details is null)
+        {
+            loadFailed = true;
+            loaded = true;
+            return;
+        }
+
+        id = details.Id;
+        model.IssuedOn = details.IssuedOn;
+        model.CredentialUrl = details.CredentialUrl ?? string.Empty;
+        model.CredentialId = details.CredentialId ?? string.Empty;
+        model.Hours = details.Hours;
+        model.ImagePath = details.ImagePath;
+        model.DisplayOrder = details.DisplayOrder;
+        model.SpanishName = details.Spanish.Name;
+        model.SpanishIssuer = details.Spanish.Issuer;
+        model.SpanishDetails = details.Spanish.Details ?? string.Empty;
+        model.EnglishName = details.English.Name;
+        model.EnglishIssuer = details.English.Issuer;
+        model.EnglishDetails = details.English.Details ?? string.Empty;
+        attachments = await MediaService.GetAttachmentsAsync(details.Id);
+        attachmentDisplayNameDrafts.Clear();
+        foreach (var attachment in attachments)
+        {
+            attachmentDisplayNameDrafts[attachment.Id] = attachment.DisplayName;
+        }
+        initialSnapshot = CaptureSnapshot();
+        loaded = true;
+    }
+
+    private RenderFragment FieldErrors(string field) => builder =>
+    {
+        if (fieldErrors.TryGetValue(field, out var error))
+        {
+            builder.OpenElement(0, "span");
+            builder.AddAttribute(1, "class", "field-validation-error");
+            builder.AddAttribute(2, "role", "alert");
+            builder.AddContent(3, Localizer[error]);
+            builder.CloseElement();
+        }
+    };
+
+    private async Task SaveAsync(EditContext _)
+    {
+        saving = true;
+        saveError = null;
+        saveSuccess = null;
+        fieldErrors.Clear();
+        var result = await CertificationService.SaveAsync(new CertificationEditRequest(
+            id,
+            model.IssuedOn,
+            model.CredentialUrl,
+            model.CredentialId,
+            model.Hours,
+            model.DisplayOrder,
+            new CertificationTranslationInput(model.SpanishName, model.SpanishIssuer, model.SpanishDetails),
+            new CertificationTranslationInput(model.EnglishName, model.EnglishIssuer, model.EnglishDetails)));
+        if (!result.Succeeded)
+        {
+            saving = false;
+            foreach (var error in result.Errors)
+            {
+                fieldErrors[error.Field] = error.ResourceKey;
+            }
+
+            saveError = Localizer["CertificationSaveFailed"];
+            return;
+        }
+
+        var wasNew = Id is null;
+        id = result.CertificationId;
+        if (!await SavePendingAttachmentDisplayNamesAsync())
+        {
+            saving = false;
+            saveError = Localizer["CertificationAttachmentDisplayNameSaveFailed"];
+            return;
+        }
+
+        initialSnapshot = CaptureSnapshot();
+        saving = false;
+        saveSuccess = Localizer["CertificationSaved"];
+        await DisableUnsavedChangesProtectionAsync();
+        if (wasNew)
+        {
+            Navigation.NavigateTo($"/admin/certifications/edit/{id}", replace: true);
+        }
+    }
+
+    private CertificationSnapshot CaptureSnapshot() => new(
+        model.IssuedOn,
+        model.CredentialUrl,
+        model.CredentialId,
+        model.Hours,
+        model.DisplayOrder,
+        model.SpanishName,
+        model.SpanishIssuer,
+        model.SpanishDetails,
+        model.EnglishName,
+        model.EnglishIssuer,
+        model.EnglishDetails);
+
+    private async Task DisableUnsavedChangesProtectionAsync()
+    {
+        beforeUnloadEnabled = false;
+        if (unsavedChangesModule is not null)
+        {
+            await unsavedChangesModule.InvokeVoidAsync("setEnabled", false);
+        }
+    }
+
+    private async Task UploadCardImageAsync(InputFileChangeEventArgs args)
+    {
+        if (id is not { } certificationId)
+        {
+            return;
+        }
+
+        try
+        {
+            var file = args.File;
+            await using var stream = file.OpenReadStream(MediaService.MaximumFileSizeBytes);
+            var result = await MediaService.UploadCardImageAsync(certificationId, file.Name, file.ContentType, file.Size, stream);
+            imageSeverity = result.Succeeded ? Severity.Success : Severity.Error;
+            imageMessage = result.Error switch
+            {
+                CertificationAttachmentError.None => Localizer["CertificationImageUploaded"].Value,
+                CertificationAttachmentError.UnsupportedType => Localizer["CertificationImageUnsupportedType"].Value,
+                CertificationAttachmentError.TooLarge => Localizer["CertificationImageTooLarge"].Value,
+                CertificationAttachmentError.InvalidContent => Localizer["CertificationImageInvalidContent"].Value,
+                _ => Localizer["CertificationNotFound"].Value
+            };
+            if (result.Succeeded)
+            {
+                model.ImagePath = (await CertificationService.GetCertificationAsync(certificationId))?.ImagePath;
+            }
+        }
+        catch (IOException)
+        {
+            imageMessage = Localizer["CertificationImageTooLarge"];
+            imageSeverity = Severity.Error;
+        }
+        finally
+        {
+            imageInputVersion++;
+        }
+    }
+
+    private async Task UploadAttachmentAsync(InputFileChangeEventArgs args)
+    {
+        if (id is not { } certificationId)
+        {
+            return;
+        }
+
+        try
+        {
+            var file = args.File;
+            await using var stream = file.OpenReadStream(MediaService.MaximumFileSizeBytes);
+            var result = await MediaService.UploadAttachmentAsync(certificationId, file.Name, file.ContentType, file.Size, stream);
+            attachmentSeverity = result.Succeeded ? Severity.Success : Severity.Error;
+            attachmentMessage = result.Error switch
+            {
+                CertificationAttachmentError.None => Localizer["CertificationAttachmentUploaded"].Value,
+                CertificationAttachmentError.UnsupportedType => Localizer["CertificationAttachmentUnsupportedType"].Value,
+                CertificationAttachmentError.TooLarge => Localizer["CertificationAttachmentTooLarge"].Value,
+                CertificationAttachmentError.InvalidContent => Localizer["CertificationAttachmentInvalidContent"].Value,
+                _ => Localizer["CertificationNotFound"].Value
+            };
+            if (result.Succeeded)
+            {
+                attachments = await MediaService.GetAttachmentsAsync(certificationId);
+            }
+        }
+        catch (IOException)
+        {
+            attachmentMessage = Localizer["CertificationAttachmentTooLarge"];
+            attachmentSeverity = Severity.Error;
+        }
+        finally
+        {
+            attachmentInputVersion++;
+        }
+    }
+
+    private void RequestCardImageDelete() => pendingCardImageDelete = true;
+    private void CancelCardImageDelete() => pendingCardImageDelete = false;
+
+    private async Task DeleteCardImageAsync()
+    {
+        if (id is { } certificationId && await MediaService.DeleteCardImageAsync(certificationId))
+        {
+            model.ImagePath = null;
+            imageMessage = Localizer["CertificationImageDeleted"];
+            imageSeverity = Severity.Success;
+        }
+
+        pendingCardImageDelete = false;
+    }
+
+    private void RequestAttachmentDelete(Guid attachmentId) => pendingAttachmentDelete = attachmentId;
+    private void CancelAttachmentDelete() => pendingAttachmentDelete = null;
+
+    private async Task DeleteAttachmentAsync(Guid attachmentId)
+    {
+        if (await MediaService.DeleteAttachmentAsync(attachmentId) && id is { } certificationId)
+        {
+            attachments = await MediaService.GetAttachmentsAsync(certificationId);
+            attachmentMessage = Localizer["CertificationAttachmentDeleted"];
+            attachmentSeverity = Severity.Success;
+        }
+
+        pendingAttachmentDelete = null;
+    }
+
+    private string GetAttachmentDisplayNameDraft(CertificationAttachmentReadModel attachment) =>
+        attachmentDisplayNameDrafts.TryGetValue(attachment.Id, out var draft) ? draft : attachment.DisplayName;
+
+    private void SetAttachmentDisplayNameDraft(Guid attachmentId, ChangeEventArgs args) =>
+        attachmentDisplayNameDrafts[attachmentId] = args.Value?.ToString() ?? string.Empty;
+
+    private bool CanSaveAttachmentDisplayName(CertificationAttachmentReadModel attachment)
+    {
+        var draft = GetAttachmentDisplayNameDraft(attachment);
+        return !string.IsNullOrWhiteSpace(draft)
+            && draft.Trim().Length <= 255
+            && !string.Equals(draft.Trim(), attachment.DisplayName, StringComparison.Ordinal);
+    }
+
+    private async Task SaveAttachmentDisplayNameAsync(CertificationAttachmentReadModel attachment)
+    {
+        var displayName = GetAttachmentDisplayNameDraft(attachment);
+        if (!await MediaService.UpdateAttachmentDisplayNameAsync(attachment.Id, displayName)
+            || id is not { } certificationId)
+        {
+            attachmentSeverity = Severity.Error;
+            attachmentMessage = Localizer["CertificationAttachmentDisplayNameSaveFailed"];
+            return;
+        }
+
+        attachments = await MediaService.GetAttachmentsAsync(certificationId);
+        attachmentDisplayNameDrafts[attachment.Id] = displayName.Trim();
+        attachmentSeverity = Severity.Success;
+        attachmentMessage = Localizer["ExperienceAttachmentChangesSaved"];
+    }
+
+    private async Task<bool> SavePendingAttachmentDisplayNamesAsync()
+    {
+        var changedAttachments = attachments.Where(HasAttachmentDisplayNameChange).ToArray();
+        if (changedAttachments.Any(attachment => !CanSaveAttachmentDisplayName(attachment)))
+        {
+            return false;
+        }
+
+        foreach (var attachment in changedAttachments)
+        {
+            if (!await MediaService.UpdateAttachmentDisplayNameAsync(
+                    attachment.Id,
+                    GetAttachmentDisplayNameDraft(attachment).Trim()))
+            {
+                return false;
+            }
+
+            attachmentDisplayNameDrafts[attachment.Id] = GetAttachmentDisplayNameDraft(attachment).Trim();
+        }
+
+        if (id is { } certificationId)
+        {
+            attachments = await MediaService.GetAttachmentsAsync(certificationId);
+            foreach (var attachment in attachments)
+            {
+                attachmentDisplayNameDrafts[attachment.Id] = attachment.DisplayName;
+            }
+        }
+
+        return true;
+    }
+
+    private bool HasAttachmentDisplayNameChange(CertificationAttachmentReadModel attachment) =>
+        !string.Equals(
+            GetAttachmentDisplayNameDraft(attachment).Trim(),
+            attachment.DisplayName,
+            StringComparison.Ordinal);
+
+    public async ValueTask DisposeAsync()
+    {
+        if (unsavedChangesModule is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await unsavedChangesModule.InvokeVoidAsync("setEnabled", false);
+            await unsavedChangesModule.InvokeVoidAsync("dispose");
+            await unsavedChangesModule.DisposeAsync();
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+    }
+
+    private sealed class CertificationFormModel
+    {
+        public DateOnly? IssuedOn { get; set; }
+        public string CredentialUrl { get; set; } = string.Empty;
+        public string CredentialId { get; set; } = string.Empty;
+        public int? Hours { get; set; }
+        public string? ImagePath { get; set; }
+        public int DisplayOrder { get; set; }
+        public string SpanishName { get; set; } = string.Empty;
+        public string SpanishIssuer { get; set; } = string.Empty;
+        public string SpanishDetails { get; set; } = string.Empty;
+        public string EnglishName { get; set; } = string.Empty;
+        public string EnglishIssuer { get; set; } = string.Empty;
+        public string EnglishDetails { get; set; } = string.Empty;
+    }
+
+    private sealed record CertificationSnapshot(
+        DateOnly? IssuedOn,
+        string CredentialUrl,
+        string CredentialId,
+        int? Hours,
+        int DisplayOrder,
+        string SpanishName,
+        string SpanishIssuer,
+        string SpanishDetails,
+        string EnglishName,
+        string EnglishIssuer,
+        string EnglishDetails);
+}

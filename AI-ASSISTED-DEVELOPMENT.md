@@ -3202,3 +3202,14 @@ El alcance de esta entrega es:
 Mantén los cambios acotados a Proyectos y a las dependencias necesarias. No implementes todavía Certificaciones ni Blog, y no alteres el comportamiento existente de Experiencias, Identity o contacto.
 Sigue los requisitos existentes de localización, accesibilidad, tema, validación, persistencia y seguridad. Si la gestión de imágenes requiere cambios de esquema, genera la migración correspondiente y documenta si debe aplicarse manualmente; no apliques migraciones a bases de datos sin confirmar explícitamente el destino.
 Añade o actualiza pruebas para las reglas implementadas. Al terminar, compila la solución y ejecuta las pruebas pertinentes. Si la entrega queda completada, actualiza PORTFOLIO_PROJECT.md y .github/copilot-instructions.md para reflejar el estado real, sin marcar toda la Fase 7 como finalizada mientras queden entregas pendientes.
+
+
+# ****************************************
+# PROMPT PARA REALIZAR LA FASE 7 - PARTE 3
+# ****************************************
+
+Implementa la entrega de Certificaciones de la Fase 7 en este portfolio.
+Antes de modificar código, lee .github/copilot-instructions.md y consulta PORTFOLIO_PROJECT.md, especialmente las secciones 19. Certificaciones, entregas incrementales de la Fase 7 y la documentación de las entregas de Experiencias y Proyectos. Usa esos documentos como fuente de verdad y sigue los patrones existentes de administración, localización, validación, imágenes, autorización y protección frente a cambios sin guardar.
+Implementa el CRUD administrativo de Certificaciones que establece la especificación: listado y formulario para crear, editar y eliminar; edición localizada en español e inglés con avisos cuando falten traducciones; y gestión de fechas, credenciales, orden e imágenes según lo acordado en el documento. Integra el módulo en la navegación y el Dashboard administrativos según las convenciones existentes.
+No inventes campos, relaciones ni comportamientos que no estén definidos en la especificación. Si algún detalle necesario —en especial el alcance o tratamiento de imágenes/documentos— no está claro en PORTFOLIO_PROJECT.md ni puede deducirse del código existente, pregúntame antes de tomar una decisión.
+Añade o actualiza pruebas, ejecuta la compilación y las pruebas pertinentes, y sincroniza la documentación al terminar. Si hace falta una migración, genérala y explica su impacto, pero no la apliques a ninguna base de datos.

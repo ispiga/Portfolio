@@ -253,7 +253,7 @@
     <value>Aún no hay certificaciones disponibles para mostrar.</value>
   </data>
   <data name="CertificationIssuedOn" xml:space="preserve">
-    <value>Obtenida:</value>
+    <value>Obtenida</value>
   </data>
   <data name="CertificationCredential" xml:space="preserve">
     <value>Ver credencial</value>
@@ -448,7 +448,7 @@
     <value>Estado del contenido</value>
   </data>
   <data name="AdminContentSummary" xml:space="preserve">
-    <value>La gestión de experiencias está disponible. Los módulos restantes se habilitarán en próximas entregas.</value>
+    <value>La gestión de experiencias, proyectos y certificaciones está disponible. El blog se habilitará en una próxima entrega.</value>
   </data>
   <data name="AdminPublicSiteAction" xml:space="preserve">
     <value>Ver sitio público</value>
@@ -705,12 +705,6 @@
   <data name="ExperienceUnsavedChangesTitle" xml:space="preserve">
     <value>Cambios sin guardar</value>
   </data>
-  <data name="ProjectUnsavedChangesConfirmation" xml:space="preserve">
-    <value>Los cambios del proyecto se perderán si sales sin guardar. ¿Quieres salir sin guardar?</value>
-  </data>
-  <data name="ProjectUnsavedChangesTitle" xml:space="preserve">
-    <value>Cambios sin guardar</value>
-  </data>
   <data name="StayOnPage" xml:space="preserve">
     <value>Seguir editando</value>
   </data>
@@ -786,12 +780,6 @@
   <data name="ProjectTitle" xml:space="preserve">
     <value>Nombre</value>
   </data>
-  <data name="ProjectSlug" xml:space="preserve">
-    <value>Slug (parte legible de la URL)</value>
-  </data>
-  <data name="ProjectSlugDisabled" xml:space="preserve">
-    <value>Deshabilitado hasta implementar las páginas de detalle</value>
-  </data>
   <data name="ProjectSummary" xml:space="preserve">
     <value>Descripción breve</value>
   </data>
@@ -806,9 +794,6 @@
   </data>
   <data name="ProjectFieldTooLong" xml:space="preserve">
     <value>El contenido supera la longitud máxima permitida.</value>
-  </data>
-  <data name="ProjectSlugDisabled" xml:space="preserve">
-    <value>Deshabilitado</value>
   </data>
   <data name="ProjectUrlInvalid" xml:space="preserve">
     <value>Introduce una URL completa que empiece por http:// o https://.</value>
@@ -875,5 +860,215 @@
   </data>
   <data name="ProjectDescriptionCollapse" xml:space="preserve">
     <value>Ocultar descripción</value>
+  </data>
+  <data name="ProjectSlug" xml:space="preserve">
+    <value>Slug (parte legible de la URL)</value>
+  </data>
+  <data name="ProjectUnsavedChangesConfirmation" xml:space="preserve">
+    <value>Los cambios del proyecto se perderán si sales sin guardar. ¿Quieres salir sin guardar?</value>
+  </data>
+  <data name="ProjectUnsavedChangesTitle" xml:space="preserve">
+    <value>Cambios sin guardar</value>
+  </data>
+  <data name="ProjectSlugDisabled" xml:space="preserve">
+    <value>Deshabilitado</value>
+  </data>
+  <data name="CertificationAdminTitle" xml:space="preserve">
+    <value>Administrar certificaciones</value>
+  </data>
+  <data name="CertificationAdminDescription" xml:space="preserve">
+    <value>Crea y administra las certificaciones que se muestran en el portfolio.</value>
+  </data>
+  <data name="CertificationAdminEmpty" xml:space="preserve">
+    <value>Aún no hay certificaciones. Puedes crear la primera.</value>
+  </data>
+  <data name="CertificationCreate" xml:space="preserve">
+    <value>Crear certificación</value>
+  </data>
+  <data name="CertificationEdit" xml:space="preserve">
+    <value>Editar certificación</value>
+  </data>
+  <data name="CertificationDetails" xml:space="preserve">
+    <value>Datos de la certificación</value>
+  </data>
+  <data name="CertificationIssuedOnField" xml:space="preserve">
+    <value>Fecha de obtención (opcional)</value>
+  </data>
+  <data name="CertificationOrder" xml:space="preserve">
+    <value>Orden</value>
+  </data>
+  <data name="CertificationSpanish" xml:space="preserve">
+    <value>Español</value>
+  </data>
+  <data name="CertificationEnglish" xml:space="preserve">
+    <value>Inglés</value>
+  </data>
+  <data name="CertificationName" xml:space="preserve">
+    <value>Nombre</value>
+  </data>
+  <data name="CertificationIssuer" xml:space="preserve">
+    <value>Entidad emisora</value>
+  </data>
+  <data name="CertificationCredentialUrl" xml:space="preserve">
+    <value>URL de credencial (opcional)</value>
+  </data>
+  <data name="CertificationMedia" xml:space="preserve">
+    <value>Archivos</value>
+  </data>
+  <data name="CertificationAttachmentCount" xml:space="preserve">
+    <value>{0} adjuntos</value>
+  </data>
+  <data name="CertificationCardImage" xml:space="preserve">
+    <value>Imagen de tarjeta</value>
+  </data>
+  <data name="CertificationAttachments" xml:space="preserve">
+    <value>Adjuntos públicos</value>
+  </data>
+  <data name="CertificationAttachmentRules" xml:space="preserve">
+    <value>JPG/JPEG, PNG o PDF. Tamaño máximo por archivo: {0} MiB.</value>
+  </data>
+  <data name="CertificationPublicFilesWarning" xml:space="preserve">
+    <value>Los adjuntos se publican al cargarlos y serán accesibles para cualquier visitante.</value>
+  </data>
+  <data name="CertificationAttachmentUpload" xml:space="preserve">
+    <value>Seleccionar adjunto</value>
+  </data>
+  <data name="CertificationTranslationMissingSpanish" xml:space="preserve">
+    <value>Falta una traducción completa en español.</value>
+  </data>
+  <data name="CertificationTranslationMissingEnglish" xml:space="preserve">
+    <value>Falta la traducción en inglés; la web pública usará el español como alternativa.</value>
+  </data>
+  <data name="CertificationFieldRequired" xml:space="preserve">
+    <value>Completa este campo para guardar la traducción.</value>
+  </data>
+  <data name="CertificationFieldTooLong" xml:space="preserve">
+    <value>El contenido supera la longitud máxima permitida.</value>
+  </data>
+  <data name="CertificationDisplayOrderInvalid" xml:space="preserve">
+    <value>El orden debe ser un número igual o mayor que cero.</value>
+  </data>
+  <data name="CertificationUrlInvalid" xml:space="preserve">
+    <value>Introduce una URL completa que empiece por http:// o https://.</value>
+  </data>
+  <data name="CertificationNotFound" xml:space="preserve">
+    <value>No se ha encontrado la certificación.</value>
+  </data>
+  <data name="CertificationDeleteConfirmation" xml:space="preserve">
+    <value>¿Quieres eliminar esta certificación y sus archivos? Esta acción no se puede deshacer.</value>
+  </data>
+  <data name="CertificationDeleted" xml:space="preserve">
+    <value>La certificación se ha eliminado.</value>
+  </data>
+  <data name="CertificationSaveFailed" xml:space="preserve">
+    <value>No se ha podido guardar la certificación. Revisa los campos indicados.</value>
+  </data>
+  <data name="CertificationSaved" xml:space="preserve">
+    <value>La certificación se ha guardado correctamente.</value>
+  </data>
+  <data name="CertificationSaving" xml:space="preserve">
+    <value>Guardando…</value>
+  </data>
+  <data name="CertificationUnsavedChangesTitle" xml:space="preserve">
+    <value>Hay cambios sin guardar</value>
+  </data>
+  <data name="CertificationUnsavedChangesConfirmation" xml:space="preserve">
+    <value>Si sales ahora, se perderán los cambios del formulario. ¿Quieres continuar?</value>
+  </data>
+  <data name="CertificationImageRules" xml:space="preserve">
+    <value>Imagen JPG/JPEG o PNG. Tamaño máximo: {0} MiB.</value>
+  </data>
+  <data name="CertificationImageUpload" xml:space="preserve">
+    <value>Seleccionar imagen de tarjeta</value>
+  </data>
+  <data name="CertificationCardImageAlt" xml:space="preserve">
+    <value>Imagen de la certificación {0}</value>
+  </data>
+  <data name="CertificationImageDelete" xml:space="preserve">
+    <value>Eliminar imagen</value>
+  </data>
+  <data name="CertificationImageDeleteConfirmation" xml:space="preserve">
+    <value>¿Seguro que quieres eliminar la imagen de tarjeta?</value>
+  </data>
+  <data name="CertificationImageUploaded" xml:space="preserve">
+    <value>La imagen de tarjeta se ha guardado.</value>
+  </data>
+  <data name="CertificationImageDeleted" xml:space="preserve">
+    <value>La imagen de tarjeta se ha eliminado.</value>
+  </data>
+  <data name="CertificationImageUnsupportedType" xml:space="preserve">
+    <value>Elige una imagen JPG, JPEG o PNG.</value>
+  </data>
+  <data name="CertificationImageTooLarge" xml:space="preserve">
+    <value>La imagen supera el tamaño máximo permitido.</value>
+  </data>
+  <data name="CertificationImageInvalidContent" xml:space="preserve">
+    <value>El contenido del archivo no es una imagen válida del tipo indicado.</value>
+  </data>
+  <data name="CertificationAttachmentUploaded" xml:space="preserve">
+    <value>El adjunto público se ha guardado.</value>
+  </data>
+  <data name="CertificationAttachmentDeleted" xml:space="preserve">
+    <value>El adjunto se ha eliminado.</value>
+  </data>
+  <data name="CertificationAttachmentDeleteConfirmation" xml:space="preserve">
+    <value>¿Seguro que quieres eliminar este adjunto público? Esta acción no se puede deshacer.</value>
+  </data>
+  <data name="CertificationAttachmentUnsupportedType" xml:space="preserve">
+    <value>Elige un archivo PDF, JPG, JPEG o PNG.</value>
+  </data>
+  <data name="CertificationAttachmentTooLarge" xml:space="preserve">
+    <value>El archivo supera el tamaño máximo permitido.</value>
+  </data>
+  <data name="CertificationAttachmentInvalidContent" xml:space="preserve">
+    <value>El contenido del archivo no coincide con el tipo indicado.</value>
+  </data>
+  <data name="CertificationAttachmentOpen" xml:space="preserve">
+    <value>Abrir adjunto público: {0}</value>
+  </data>
+  <data name="CertificationPublicAttachments" xml:space="preserve">
+    <value>Adjuntos públicos de la certificación</value>
+  </data>
+  <data name="CertificationManageAction" xml:space="preserve">
+    <value>Gestionar certificaciones</value>
+  </data>
+  <data name="CertificationCredentialId" xml:space="preserve">
+    <value>ID de la credencial (opcional)</value>
+  </data>
+  <data name="CertificationHours" xml:space="preserve">
+    <value>Horas de duración (opcional)</value>
+  </data>
+  <data name="CertificationHoursInvalid" xml:space="preserve">
+    <value>Las horas deben ser un número entero igual o mayor que cero.</value>
+  </data>
+  <data name="CertificationHoursUnit" xml:space="preserve">
+    <value>{0} horas</value>
+  </data>
+  <data name="CertificationCredentialIdLabel" xml:space="preserve">
+    <value>ID de credencial</value>
+  </data>
+  <data name="CertificationDetailsField" xml:space="preserve">
+    <value>Detalles (opcional)</value>
+  </data>
+  <data name="CertificationDetailsExpand" xml:space="preserve">
+    <value>Ver detalles</value>
+  </data>
+  <data name="CertificationDetailsCollapse" xml:space="preserve">
+    <value>Ocultar detalles</value>
+  </data>
+  <data name="CertificationAttachmentDisplayName" xml:space="preserve">
+    <value>Nombre para mostrar</value>
+  </data>
+  <data name="BytesUnit" xml:space="preserve">
+    <value>bytes</value>
+  </data>
+  <data name="CertificationAttachmentSaveChanges" xml:space="preserve">
+    <value>Guardar nombre</value>
+  </data>
+  <data name="CertificationAttachmentDisplayNameSaved" xml:space="preserve">
+    <value>El nombre visible del adjunto se ha guardado.</value>
+  </data>
+  <data name="CertificationAttachmentDisplayNameSaveFailed" xml:space="preserve">
+    <value>No se ha podido guardar el nombre. Debe contener entre 1 y 255 caracteres.</value>
   </data>
 </root>

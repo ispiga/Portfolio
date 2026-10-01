@@ -10,7 +10,9 @@
 <Authorized>
 <div class="admin-layout">
     <header class="admin-header">
-        <NavLink class="admin-brand" href="/admin" data-unsaved-navigation>@Localizer["PortfolioName"]</NavLink>
+                <NavLink class="portfolio-logo" href="/admin" Match="NavLinkMatch.All" data-unsaved-navigation>
+                    <span class="portfolio-logo__mark" aria-hidden="true">[ LOGO ]</span>
+                </NavLink>
         <div class="admin-header__controls">
             <ThemeSelector />
             <LanguageSelector />
@@ -27,7 +29,7 @@
             <NavLink class="admin-navigation__link" href="/admin" Match="NavLinkMatch.All" data-unsaved-navigation>@Localizer["AdminDashboard"]</NavLink>
             <NavLink class="admin-navigation__link" href="/admin/experiences" data-unsaved-navigation>@Localizer["AdminExperiences"]</NavLink>
             <NavLink class="admin-navigation__link" href="/admin/projects" data-unsaved-navigation>@Localizer["AdminProjects"]</NavLink>
-            <span class="admin-navigation__item" aria-disabled="true">@Localizer["AdminCertifications"]</span>
+            <NavLink class="admin-navigation__link" href="/admin/certifications" data-unsaved-navigation>@Localizer["AdminCertifications"]</NavLink>
             <span class="admin-navigation__item" aria-disabled="true">@Localizer["AdminBlog"]</span>
             <NavLink class="admin-navigation__link" href="/" Match="NavLinkMatch.All" data-unsaved-navigation>@Localizer["AdminPublicSiteAction"]</NavLink>
         </nav>

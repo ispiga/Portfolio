@@ -14,7 +14,9 @@ public sealed class CertificationQueryService(
 
         var certifications = await context.Certifications
             .AsNoTracking()
+            .AsSplitQuery()
             .Include(certification => certification.Translations)
+            .Include(certification => certification.Attachments)
             .OrderBy(certification => certification.DisplayOrder)
             .ThenBy(certification => certification.Id)
             .ToListAsync(cancellationToken);

@@ -228,11 +228,18 @@ namespace Portfolio.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("CredentialId")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
                     b.Property<string>("CredentialUrl")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<int>("DisplayOrder")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Hours")
                         .HasColumnType("int");
 
                     b.Property<string>("ImagePath")
@@ -247,6 +254,48 @@ namespace Portfolio.Infrastructure.Migrations
                     b.ToTable("Certifications", (string)null);
                 });
 
+            modelBuilder.Entity("Portfolio.Domain.Entities.CertificationAttachment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CertificationId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("OriginalFileName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<long>("SizeBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("StorageKey")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CertificationId", "CreatedAt");
+
+                    b.ToTable("CertificationAttachments", (string)null);
+                });
+
             modelBuilder.Entity("Portfolio.Domain.Entities.CertificationTranslation", b =>
                 {
                     b.Property<Guid>("CertificationId")
@@ -255,6 +304,10 @@ namespace Portfolio.Infrastructure.Migrations
                     b.Property<string>("LanguageCode")
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("Details")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("Issuer")
                         .IsRequired()
@@ -412,7 +465,8 @@ namespace Portfolio.Infrastructure.Migrations
                         .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("Slug")
                         .HasMaxLength(200)
@@ -567,6 +621,17 @@ namespace Portfolio.Infrastructure.Migrations
                     b.Navigation("BlogPost");
                 });
 
+            modelBuilder.Entity("Portfolio.Domain.Entities.CertificationAttachment", b =>
+                {
+                    b.HasOne("Portfolio.Domain.Entities.Certification", "Certification")
+                        .WithMany("Attachments")
+                        .HasForeignKey("CertificationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Certification");
+                });
+
             modelBuilder.Entity("Portfolio.Domain.Entities.CertificationTranslation", b =>
                 {
                     b.HasOne("Portfolio.Domain.Entities.Certification", "Certification")
@@ -618,6 +683,8 @@ namespace Portfolio.Infrastructure.Migrations
 
             modelBuilder.Entity("Portfolio.Domain.Entities.Certification", b =>
                 {
+                    b.Navigation("Attachments");
+
                     b.Navigation("Translations");
                 });
 

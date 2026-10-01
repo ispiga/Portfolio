@@ -81,7 +81,7 @@
                 </div>
                 <div class="admin-field">
                     <label for="project-description-es">@Localizer["ProjectDescription"]</label>
-                    <InputTextArea id="project-description-es" @bind-Value="model.SpanishDescription" rows="8" />
+                    <InputTextArea id="project-description-es" @bind-Value="model.SpanishDescription" maxlength="1000" rows="8" />
                     @FieldErrors("Spanish.Description")
                 </div>
             </MudPaper>
@@ -108,7 +108,7 @@
                 </div>
                 <div class="admin-field">
                     <label for="project-description-en">@Localizer["ProjectDescription"]</label>
-                    <InputTextArea id="project-description-en" @bind-Value="model.EnglishDescription" rows="8" />
+                    <InputTextArea id="project-description-en" @bind-Value="model.EnglishDescription" maxlength="1000" rows="8" />
                     @FieldErrors("English.Description")
                 </div>
             </MudPaper>

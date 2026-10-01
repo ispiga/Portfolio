@@ -1,0 +1,119 @@
+@page "/admin/certifications"
+@attribute [Authorize(Policy = PortfolioAuthorization.AdministratorPolicy)]
+@layout AdminLayout
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.Extensions.Localization
+@using Portfolio.Application.Certifications
+@using Portfolio.Infrastructure.Identity
+@inject ICertificationAdministrationService CertificationService
+@inject IStringLocalizer<SharedResource> Localizer
+
+<PageTitle>@Localizer["CertificationAdminTitle"]</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="admin-dashboard">
+    <header class="admin-dashboard__heading">
+        <MudText Typo="Typo.h1" Tag="@("h1")">@Localizer["CertificationAdminTitle"]</MudText>
+        <MudText Typo="Typo.body1">@Localizer["CertificationAdminDescription"]</MudText>
+    </header>
+    <MudButton Href="/admin/certifications/edit" Color="Color.Primary" Variant="Variant.Filled" Class="mb-4">
+        @Localizer["CertificationCreate"]
+    </MudButton>
+
+    @if (certifications is null)
+    {
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary" aria-label="@Localizer["Loading"]" />
+    }
+    else if (certifications.Count == 0)
+    {
+        <MudPaper Elevation="1" Class="pa-5"><MudText>@Localizer["CertificationAdminEmpty"]</MudText></MudPaper>
+    }
+    else
+    {
+        <MudTable Items="certifications" Hover="true" Breakpoint="Breakpoint.Sm">
+            <HeaderContent>
+                <MudTh>@Localizer["CertificationOrder"]</MudTh>
+                <MudTh>@Localizer["CertificationSpanish"]</MudTh>
+                <MudTh>@Localizer["CertificationMedia"]</MudTh>
+                <MudTh>@Localizer["ProjectTranslations"]</MudTh>
+                <MudTh><span class="visually-hidden">@Localizer["Actions"]</span></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="@Localizer["CertificationOrder"]">@context.DisplayOrder</MudTd>
+                <MudTd DataLabel="@Localizer["CertificationSpanish"]">@context.SpanishName</MudTd>
+                <MudTd DataLabel="@Localizer["CertificationMedia"]">
+                    @if (context.HasImage)
+                    {
+                        <MudChip T="string" Color="Color.Info" Variant="Variant.Outlined">@Localizer["CertificationCardImage"]</MudChip>
+                    }
+                    @if (context.AttachmentCount > 0)
+                    {
+                        <MudChip T="string" Color="Color.Info" Variant="Variant.Outlined">@Localizer["CertificationAttachmentCount", context.AttachmentCount]</MudChip>
+                    }
+                </MudTd>
+                <MudTd DataLabel="@Localizer["ProjectTranslations"]">
+                    @if (!context.HasSpanishTranslation)
+                    {
+                        <MudChip T="string" Color="Color.Warning" Variant="Variant.Outlined">@Localizer["CertificationTranslationMissingSpanish"]</MudChip>
+                    }
+                    @if (!context.HasEnglishTranslation)
+                    {
+                        <MudChip T="string" Color="Color.Warning" Variant="Variant.Outlined">@Localizer["CertificationTranslationMissingEnglish"]</MudChip>
+                    }
+                </MudTd>
+                <MudTd>
+                    <MudButton Href="@($"/admin/certifications/edit/{context.Id}")" Variant="Variant.Outlined" Color="Color.Primary">@Localizer["Edit"]</MudButton>
+                    <MudButton OnClick="@(() => RequestDelete(context.Id))" Variant="Variant.Outlined" Color="Color.Error">@Localizer["Delete"]</MudButton>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    }
+
+    @if (deleteId is { } pendingId)
+    {
+        <MudAlert Severity="Severity.Warning" Class="mt-4" Role="alert">
+            @Localizer["CertificationDeleteConfirmation"]
+            <MudButton OnClick="@(() => ConfirmDeleteAsync(pendingId))" Color="Color.Error" Variant="Variant.Filled">@Localizer["Delete"]</MudButton>
+            <MudButton OnClick="CancelDelete" Variant="Variant.Outlined">@Localizer["Cancel"]</MudButton>
+        </MudAlert>
+    }
+    @if (operationMessage is not null)
+    {
+        <MudAlert Severity="@operationSeverity" Class="mt-4" Role="status">@operationMessage</MudAlert>
+    }
+</MudContainer>
+
+@code {
+    private IReadOnlyList<CertificationAdminListItem>? certifications;
+    private Guid? deleteId;
+    private string? operationMessage;
+    private Severity operationSeverity = Severity.Info;
+
+    protected override async Task OnInitializedAsync() => await ReloadAsync();
+
+    private async Task ReloadAsync() => certifications = await CertificationService.GetCertificationsAsync();
+
+    private void RequestDelete(Guid id)
+    {
+        deleteId = id;
+        operationMessage = null;
+    }
+
+    private void CancelDelete() => deleteId = null;
+
+    private async Task ConfirmDeleteAsync(Guid id)
+    {
+        var result = await CertificationService.DeleteAsync(id);
+        deleteId = null;
+        if (result == CertificationDeleteResult.Deleted)
+        {
+            operationMessage = Localizer["CertificationDeleted"];
+            operationSeverity = Severity.Success;
+            await ReloadAsync();
+        }
+        else
+        {
+            operationMessage = Localizer["CertificationNotFound"];
+            operationSeverity = Severity.Error;
+        }
+    }
+}

@@ -24,7 +24,7 @@ public sealed class PersistenceModelTests
             .ToArray();
 
         Assert.All(
-            ["BlogPost", "BlogPostTranslation", "Certification", "CertificationTranslation", "Experience", "ExperienceAttachment", "ExperienceTranslation", "Project", "ProjectTranslation"],
+            ["BlogPost", "BlogPostTranslation", "Certification", "CertificationAttachment", "CertificationTranslation", "Experience", "ExperienceAttachment", "ExperienceTranslation", "Project", "ProjectTranslation"],
             entityName => Assert.Contains(entityName, entityNames));
         Assert.All(
             ["PortfolioUser", "IdentityRole", "IdentityRoleClaim`1", "IdentityUserClaim`1", "IdentityUserLogin`1", "IdentityUserRole`1", "IdentityUserToken`1"],
@@ -55,6 +55,23 @@ public sealed class PersistenceModelTests
             .Single(constraint => constraint.Name == "CK_ExperienceTranslations_LanguageCode");
         Assert.Contains("es-ES", languageConstraint.Sql);
         Assert.Contains("en-US", languageConstraint.Sql);
+    }
+
+    [Fact]
+    public void Certification_attachments_have_storage_metadata_and_restrict_certification_deletion()
+    {
+        using var context = CreateContext();
+        var attachmentEntity = context.Model.FindEntityType(typeof(CertificationAttachment))!;
+
+        Assert.Equal("CertificationAttachments", attachmentEntity.GetTableName());
+        Assert.Equal(DeleteBehavior.Restrict, attachmentEntity.GetForeignKeys().Single().DeleteBehavior);
+        Assert.Contains(
+            attachmentEntity.GetIndexes(),
+            index => index.Properties.Select(property => property.Name)
+                .SequenceEqual([nameof(CertificationAttachment.CertificationId), nameof(CertificationAttachment.CreatedAt)]));
+        Assert.Equal(255, attachmentEntity.FindProperty(nameof(CertificationAttachment.OriginalFileName))!.GetMaxLength());
+        Assert.Equal(255, attachmentEntity.FindProperty(nameof(CertificationAttachment.DisplayName))!.GetMaxLength());
+        Assert.Equal(500, attachmentEntity.FindProperty(nameof(CertificationAttachment.StorageKey))!.GetMaxLength());
     }
 
     [Fact]
@@ -420,6 +437,8 @@ public sealed class PersistenceModelTests
             Id = Guid.NewGuid(),
             IssuedOn = new DateOnly(2025, 4, 15),
             CredentialUrl = "https://example.com/credential",
+            CredentialId = "ABC-123",
+            Hours = 40,
             ImagePath = "/images/certifications/certification.webp",
             DisplayOrder = 3,
             Translations =
@@ -428,13 +447,15 @@ public sealed class PersistenceModelTests
                 {
                     LanguageCode = "es-ES",
                     Name = "Certificación",
-                    Issuer = "Emisor"
+                    Issuer = "Emisor",
+                    Details = "Detalles en español"
                 },
                 new CertificationTranslation
                 {
                     LanguageCode = "en-US",
                     Name = "Certification",
-                    Issuer = "Issuer"
+                    Issuer = "Issuer",
+                    Details = "English details"
                 }
             ]
         };
@@ -444,10 +465,27 @@ public sealed class PersistenceModelTests
         Assert.NotNull(result);
         Assert.Equal("Certification", result.Name);
         Assert.Equal("Issuer", result.Issuer);
+        Assert.Equal("English details", result.Details);
         Assert.Equal(certification.IssuedOn, result.IssuedOn);
         Assert.Equal(certification.CredentialUrl, result.CredentialUrl);
+        Assert.Equal(certification.CredentialId, result.CredentialId);
+        Assert.Equal(certification.Hours, result.Hours);
         Assert.Equal(certification.ImagePath, result.ImagePath);
         Assert.Equal(3, result.DisplayOrder);
+    }
+
+    [Fact]
+    public void Certification_details_and_project_description_are_optional_and_limited_to_one_thousand_characters()
+    {
+        using var context = CreateContext();
+        var details = context.Model.FindEntityType(typeof(CertificationTranslation))!
+            .FindProperty(nameof(CertificationTranslation.Details))!;
+        var projectDescription = context.Model.FindEntityType(typeof(ProjectTranslation))!
+            .FindProperty(nameof(ProjectTranslation.Description))!;
+
+        Assert.True(details.IsNullable);
+        Assert.Equal(1000, details.GetMaxLength());
+        Assert.Equal(1000, projectDescription.GetMaxLength());
     }
 
     [Fact]
@@ -473,7 +511,8 @@ public sealed class PersistenceModelTests
                 {
                     LanguageCode = "es-ES",
                     Name = "Certificación",
-                    Issuer = "Emisor"
+                    Issuer = "Emisor",
+                    Details = "Detalles en español"
                 }
             ]
         };
@@ -482,6 +521,7 @@ public sealed class PersistenceModelTests
 
         Assert.NotNull(result);
         Assert.Equal("Certificación", result.Name);
+        Assert.Equal("Detalles en español", result.Details);
     }
 
     [Fact]

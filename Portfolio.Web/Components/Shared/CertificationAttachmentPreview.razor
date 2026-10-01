@@ -1,0 +1,73 @@
+@using Microsoft.Extensions.Localization
+@implements IAsyncDisposable
+@inject IJSRuntime JSRuntime
+@inject IStringLocalizer<SharedResource> Localizer
+
+<a class="certification-attachment-preview" href="@ContentUrl" target="_blank" rel="noopener noreferrer" aria-label="@Localizer["CertificationAttachmentOpen", DisplayName]">
+    @if (ContentType == "application/pdf")
+    {
+        @if (previewFailed)
+        {
+            <span class="certification-attachment-preview__fallback" aria-hidden="true">PDF</span>
+        }
+        else
+        {
+            <canvas @ref="pdfCanvas" class="certification-attachment-preview__pdf" aria-hidden="true"></canvas>
+        }
+        <span class="certification-attachment-preview__label">PDF</span>
+    }
+    else
+    {
+        <img src="@ContentUrl" alt="" loading="lazy" />
+    }
+    <span class="certification-attachment-preview__name">@DisplayName</span>
+</a>
+
+@code {
+    [Parameter, EditorRequired]
+    public string DisplayName { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string ContentType { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string ContentUrl { get; set; } = string.Empty;
+
+    private ElementReference pdfCanvas;
+    private IJSObjectReference? pdfModule;
+    private bool previewFailed;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && ContentType == "application/pdf")
+        {
+            try
+            {
+                pdfModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/experience-pdf-preview.js");
+                await pdfModule.InvokeVoidAsync("renderFirstPage", ContentUrl, pdfCanvas);
+            }
+            catch (JSException)
+            {
+                previewFailed = true;
+                StateHasChanged();
+            }
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (pdfModule is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await pdfModule.InvokeVoidAsync("disposePreview", pdfCanvas);
+            await pdfModule.DisposeAsync();
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+    }
+}

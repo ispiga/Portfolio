@@ -39,6 +39,15 @@ public static class DependencyInjection
         services.AddScoped<IEmailService, MailKitEmailService>();
         services.AddHttpClient<IGmailOAuthTokenService, GmailOAuthTokenService>();
         services.AddScoped<ICertificationQueryService, CertificationQueryService>();
+        services.AddScoped<ICertificationAdministrationService, CertificationAdministrationService>();
+        services.AddOptions<CertificationMediaStorageOptions>()
+            .Bind(configuration.GetSection(CertificationMediaStorageOptions.SectionName))
+            .ValidateDataAnnotations()
+            .Validate(options => options.AllowedExtensions.Length > 0
+                && options.AllowedExtensions.All(extension => extension is ".pdf" or ".jpg" or ".jpeg" or ".png"),
+                "Only PDF, JPEG and PNG certification media are supported.")
+            .ValidateOnStart();
+        services.AddScoped<ICertificationMediaService, CertificationMediaStorageService>();
         services.AddScoped<IBlogPostQueryService, BlogPostQueryService>();
         services.AddScoped<IExperienceQueryService, ExperienceQueryService>();
         services.AddScoped<IExperienceAdministrationService, ExperienceAdministrationService>();

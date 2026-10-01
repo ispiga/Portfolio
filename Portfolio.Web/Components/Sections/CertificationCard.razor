@@ -4,13 +4,22 @@
 @inject IStringLocalizer<SharedResource> Localizer
 
 <article class="surface certification-card">
-    @if (!string.IsNullOrWhiteSpace(Certification.ImagePath))
-    {
-        <img class="certification-card__image" src="@Certification.ImagePath" alt="@Certification.Name" loading="lazy" />
-    }
-
-    <div class="certification-card__badge" aria-hidden="true">+</div>
-    <div>
+    <div class="certification-card__visual">
+        @if (!string.IsNullOrWhiteSpace(Certification.ImagePath))
+        {
+            <img class="certification-card__image" src="@Certification.ImagePath" alt="@Certification.Name" loading="lazy" />
+        }
+        else
+        {
+            <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6" focusable="false"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5" /></svg>
+            @* <div class="certification-card__badge" aria-hidden="true">+</div> *@
+        }
+        @if (Certification.Hours is { } imageColumnHours)
+        {
+            <p class="certification-card__hours">@Localizer["CertificationHoursUnit", imageColumnHours]</p>
+        }
+    </div>
+    <div class="certification-card__content">
         <h3>@Certification.Name</h3>
         <p class="certification-card__issuer">@Certification.Issuer</p>
 
@@ -18,18 +27,58 @@
         {
             <p class="certification-card__date">
                 <span>@Localizer["CertificationIssuedOn"]</span>
-                <time datetime="@issuedOn.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)">@issuedOn.ToString("D", CultureInfo.CurrentCulture)</time>
+                <time datetime="@issuedOn.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)">@issuedOn.ToString("Y", CultureInfo.CurrentCulture)</time>
             </p>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Certification.CredentialId))
+        {
+            <p class="certification-card__credential-id">
+                <span>@Localizer["CertificationCredentialIdLabel"]</span>
+                <span>@Certification.CredentialId</span>
+            </p>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Certification.Details))
+        {
+            <button type="button"
+                    class="project-card__description-toggle"
+                    aria-expanded="@detailsExpanded"
+                    aria-controls="@DetailsId"
+                    @onclick="ToggleDetails">
+                @Localizer[detailsExpanded ? "CertificationDetailsCollapse" : "CertificationDetailsExpand"]
+            </button>
+            <p id="@DetailsId" class="certification-card__details" hidden="@(!detailsExpanded)">@Certification.Details</p>
         }
 
         @if (!string.IsNullOrWhiteSpace(Certification.CredentialUrl))
         {
-            <a class="certification-card__link" href="@Certification.CredentialUrl" target="_blank" rel="noopener noreferrer">@Localizer["CertificationCredential"]</a>
+            <div class="project-card__links">
+                <a class="certification-card__link" href="@Certification.CredentialUrl" target="_blank" rel="noopener noreferrer">@Localizer["CertificationCredential"]</a>
+            </div>
+        }
+        @if (Certification.Attachments.Count > 0)
+        {
+            <section class="certification-card__attachments" aria-label="@Localizer["CertificationPublicAttachments"]">
+                @foreach (var attachment in Certification.Attachments)
+                {
+                    <CertificationAttachmentPreview
+                        DisplayName="@attachment.DisplayName"
+                        ContentType="@attachment.ContentType"
+                        ContentUrl="@($"/certification-attachments/{attachment.Id}")" />
+                }
+            </section>
         }
     </div>
 </article>
 
 @code {
+    private bool detailsExpanded;
+
+    private string DetailsId => $"certification-details-{Certification.Id:N}";
+
     [Parameter, EditorRequired]
     public CertificationReadModel Certification { get; set; } = null!;
+
+    private void ToggleDetails() => detailsExpanded = !detailsExpanded;
 }

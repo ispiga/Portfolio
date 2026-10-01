@@ -115,6 +115,19 @@ public sealed class ProjectAdministrationTests
     }
 
     [Fact]
+    public async Task Description_longer_than_one_thousand_characters_is_rejected()
+    {
+        var service = new ProjectAdministrationService(CreateFactory());
+        var result = await service.SaveAsync(ValidRequest() with
+        {
+            Spanish = new("Portfolio personal", "portfolio-personal", "Resumen del portfolio", new string('x', 1001))
+        });
+
+        Assert.False(result.Succeeded);
+        Assert.Contains(result.Errors, error => error.Field == "Spanish.Description");
+    }
+
+    [Fact]
     public async Task Duplicate_slug_is_rejected_within_the_same_language()
     {
         var service = new ProjectAdministrationService(CreateFactory());
