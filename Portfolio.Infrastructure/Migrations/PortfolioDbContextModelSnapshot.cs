@@ -161,6 +161,11 @@ namespace Portfolio.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("EditorialStatus")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
                     b.Property<string>("FeaturedImagePath")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
@@ -168,15 +173,47 @@ namespace Portfolio.Infrastructure.Migrations
                     b.Property<bool>("IsFeatured")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsPublished")
-                        .HasColumnType("bit");
-
                     b.Property<DateTimeOffset?>("PublishedOn")
                         .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
-                    b.ToTable("BlogPosts", (string)null);
+                    b.ToTable("BlogPosts", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_BlogPosts_EditorialStatus", "[EditorialStatus] IN (0, 1, 2)");
+                        });
+                });
+
+            modelBuilder.Entity("Portfolio.Domain.Entities.BlogPostImage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BlogPostId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<long>("SizeBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("StorageKey")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BlogPostId", "CreatedAt");
+
+                    b.ToTable("BlogPostImages", (string)null);
                 });
 
             modelBuilder.Entity("Portfolio.Domain.Entities.BlogPostTranslation", b =>
@@ -610,6 +647,17 @@ namespace Portfolio.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Portfolio.Domain.Entities.BlogPostImage", b =>
+                {
+                    b.HasOne("Portfolio.Domain.Entities.BlogPost", "BlogPost")
+                        .WithMany("Images")
+                        .HasForeignKey("BlogPostId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("BlogPost");
+                });
+
             modelBuilder.Entity("Portfolio.Domain.Entities.BlogPostTranslation", b =>
                 {
                     b.HasOne("Portfolio.Domain.Entities.BlogPost", "BlogPost")
@@ -678,6 +726,8 @@ namespace Portfolio.Infrastructure.Migrations
 
             modelBuilder.Entity("Portfolio.Domain.Entities.BlogPost", b =>
                 {
+                    b.Navigation("Images");
+
                     b.Navigation("Translations");
                 });
 

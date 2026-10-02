@@ -33,7 +33,7 @@ public static class BlogPostTranslationSelector
             || string.IsNullOrWhiteSpace(translation.Slug)
             || string.IsNullOrWhiteSpace(translation.Excerpt)
             || string.IsNullOrWhiteSpace(translation.Content)
-            || !blogPost.IsPublished
+            || blogPost.EditorialStatus != BlogPostEditorialStatus.Published
             || blogPost.PublishedOn is not { } publishedOn)
         {
             return null;

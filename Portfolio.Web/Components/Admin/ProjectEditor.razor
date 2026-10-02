@@ -39,7 +39,7 @@
                 <div class="experience-admin-grid">
                     <div class="admin-field">
                         <label for="project-order">@Localizer["ProjectOrder"]</label>
-                        <InputNumber id="project-order" @bind-Value="model.DisplayOrder" min="0" />
+                        <InputNumber id="project-order" @bind-Value="model.DisplayOrder" TValue="int" min="0" />
                         @FieldErrors("DisplayOrder")
                     </div>
                     <div class="admin-field">
@@ -120,8 +120,13 @@
                     <MudText Typo="Typo.body2">@Localizer["ProjectImageRules", ImageService.MaximumFileSizeBytes / 1024 / 1024]</MudText>
                     @if (!string.IsNullOrWhiteSpace(model.PreviewImagePath))
                     {
-                        <img class="project-card__image" src="@($"/project-preview-images/{projectId}?v={previewImageVersion}")" alt="@Localizer["ProjectPreviewImageAlt", model.SpanishTitle]" />
-                        <MudButton OnClick="RequestImageDelete" Color="Color.Error" Variant="Variant.Outlined">@Localizer["ProjectImageDelete"]</MudButton>
+                        <div class="certification-attachment-list__item project-preview-image-row">
+                            <img class="admin-image-preview" src="@($"/project-preview-images/{projectId}?v={previewImageVersion}")" alt="@Localizer["ProjectPreviewImageAlt", model.SpanishTitle]" />
+                            <span class="certification-attachment-list__size">@(previewImageSizeBytes is { } size ? $"{size / 1024} KB" : "—")</span>
+                            <div class="certification-attachment-list__controls">
+                                <MudButton OnClick="RequestImageDelete" Color="Color.Error" Variant="Variant.Outlined">@Localizer["ProjectImageDelete"]</MudButton>
+                            </div>
+                        </div>
                     }
                     <div class="admin-field">
                         <label for="project-preview-upload">@Localizer["ProjectImageUpload"]</label>
@@ -175,6 +180,7 @@
     private string? saveSuccess;
     private string? imageMessage;
     private Severity imageSeverity = Severity.Info;
+    private long? previewImageSizeBytes;
     private ProjectSnapshot? initialSnapshot;
     private IJSObjectReference? unsavedChangesModule;
     private bool unsavedChangesModuleInitialized;
@@ -240,6 +246,7 @@
         model.RepositoryUrl = details.RepositoryUrl ?? string.Empty;
         model.DemoUrl = details.DemoUrl ?? string.Empty;
         model.PreviewImagePath = details.PreviewImagePath;
+        previewImageSizeBytes = await ImageService.GetPreviewImageSizeAsync(details.Id);
         model.IsFeatured = details.IsFeatured;
         model.DisplayOrder = details.DisplayOrder;
         model.SpanishTitle = details.Spanish.Title;
@@ -379,6 +386,7 @@
         if (result.Error == ProjectImageError.None)
         {
             model.PreviewImagePath = result.ImagePath;
+            previewImageSizeBytes = file.Size;
             previewImageVersion++;
         }
     }
@@ -391,6 +399,7 @@
         if (id is { } projectId && await ImageService.DeleteAsync(projectId))
         {
             model.PreviewImagePath = null;
+            previewImageSizeBytes = null;
             previewImageVersion++;
             imageMessage = Localizer["ProjectImageDeleted"];
             imageSeverity = Severity.Success;

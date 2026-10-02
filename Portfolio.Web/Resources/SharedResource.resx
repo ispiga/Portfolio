@@ -121,5 +121,63 @@
   <data name="AdminLoginRequiredTitle" xml:space="preserve"><value>Inicia sesión para continuar</value></data>
   <data name="AdminLoginRequiredMessage" xml:space="preserve"><value>Esta área requiere una cuenta administrativa autorizada.</value></data>
   <data name="AdminLoginLink" xml:space="preserve"><value>Ir al acceso administrativo</value></data>
-  <data name="AdminReturnHome" xml:space="preserve"><value>Volver al sitio público</value></data>
+	<data name="AdminReturnHome" xml:space="preserve"><value>Volver al sitio público</value></data>
+  <data name="BlogAdminTitle" xml:space="preserve"><value>Administración del blog</value></data>
+  <data name="BlogAdminDescription" xml:space="preserve"><value>Administra artículos, traducciones, imágenes y publicación.</value></data>
+  <data name="BlogAdminEmpty" xml:space="preserve"><value>Aún no hay artículos.</value></data>
+  <data name="BlogPostCreate" xml:space="preserve"><value>Crear artículo</value></data>
+  <data name="BlogPostEdit" xml:space="preserve"><value>Editar artículo</value></data>
+  <data name="BlogPostDetails" xml:space="preserve"><value>Datos del artículo</value></data>
+  <data name="BlogPostTitle" xml:space="preserve"><value>Título</value></data>
+  <data name="BlogPostSlug" xml:space="preserve"><value>Slug</value></data>
+  <data name="BlogPostExcerpt" xml:space="preserve"><value>Extracto</value></data>
+  <data name="BlogPostContent" xml:space="preserve"><value>Contenido</value></data>
+  <data name="BlogPostFeaturedImageAlt" xml:space="preserve"><value>Texto alternativo de la imagen destacada</value></data>
+  <data name="BlogPostSpanish" xml:space="preserve"><value>Español</value></data>
+  <data name="BlogPostEnglish" xml:space="preserve"><value>English</value></data>
+  <data name="BlogPostTranslations" xml:space="preserve"><value>Traducciones</value></data>
+  <data name="BlogPostTranslationMissingSpanish" xml:space="preserve"><value>Falta o está incompleta la traducción en español.</value></data>
+  <data name="BlogPostTranslationMissingEnglish" xml:space="preserve"><value>Falta o está incompleta la traducción en English.</value></data>
+  <data name="BlogPostEditorialStatus" xml:space="preserve"><value>Estado editorial</value></data>
+  <data name="BlogPostStatusDraft" xml:space="preserve"><value>Incompleto/Borrador</value></data>
+  <data name="BlogPostStatusReadyToPublish" xml:space="preserve"><value>Listo para publicar</value></data>
+  <data name="BlogPostStatusPublished" xml:space="preserve"><value>Publicado</value></data>
+  <data name="BlogPostFeatured" xml:space="preserve"><value>Artículo destacado</value></data>
+  <data name="BlogPostPublishedOn" xml:space="preserve"><value>Publicado el</value></data>
+  <data name="BlogPostImages" xml:space="preserve"><value>Imágenes</value></data>
+  <data name="BlogPostDeleteConfirmation" xml:space="preserve"><value>¿Quieres eliminar este artículo? Si tiene imágenes, elimínalas primero desde su editor.</value></data>
+  <data name="BlogPostDeleteHasImages" xml:space="preserve"><value>El artículo contiene imágenes; elimínalas desde el editor antes de borrar el artículo.</value></data>
+  <data name="BlogPostDeleted" xml:space="preserve"><value>El artículo se ha eliminado.</value></data>
+  <data name="BlogPostNotFound" xml:space="preserve"><value>No se ha encontrado el artículo.</value></data>
+  <data name="BlogPostSaving" xml:space="preserve"><value>Guardando…</value></data>
+  <data name="BlogPostSaved" xml:space="preserve"><value>El artículo se ha guardado.</value></data>
+  <data name="BlogPostSaveFailed" xml:space="preserve"><value>No se ha podido guardar el artículo. Revisa los campos indicados.</value></data>
+  <data name="BlogPostUnsavedChangesTitle" xml:space="preserve"><value>Cambios sin guardar</value></data>
+  <data name="BlogPostUnsavedChangesConfirmation" xml:space="preserve"><value>Hay cambios sin guardar. ¿Quieres descartarlos?</value></data>
+  <data name="BlogPostStatusInvalid" xml:space="preserve"><value>Selecciona un estado editorial válido.</value></data>
+  <data name="BlogPostFieldRequired" xml:space="preserve"><value>Este campo es obligatorio para este estado editorial.</value></data>
+  <data name="BlogPostFieldTooLong" xml:space="preserve"><value>El valor supera la longitud máxima permitida.</value></data>
+  <data name="BlogPostSlugDuplicate" xml:space="preserve"><value>Ya existe un artículo con ese slug en este idioma.</value></data>
+  <data name="BlogPostManageAction" xml:space="preserve"><value>Gestionar artículos</value></data>
+	<data name="BlogImageRules" xml:space="preserve"><value>JPG, JPEG, PNG, WebP y SVG. Máximo {0} MiB por archivo.</value></data>
+  <data name="BlogImageUpload" xml:space="preserve"><value>Subir imágenes</value></data>
+  <data name="BlogImagesEmpty" xml:space="preserve"><value>Este artículo aún no tiene imágenes.</value></data>
+  <data name="BlogImagePreviewAlt" xml:space="preserve"><value>Vista previa de la imagen del artículo</value></data>
+  <data name="BlogImageFeatured" xml:space="preserve"><value>Imagen destacada</value></data>
+  <data name="BlogImageSetFeatured" xml:space="preserve"><value>Usar como imagen destacada</value></data>
+  <data name="BlogImageDeleteConfirmation" xml:space="preserve"><value>¿Quieres eliminar esta imagen? No se podrá eliminar mientras esté insertada en una traducción.</value></data>
+  <data name="BlogImageInUse" xml:space="preserve"><value>La imagen todavía está insertada en el contenido de una traducción. Retírala y guarda el artículo antes de eliminarla.</value></data>
+  <data name="BlogImageDeleted" xml:space="preserve"><value>La imagen se ha eliminado.</value></data>
+  <data name="BlogImageUploaded" xml:space="preserve"><value>La imagen se ha subido.</value></data>
+  <data name="BlogImageUploadFailed" xml:space="preserve"><value>No se ha podido subir o modificar la imagen.</value></data>
+  <data name="BlogImageUnsupportedType" xml:space="preserve"><value>El formato de imagen no está permitido.</value></data>
+  <data name="BlogImageTooLarge" xml:space="preserve"><value>La imagen supera el tamaño máximo permitido.</value></data>
+  <data name="BlogImageInvalidContent" xml:space="preserve"><value>El contenido del archivo no coincide con un formato de imagen válido.</value></data>
+  <data name="BlogImageSaveArticleFirst" xml:space="preserve"><value>Guarda primero el artículo para poder subir imágenes.</value></data>
+  <data name="BlogImageFeaturedSet" xml:space="preserve"><value>La imagen destacada se ha actualizado.</value></data>
+  <data name="BlogImageOperationFailed" xml:space="preserve"><value>No se ha podido completar la operación de imagen.</value></data>
+  <data name="AdminContentSummary" xml:space="preserve"><value>La administración permite gestionar experiencias, proyectos, certificaciones y artículos del blog.</value></data>
+  <data name="BlogPostNotFeatured" xml:space="preserve">
+	<value>Not featured</value>
+  </data>
 </root>

@@ -17,6 +17,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Portfolio.Application.Experiences;
+using Portfolio.Application.Blog;
 using Portfolio.Infrastructure;
 using Portfolio.Infrastructure.Identity;
 using Portfolio.Web.Authentication;
@@ -52,6 +53,7 @@ public sealed class AdminAuthenticationTests : IAsyncLifetime
         builder.Services.AddPortfolioIdentity();
         builder.Services.AddSingleton<AdminSessionActivityStore>();
         builder.Services.AddSingleton<IExperienceAttachmentService, TestExperienceAttachmentService>();
+        builder.Services.AddSingleton<IBlogPostImageService, TestBlogPostImageService>();
         builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
             .AddCookie(IdentityConstants.ApplicationScheme, options =>
             {
@@ -68,6 +70,7 @@ public sealed class AdminAuthenticationTests : IAsyncLifetime
         app.UseAntiforgery();
         app.MapAdminAuthentication();
         app.MapExperienceAttachmentEndpoints();
+        app.MapBlogPostImageEndpoints();
         app.MapGet("/admin/login", (HttpContext context, IAntiforgery antiforgery) =>
         {
             var tokens = antiforgery.GetAndStoreTokens(context);
@@ -90,6 +93,32 @@ public sealed class AdminAuthenticationTests : IAsyncLifetime
         await roleManager.CreateAsync(new IdentityRole(PortfolioAuthorization.AdministratorRole));
         await CreateUserAsync(AdministratorEmail, isAdministrator: true);
         await CreateUserAsync(RegularUserEmail, isAdministrator: false);
+    }
+
+    [Fact]
+    public async Task Blog_image_preview_requires_administrator_and_published_image_is_public()
+    {
+        var imageId = TestBlogPostImageService.ImageId;
+        using (var anonymousResponse = await SendAsync(new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/admin/blog-post-images/{imageId}")))
+        {
+            Assert.Equal(HttpStatusCode.Redirect, anonymousResponse.StatusCode);
+            Assert.Equal("/admin/login", anonymousResponse.Headers.Location?.AbsolutePath);
+        }
+
+        using var login = await LoginAsync(AdministratorEmail, TestPassword);
+        using var adminResponse = await SendAsync(new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/admin/blog-post-images/{imageId}"));
+        Assert.Equal(HttpStatusCode.OK, adminResponse.StatusCode);
+        Assert.Equal("no-store", adminResponse.Headers.CacheControl?.ToString());
+
+        using var publicResponse = await SendAsync(new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/blog-post-images/{imageId}"));
+        Assert.Equal(HttpStatusCode.OK, publicResponse.StatusCode);
+        Assert.Equal("nosniff", Assert.Single(publicResponse.Headers.GetValues("X-Content-Type-Options")));
     }
 
     [Fact]
@@ -383,6 +412,24 @@ public sealed class AdminAuthenticationTests : IAsyncLifetime
             var roleResult = await userManager.AddToRoleAsync(user, PortfolioAuthorization.AdministratorRole);
             Assert.True(roleResult.Succeeded, string.Join(", ", roleResult.Errors.Select(error => error.Code)));
         }
+    }
+
+    private sealed class TestBlogPostImageService : IBlogPostImageService
+    {
+        public static Guid ImageId { get; } = Guid.Parse("98615387-8cb9-4786-8e5a-52ebc184c15a");
+        public long MaximumFileSizeBytes => 10 * 1024 * 1024;
+        public Task<IReadOnlyList<BlogPostImageReadModel>> GetImagesAsync(Guid blogPostId, CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<BlogPostImageReadModel>>([]);
+        public Task<BlogPostImageOperationResult> UploadImageAsync(Guid blogPostId, string fileName, string contentType, long fileSize, Stream content, CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+        public Task<BlogPostImageOperationResult> SetFeaturedImageAsync(Guid imageId, CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+        public Task<BlogPostImageError> DeleteImageAsync(Guid imageId, CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException();
+        public Task<BlogPostImageContent?> OpenImageAsync(Guid imageId, bool administratorCanViewDrafts, CancellationToken cancellationToken = default) =>
+            imageId == ImageId
+                ? Task.FromResult<BlogPostImageContent?>(new(new MemoryStream([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]), "image/png"))
+                : Task.FromResult<BlogPostImageContent?>(null);
     }
 
     private async Task<HttpResponseMessage> LoginAsync(string email, string password)

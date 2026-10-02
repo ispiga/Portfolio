@@ -1071,4 +1071,62 @@
   <data name="CertificationAttachmentDisplayNameSaveFailed" xml:space="preserve">
     <value>The name could not be saved. It must contain 1 to 255 characters.</value>
   </data>
+  <data name="BlogAdminTitle" xml:space="preserve"><value>Blog administration</value></data>
+  <data name="BlogAdminDescription" xml:space="preserve"><value>Manage posts, translations, images, and publication.</value></data>
+  <data name="BlogAdminEmpty" xml:space="preserve"><value>There are no posts yet.</value></data>
+  <data name="BlogPostCreate" xml:space="preserve"><value>Create post</value></data>
+  <data name="BlogPostEdit" xml:space="preserve"><value>Edit post</value></data>
+  <data name="BlogPostDetails" xml:space="preserve"><value>Post details</value></data>
+  <data name="BlogPostTitle" xml:space="preserve"><value>Title</value></data>
+  <data name="BlogPostSlug" xml:space="preserve"><value>Slug</value></data>
+  <data name="BlogPostExcerpt" xml:space="preserve"><value>Excerpt</value></data>
+  <data name="BlogPostContent" xml:space="preserve"><value>Content</value></data>
+  <data name="BlogPostFeaturedImageAlt" xml:space="preserve"><value>Featured image alternative text</value></data>
+  <data name="BlogPostSpanish" xml:space="preserve"><value>Spanish</value></data>
+  <data name="BlogPostEnglish" xml:space="preserve"><value>English</value></data>
+  <data name="BlogPostTranslations" xml:space="preserve"><value>Translations</value></data>
+  <data name="BlogPostTranslationMissingSpanish" xml:space="preserve"><value>The Spanish translation is missing or incomplete.</value></data>
+  <data name="BlogPostTranslationMissingEnglish" xml:space="preserve"><value>The English translation is missing or incomplete.</value></data>
+  <data name="BlogPostEditorialStatus" xml:space="preserve"><value>Editorial status</value></data>
+  <data name="BlogPostStatusDraft" xml:space="preserve"><value>Incomplete/Draft</value></data>
+  <data name="BlogPostStatusReadyToPublish" xml:space="preserve"><value>Ready to publish</value></data>
+  <data name="BlogPostStatusPublished" xml:space="preserve"><value>Published</value></data>
+  <data name="BlogPostFeatured" xml:space="preserve"><value>Featured post</value></data>
+  <data name="BlogPostPublishedOn" xml:space="preserve"><value>Published on</value></data>
+  <data name="BlogPostImages" xml:space="preserve"><value>Images</value></data>
+  <data name="BlogPostDeleteConfirmation" xml:space="preserve"><value>Delete this post? Remove its images from the editor first.</value></data>
+  <data name="BlogPostDeleteHasImages" xml:space="preserve"><value>This post still has images. Remove them from its editor before deleting the post.</value></data>
+  <data name="BlogPostDeleted" xml:space="preserve"><value>The post was deleted.</value></data>
+  <data name="BlogPostNotFound" xml:space="preserve"><value>The post could not be found.</value></data>
+  <data name="BlogPostSaving" xml:space="preserve"><value>Saving…</value></data>
+  <data name="BlogPostSaved" xml:space="preserve"><value>The post was saved.</value></data>
+  <data name="BlogPostSaveFailed" xml:space="preserve"><value>The post could not be saved. Review the validation errors.</value></data>
+  <data name="BlogPostUnsavedChangesTitle" xml:space="preserve"><value>Unsaved changes</value></data>
+  <data name="BlogPostUnsavedChangesConfirmation" xml:space="preserve"><value>You have unsaved changes. Do you want to discard them?</value></data>
+  <data name="BlogPostStatusInvalid" xml:space="preserve"><value>Select a valid editorial status.</value></data>
+  <data name="BlogPostFieldRequired" xml:space="preserve"><value>This field is required for this editorial status.</value></data>
+  <data name="BlogPostFieldTooLong" xml:space="preserve"><value>The value exceeds the maximum length.</value></data>
+  <data name="BlogPostSlugDuplicate" xml:space="preserve"><value>A post with this slug already exists in this language.</value></data>
+  <data name="BlogPostManageAction" xml:space="preserve"><value>Manage posts</value></data>
+  <data name="BlogImageRules" xml:space="preserve"><value>JPG, JPEG, PNG, WebP, and SVG. Maximum {0} MiB per file.</value></data>
+  <data name="BlogImageUpload" xml:space="preserve"><value>Upload images</value></data>
+  <data name="BlogImagesEmpty" xml:space="preserve"><value>This post has no images yet.</value></data>
+  <data name="BlogImagePreviewAlt" xml:space="preserve"><value>Post image preview</value></data>
+  <data name="BlogImageFeatured" xml:space="preserve"><value>Featured image</value></data>
+  <data name="BlogImageSetFeatured" xml:space="preserve"><value>Use as featured image</value></data>
+  <data name="BlogImageDeleteConfirmation" xml:space="preserve"><value>Delete this image? It cannot be deleted while it is used in a translation.</value></data>
+  <data name="BlogImageInUse" xml:space="preserve"><value>The image is still used in a translation. Remove it and save the post before deleting it.</value></data>
+  <data name="BlogImageDeleted" xml:space="preserve"><value>The image was deleted.</value></data>
+  <data name="BlogImageUploaded" xml:space="preserve"><value>The image was uploaded.</value></data>
+  <data name="BlogImageUploadFailed" xml:space="preserve"><value>The image could not be uploaded or updated.</value></data>
+  <data name="BlogImageUnsupportedType" xml:space="preserve"><value>This image format is not supported.</value></data>
+  <data name="BlogImageTooLarge" xml:space="preserve"><value>The image exceeds the maximum file size.</value></data>
+  <data name="BlogImageInvalidContent" xml:space="preserve"><value>The file content does not match a valid image format.</value></data>
+  <data name="BlogImageSaveArticleFirst" xml:space="preserve"><value>Save the post before uploading images.</value></data>
+  <data name="BlogImageFeaturedSet" xml:space="preserve"><value>The featured image was updated.</value></data>
+  <data name="BlogImageOperationFailed" xml:space="preserve"><value>The image operation could not be completed.</value></data>
+  <data name="AdminContentSummary" xml:space="preserve"><value>Experience, project, certification, and blog content can now be managed here.</value></data>
+  <data name="BlogPostNotFeatured" xml:space="preserve">
+    <value>Not featured</value>
+  </data>
 </root>

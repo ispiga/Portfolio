@@ -23,6 +23,8 @@ public sealed class PortfolioDbContext(DbContextOptions<PortfolioDbContext> opti
 
     public DbSet<BlogPost> BlogPosts => Set<BlogPost>();
 
+    public DbSet<BlogPostImage> BlogPostImages => Set<BlogPostImage>();
+
     public DbSet<BlogPostTranslation> BlogPostTranslations => Set<BlogPostTranslation>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

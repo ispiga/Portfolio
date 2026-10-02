@@ -3205,7 +3205,7 @@ Añade o actualiza pruebas para las reglas implementadas. Al terminar, compila l
 
 
 # ****************************************
-# PROMPT PARA REALIZAR LA FASE 7 - PARTE 3
+# PROMPT PARA REALIZAR LA FASE 7 - PARTE 4
 # ****************************************
 
 Implementa la entrega de Certificaciones de la Fase 7 en este portfolio.
@@ -3213,3 +3213,27 @@ Antes de modificar código, lee .github/copilot-instructions.md y consulta PORTF
 Implementa el CRUD administrativo de Certificaciones que establece la especificación: listado y formulario para crear, editar y eliminar; edición localizada en español e inglés con avisos cuando falten traducciones; y gestión de fechas, credenciales, orden e imágenes según lo acordado en el documento. Integra el módulo en la navegación y el Dashboard administrativos según las convenciones existentes.
 No inventes campos, relaciones ni comportamientos que no estén definidos en la especificación. Si algún detalle necesario —en especial el alcance o tratamiento de imágenes/documentos— no está claro en PORTFOLIO_PROJECT.md ni puede deducirse del código existente, pregúntame antes de tomar una decisión.
 Añade o actualiza pruebas, ejecuta la compilación y las pruebas pertinentes, y sincroniza la documentación al terminar. Si hace falta una migración, genérala y explica su impacto, pero no la apliques a ninguna base de datos.
+
+
+# ****************************************
+# PROMPT PARA REALIZAR LA FASE 7 - PARTE 5
+# ****************************************
+
+Implementa la entrega 5 de la Fase 7: administración del Blog en este portfolio.
+
+Antes de modificar código:
+1. Lee .github/copilot-instructions.md y consulta PORTFOLIO_PROJECT.md como fuentes de verdad.
+2. Revisa especialmente las secciones 20. Blog, «Entregas incrementales de la Fase 7», «Avisos de traducción y estado editorial del blog», el estado actual al final del documento y los patrones implementados para Experiencias, Proyectos y Certificaciones.
+3. Inspecciona las entidades y servicios de Blog existentes, el estado actual de TinyMCE, las rutas públicas y la estrategia de imágenes.
+
+Alcance documentado de la entrega:
+- CRUD administrativo de artículos, con listado y acciones para crear, editar por identificador y eliminar.
+- Traducciones es-ES y en-US desde un único formulario, con aviso localizado cuando falta una traducción y fallback público a español según las decisiones existentes.
+- TinyMCE 8 exclusivamente para BlogPostTranslation.Content; los demás campos se mantienen estructurados.
+- Estado editorial elegido explícitamente por el administrador. No deducir «listo para publicar» porque los campos estén completos. Mantener separado el estado editorial del estado de traducción.
+- La Home continúa mostrando solo el artículo destacado válido más reciente y excluye artículos no publicados o con fecha futura.
+- La gestión administrativa de imágenes corresponde a esta entrega, siguiendo las decisiones ya documentadas.
+
+No inventes campos, relaciones, estados, rutas ni comportamiento que no estén especificados o no puedan deducirse de los patrones existentes. Si queda una decisión funcional necesaria sin resolver en PORTFOLIO_PROJECT.md ni en el código —especialmente cómo representar el estado editorial y qué significa la gestión de imágenes para el contenido de TinyMCE— pregúntame antes de decidir.
+
+Implementa solo el alcance de esta entrega y conserva arquitectura, seguridad, localización, accesibilidad y protección de cambios no guardados coherentes con las instrucciones del repositorio. Añade o actualiza pruebas, ejecuta la compilación y las pruebas pertinentes, sincroniza la documentación y genera cualquier migración necesaria sin aplicarla a ninguna base de datos. Informa claramente del impacto de la migración y de si queda pendiente de aplicación.

@@ -49,6 +49,15 @@ public static class DependencyInjection
             .ValidateOnStart();
         services.AddScoped<ICertificationMediaService, CertificationMediaStorageService>();
         services.AddScoped<IBlogPostQueryService, BlogPostQueryService>();
+        services.AddScoped<IBlogPostAdministrationService, BlogPostAdministrationService>();
+        services.AddOptions<BlogPostImageStorageOptions>()
+            .Bind(configuration.GetSection(BlogPostImageStorageOptions.SectionName))
+            .ValidateDataAnnotations()
+            .Validate(options => options.AllowedExtensions.Length > 0
+                && options.AllowedExtensions.All(extension => extension is ".jpg" or ".jpeg" or ".png" or ".webp" or ".svg"),
+                "Only JPEG, PNG, WebP and SVG blog images are supported.")
+            .ValidateOnStart();
+        services.AddScoped<IBlogPostImageService, BlogPostImageStorageService>();
         services.AddScoped<IExperienceQueryService, ExperienceQueryService>();
         services.AddScoped<IExperienceAdministrationService, ExperienceAdministrationService>();
         services.AddOptions<ExperienceAttachmentStorageOptions>()

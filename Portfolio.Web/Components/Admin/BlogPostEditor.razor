@@ -1,0 +1,505 @@
+@page "/admin/blog/edit"
+@page "/admin/blog/edit/{Id:guid}"
+@attribute [Authorize(Policy = PortfolioAuthorization.AdministratorPolicy)]
+@layout AdminLayout
+@implements IAsyncDisposable
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.Extensions.Localization
+@using Microsoft.JSInterop
+@using System.Globalization
+@using Portfolio.Application.Blog
+@using Portfolio.Domain.Entities
+@using Portfolio.Infrastructure.Identity
+@inject IBlogPostAdministrationService BlogPostService
+@inject IBlogPostImageService ImageService
+@inject IStringLocalizer<SharedResource> Localizer
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+<PageTitle>@Localizer[Id is null ? "BlogPostCreate" : "BlogPostEdit"]</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="admin-dashboard">
+    <header class="admin-dashboard__heading">
+        <MudText Typo="Typo.h1" Tag="@("h1")">@Localizer[Id is null ? "BlogPostCreate" : "BlogPostEdit"]</MudText>
+    </header>
+
+    @if (loadFailed)
+    {
+        <MudAlert Severity="Severity.Error" Role="alert">@Localizer["BlogPostNotFound"]</MudAlert>
+    }
+    else if (!loaded)
+    {
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary" aria-label="@Localizer["Loading"]" />
+    }
+    else
+    {
+        <NavigationLock ConfirmExternalNavigation="@HasUnsavedChanges" />
+        <EditForm id="blog-post-edit-form" Model="model" OnSubmit="SaveAsync">
+            <MudPaper Elevation="1" Class="pa-5 mb-4">
+                <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["BlogPostDetails"]</MudText>
+                <div class="experience-admin-grid">
+                    <div class="admin-field">
+                        <label for="blog-post-status">@Localizer["BlogPostEditorialStatus"]</label>
+                        <InputSelect id="blog-post-status" @bind-Value="model.EditorialStatus">
+                            <option value="@BlogPostEditorialStatus.Draft">@Localizer["BlogPostStatusDraft"]</option>
+                            <option value="@BlogPostEditorialStatus.ReadyToPublish">@Localizer["BlogPostStatusReadyToPublish"]</option>
+                            <option value="@BlogPostEditorialStatus.Published">@Localizer["BlogPostStatusPublished"]</option>
+                        </InputSelect>
+                        @FieldErrors(nameof(model.EditorialStatus))
+                    </div>
+                    <div class="admin-field">
+                        <label for="blog-post-featured">@Localizer["BlogPostFeatured"]</label>
+                        <InputCheckbox id="blog-post-featured" @bind-Value="model.IsFeatured" />
+                    </div>
+                    @if (publishedOn is { } publishedDate)
+                    {
+                        <div class="admin-field">
+                            <span>@Localizer["BlogPostPublishedOn"]</span>
+                            <time datetime="@publishedDate.ToString("O")">@publishedDate.ToLocalTime().ToString("g")</time>
+                        </div>
+                    }
+                </div>
+            </MudPaper>
+
+            <MudPaper Elevation="1" Class="pa-5 mb-4">
+                <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["BlogPostSpanish"]</MudText>
+                @if (!TranslationIsFilled(model.SpanishTitle, model.SpanishSlug, model.SpanishExcerpt, model.SpanishContent))
+                {
+                    <MudAlert Severity="Severity.Warning" Role="status">@Localizer["BlogPostTranslationMissingSpanish"]</MudAlert>
+                }
+                <div class="admin-field">
+                    <label for="blog-title-es">@Localizer["BlogPostTitle"]</label>
+                    <InputText id="blog-title-es" @bind-Value="model.SpanishTitle" maxlength="200" />
+                    @FieldErrors("Spanish.Title")
+                </div>
+                <div class="admin-field">
+                    <label for="blog-slug-es">@Localizer["BlogPostSlug"]</label>
+                    <InputText id="blog-slug-es" @bind-Value="model.SpanishSlug" maxlength="200" />
+                    @FieldErrors("Spanish.Slug")
+                </div>
+                <div class="admin-field">
+                    <label for="blog-excerpt-es">@Localizer["BlogPostExcerpt"]</label>
+                    <InputTextArea id="blog-excerpt-es" @bind-Value="model.SpanishExcerpt" maxlength="500" rows="3" />
+                    @FieldErrors("Spanish.Excerpt")
+                </div>
+                <div class="admin-field">
+                    <label for="blog-content-es">@Localizer["BlogPostContent"]</label>
+                    <BlogPostContentEditor @key="id" @ref="spanishEditor" Id="blog-content-es" Label="@Localizer["BlogPostContent"]"
+                                           BlogPostId="@id" Language="@EditorLanguage" @bind-Value="model.SpanishContent"
+                                           OnImageUploaded="ReloadImagesAsync" />
+                    @FieldErrors("Spanish.Content")
+                </div>
+                <div class="admin-field">
+                    <label for="blog-image-alt-es">@Localizer["BlogPostFeaturedImageAlt"]</label>
+                    <InputText id="blog-image-alt-es" @bind-Value="model.SpanishImageAlt" maxlength="500" />
+                    @FieldErrors("Spanish.FeaturedImageAlt")
+                </div>
+            </MudPaper>
+
+            <MudPaper Elevation="1" Class="pa-5 mb-4">
+                <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["BlogPostEnglish"]</MudText>
+                @if (!TranslationIsFilled(model.EnglishTitle, model.EnglishSlug, model.EnglishExcerpt, model.EnglishContent))
+                {
+                    <MudAlert Severity="Severity.Warning" Role="status">@Localizer["BlogPostTranslationMissingEnglish"]</MudAlert>
+                }
+                <div class="admin-field">
+                    <label for="blog-title-en">@Localizer["BlogPostTitle"]</label>
+                    <InputText id="blog-title-en" @bind-Value="model.EnglishTitle" maxlength="200" />
+                    @FieldErrors("English.Title")
+                </div>
+                <div class="admin-field">
+                    <label for="blog-slug-en">@Localizer["BlogPostSlug"]</label>
+                    <InputText id="blog-slug-en" @bind-Value="model.EnglishSlug" maxlength="200" />
+                    @FieldErrors("English.Slug")
+                </div>
+                <div class="admin-field">
+                    <label for="blog-excerpt-en">@Localizer["BlogPostExcerpt"]</label>
+                    <InputTextArea id="blog-excerpt-en" @bind-Value="model.EnglishExcerpt" maxlength="500" rows="3" />
+                    @FieldErrors("English.Excerpt")
+                </div>
+                <div class="admin-field">
+                    <label for="blog-content-en">@Localizer["BlogPostContent"]</label>
+                    <BlogPostContentEditor @key="id" @ref="englishEditor" Id="blog-content-en" Label="@Localizer["BlogPostContent"]"
+                                           BlogPostId="@id" Language="@EditorLanguage" @bind-Value="model.EnglishContent"
+                                           OnImageUploaded="ReloadImagesAsync" />
+                    @FieldErrors("English.Content")
+                </div>
+                <div class="admin-field">
+                    <label for="blog-image-alt-en">@Localizer["BlogPostFeaturedImageAlt"]</label>
+                    <InputText id="blog-image-alt-en" @bind-Value="model.EnglishImageAlt" maxlength="500" />
+                    @FieldErrors("English.FeaturedImageAlt")
+                </div>
+            </MudPaper>
+
+            @if (saveError is not null)
+            {
+                <MudAlert Severity="Severity.Error" Role="alert">@saveError</MudAlert>
+            }
+            @if (saveSuccess is not null)
+            {
+                <MudAlert Severity="Severity.Success" Role="status">@saveSuccess</MudAlert>
+            }
+            <div class="experience-admin-actions">
+                <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Disabled="saving">
+                    @Localizer[saving ? "BlogPostSaving" : "Save"]
+                </MudButton>
+                <NavLink class="button button--secondary" href="/admin/blog" data-unsaved-navigation>@Localizer["Cancel"]</NavLink>
+            </div>
+        </EditForm>
+
+        @if (id is { } blogPostId)
+        {
+            <MudPaper Elevation="1" Class="pa-5 mt-6">
+                <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["BlogPostImages"]</MudText>
+                <MudText Typo="Typo.body2">@Localizer["BlogImageRules", ImageService.MaximumFileSizeBytes / 1024 / 1024]</MudText>
+                <div class="admin-field blog-image-upload-area" data-ignore-unsaved-changes>
+                    <label for="blog-image-upload">@Localizer["BlogImageUpload"]</label>
+                    <InputFile id="blog-image-upload" OnChange="UploadImagesAsync" accept=".jpg,.jpeg,.png,.webp,.svg" multiple />
+                </div>
+                <div class="blog-image-list">
+                    @if (images.Count == 0)
+                    {
+                        <MudText>@Localizer["BlogImagesEmpty"]</MudText>
+                    }
+                    else
+                    {
+                        @foreach (var image in images)
+                        {
+                            <article class="certification-attachment-list__item blog-image-list__item">
+                                <img class="admin-image-preview" src="@($"/admin/blog-post-images/{image.Id}")" alt="@Localizer["BlogImagePreviewAlt"]" />
+                                <span class="certification-attachment-list__size">@(image.SizeBytes / 1024) KB</span>
+                                <div class="certification-attachment-list__controls">
+                                    @if (image.IsFeatured)
+                                    {
+                                        <MudChip T="string" Color="Color.Info" Variant="Variant.Outlined">@Localizer["BlogImageFeatured"]</MudChip>
+                                    }
+                                    @if (!image.IsFeatured)
+                                    {
+                                        <MudButton OnClick="@(() => SetFeaturedImageAsync(image.Id))" Variant="Variant.Outlined" Color="Color.Primary">@Localizer["BlogImageSetFeatured"]</MudButton>
+                                    }
+                                    <MudButton OnClick="@(() => RequestImageDelete(image.Id))" Variant="Variant.Outlined" Color="Color.Error">@Localizer["Delete"]</MudButton>
+                                </div>
+                            </article>
+                        }
+                    }
+                </div>
+                @if (pendingImageDelete is { } imageToDelete)
+                {
+                    <MudAlert Severity="Severity.Warning" Role="alert" Class="mt-4">
+                        @Localizer["BlogImageDeleteConfirmation"]
+                        <MudButton OnClick="@(() => DeleteImageAsync(imageToDelete))" Color="Color.Error" Variant="Variant.Filled">@Localizer["Delete"]</MudButton>
+                        <MudButton OnClick="CancelImageDelete" Variant="Variant.Outlined">@Localizer["Cancel"]</MudButton>
+                    </MudAlert>
+                }
+                @if (imageMessage is not null)
+                {
+                    <MudAlert Severity="@imageSeverity" Class="mt-4" Role="status">@imageMessage</MudAlert>
+                }
+            </MudPaper>
+        }
+    }
+</MudContainer>
+
+@code {
+    [Parameter]
+    public Guid? Id { get; set; }
+
+    private readonly BlogPostFormModel model = new();
+    private readonly Dictionary<string, string> fieldErrors = new(StringComparer.Ordinal);
+    private IReadOnlyList<BlogPostImageReadModel> images = [];
+    private BlogPostContentEditor? spanishEditor;
+    private BlogPostContentEditor? englishEditor;
+    private Guid? pendingImageDelete;
+    private Guid? id;
+    private DateTimeOffset? publishedOn;
+    private bool loaded;
+    private bool loadFailed;
+    private bool saving;
+    private string? saveError;
+    private string? saveSuccess;
+    private BlogPostSnapshot? initialSnapshot;
+    private string? imageMessage;
+    private Severity imageSeverity = Severity.Info;
+    private IJSObjectReference? unsavedChangesModule;
+    private bool unsavedChangesModuleInitialized;
+    private bool beforeUnloadEnabled;
+
+    private bool IsNew => Id is null;
+    private bool HasUnsavedChanges => loaded && !loadFailed && initialSnapshot is not null && CaptureSnapshot() != initialSnapshot;
+    private string EditorLanguage => CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!loaded || loadFailed)
+        {
+            return;
+        }
+
+        unsavedChangesModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./js/experience-unsaved-changes.js?v=11");
+        if (!unsavedChangesModuleInitialized)
+        {
+            await unsavedChangesModule.InvokeVoidAsync(
+                "initialize",
+                "blog-post-edit-form",
+                Localizer["BlogPostUnsavedChangesTitle"].Value,
+                Localizer["BlogPostUnsavedChangesConfirmation"].Value,
+                Localizer["StayOnPage"].Value,
+                Localizer["DiscardChanges"].Value,
+                null);
+            unsavedChangesModuleInitialized = true;
+        }
+
+        if (beforeUnloadEnabled != HasUnsavedChanges)
+        {
+            beforeUnloadEnabled = HasUnsavedChanges;
+            await unsavedChangesModule.InvokeVoidAsync("setEnabled", beforeUnloadEnabled);
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id is null)
+        {
+            initialSnapshot = CaptureSnapshot();
+            loaded = true;
+            return;
+        }
+
+        var details = await BlogPostService.GetBlogPostAsync(Id.Value);
+        if (details is null)
+        {
+            loadFailed = true;
+            loaded = true;
+            return;
+        }
+
+        id = details.Id;
+        publishedOn = details.PublishedOn;
+        model.EditorialStatus = details.EditorialStatus;
+        model.IsFeatured = details.IsFeatured;
+        model.SpanishTitle = details.Spanish.Title;
+        model.SpanishSlug = details.Spanish.Slug;
+        model.SpanishExcerpt = details.Spanish.Excerpt;
+        model.SpanishContent = ToAdminImageUrls(details.Spanish.Content);
+        model.SpanishImageAlt = details.Spanish.FeaturedImageAlt ?? string.Empty;
+        model.EnglishTitle = details.English.Title;
+        model.EnglishSlug = details.English.Slug;
+        model.EnglishExcerpt = details.English.Excerpt;
+        model.EnglishContent = ToAdminImageUrls(details.English.Content);
+        model.EnglishImageAlt = details.English.FeaturedImageAlt ?? string.Empty;
+        images = await ImageService.GetImagesAsync(details.Id);
+        initialSnapshot = CaptureSnapshot();
+        loaded = true;
+    }
+
+    private RenderFragment FieldErrors(string field) => builder =>
+    {
+        if (fieldErrors.TryGetValue(field, out var error))
+        {
+            builder.OpenElement(0, "span");
+            builder.AddAttribute(1, "class", "field-validation-error");
+            builder.AddAttribute(2, "role", "alert");
+            builder.AddContent(3, Localizer[error]);
+            builder.CloseElement();
+        }
+    };
+
+    private async Task SaveAsync(EditContext _)
+    {
+        if (spanishEditor is not null)
+        {
+            model.SpanishContent = await spanishEditor.GetContentAsync();
+        }
+
+        if (englishEditor is not null)
+        {
+            model.EnglishContent = await englishEditor.GetContentAsync();
+        }
+
+        saving = true;
+        saveError = null;
+        saveSuccess = null;
+        fieldErrors.Clear();
+        var result = await BlogPostService.SaveAsync(new BlogPostEditRequest(
+            id,
+            model.EditorialStatus,
+            model.IsFeatured,
+            new BlogPostTranslationInput(model.SpanishTitle, model.SpanishSlug, model.SpanishExcerpt, ToPublicImageUrls(model.SpanishContent), model.SpanishImageAlt),
+            new BlogPostTranslationInput(model.EnglishTitle, model.EnglishSlug, model.EnglishExcerpt, ToPublicImageUrls(model.EnglishContent), model.EnglishImageAlt)));
+        saving = false;
+
+        if (!result.Succeeded)
+        {
+            foreach (var error in result.Errors)
+            {
+                fieldErrors[error.Field] = error.ResourceKey;
+            }
+
+            saveError = Localizer["BlogPostSaveFailed"];
+            return;
+        }
+
+        var wasNew = Id is null;
+        id = result.BlogPostId;
+        initialSnapshot = CaptureSnapshot();
+        saveSuccess = Localizer["BlogPostSaved"];
+        await DisableUnsavedChangesProtectionAsync();
+        if (wasNew)
+        {
+            Navigation.NavigateTo($"/admin/blog/edit/{id}", replace: true);
+        }
+    }
+
+    private static bool TranslationIsFilled(string title, string slug, string excerpt, string content) =>
+        !string.IsNullOrWhiteSpace(title)
+        && !string.IsNullOrWhiteSpace(slug)
+        && !string.IsNullOrWhiteSpace(excerpt)
+        && !string.IsNullOrWhiteSpace(content);
+
+    private static string ToAdminImageUrls(string content) =>
+        content.Replace("/blog-post-images/", "/admin/blog-post-images/", StringComparison.OrdinalIgnoreCase);
+
+    private static string ToPublicImageUrls(string content) =>
+        content.Replace("/admin/blog-post-images/", "/blog-post-images/", StringComparison.OrdinalIgnoreCase);
+
+    private BlogPostSnapshot CaptureSnapshot() => new(
+        model.EditorialStatus, model.IsFeatured,
+        model.SpanishTitle, model.SpanishSlug, model.SpanishExcerpt, model.SpanishContent, model.SpanishImageAlt,
+        model.EnglishTitle, model.EnglishSlug, model.EnglishExcerpt, model.EnglishContent, model.EnglishImageAlt);
+
+    private async Task ReloadImagesAsync()
+    {
+        if (id is { } blogPostId)
+        {
+            images = await ImageService.GetImagesAsync(blogPostId);
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task UploadImagesAsync(InputFileChangeEventArgs args)
+    {
+        if (id is not { } blogPostId)
+        {
+            return;
+        }
+
+        foreach (var file in args.GetMultipleFiles())
+        {
+            try
+            {
+                await using var stream = file.OpenReadStream(ImageService.MaximumFileSizeBytes);
+                var result = await ImageService.UploadImageAsync(blogPostId, file.Name, file.ContentType, file.Size, stream);
+                imageSeverity = result.Succeeded ? Severity.Success : Severity.Error;
+                imageMessage = Localizer[result.Error switch
+                {
+                    BlogPostImageError.None => "BlogImageUploaded",
+                    BlogPostImageError.UnsupportedType => "BlogImageUnsupportedType",
+                    BlogPostImageError.TooLarge => "BlogImageTooLarge",
+                    BlogPostImageError.InvalidContent => "BlogImageInvalidContent",
+                    _ => "BlogImageUploadFailed"
+                }];
+            }
+            catch (IOException)
+            {
+                imageSeverity = Severity.Error;
+                imageMessage = Localizer["BlogImageTooLarge"];
+            }
+        }
+
+        await ReloadImagesAsync();
+    }
+
+    private async Task SetFeaturedImageAsync(Guid imageId)
+    {
+        var result = await ImageService.SetFeaturedImageAsync(imageId);
+        imageSeverity = result.Succeeded ? Severity.Success : Severity.Error;
+        imageMessage = Localizer[result.Succeeded ? "BlogImageFeaturedSet" : "BlogImageOperationFailed"];
+        await ReloadImagesAsync();
+    }
+
+    private void RequestImageDelete(Guid imageId) => pendingImageDelete = imageId;
+    private void CancelImageDelete() => pendingImageDelete = null;
+
+    private bool ImageIsInContent(Guid imageId)
+    {
+        var publicUrl = "/blog-post-images/" + imageId;
+        var administrativeUrl = "/admin/blog-post-images/" + imageId;
+        return model.SpanishContent.Contains(publicUrl, StringComparison.OrdinalIgnoreCase)
+            || model.EnglishContent.Contains(publicUrl, StringComparison.OrdinalIgnoreCase)
+            || model.SpanishContent.Contains(administrativeUrl, StringComparison.OrdinalIgnoreCase)
+            || model.EnglishContent.Contains(administrativeUrl, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private async Task DeleteImageAsync(Guid imageId)
+    {
+        if (ImageIsInContent(imageId))
+        {
+            imageSeverity = Severity.Error;
+            imageMessage = Localizer["BlogImageInUse"];
+        }
+        else
+        {
+            var result = await ImageService.DeleteImageAsync(imageId);
+            imageSeverity = result == BlogPostImageError.None ? Severity.Success : Severity.Error;
+            imageMessage = Localizer[result switch
+            {
+                BlogPostImageError.None => "BlogImageDeleted",
+                BlogPostImageError.InUse => "BlogImageInUse",
+                _ => "BlogImageOperationFailed"
+            }];
+            await ReloadImagesAsync();
+        }
+
+        pendingImageDelete = null;
+    }
+
+    private async Task DisableUnsavedChangesProtectionAsync()
+    {
+        beforeUnloadEnabled = false;
+        if (unsavedChangesModule is not null)
+        {
+            await unsavedChangesModule.InvokeVoidAsync("setEnabled", false);
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (unsavedChangesModule is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await unsavedChangesModule.InvokeVoidAsync("setEnabled", false);
+            await unsavedChangesModule.InvokeVoidAsync("dispose");
+            await unsavedChangesModule.DisposeAsync();
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+    }
+
+    private sealed class BlogPostFormModel
+    {
+        public BlogPostEditorialStatus EditorialStatus { get; set; } = BlogPostEditorialStatus.Draft;
+        public bool IsFeatured { get; set; }
+        public string SpanishTitle { get; set; } = string.Empty;
+        public string SpanishSlug { get; set; } = string.Empty;
+        public string SpanishExcerpt { get; set; } = string.Empty;
+        public string SpanishContent { get; set; } = string.Empty;
+        public string SpanishImageAlt { get; set; } = string.Empty;
+        public string EnglishTitle { get; set; } = string.Empty;
+        public string EnglishSlug { get; set; } = string.Empty;
+        public string EnglishExcerpt { get; set; } = string.Empty;
+        public string EnglishContent { get; set; } = string.Empty;
+        public string EnglishImageAlt { get; set; } = string.Empty;
+    }
+
+    private sealed record BlogPostSnapshot(
+        BlogPostEditorialStatus EditorialStatus,
+        bool IsFeatured,
+        string SpanishTitle, string SpanishSlug, string SpanishExcerpt, string SpanishContent, string SpanishImageAlt,
+        string EnglishTitle, string EnglishSlug, string EnglishExcerpt, string EnglishContent, string EnglishImageAlt);
+}

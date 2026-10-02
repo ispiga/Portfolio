@@ -142,6 +142,23 @@ public sealed class ProjectPreviewImageStorageService(
         return new ProjectImageContent(new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.Read), contentType);
     }
 
+    public async Task<long?> GetPreviewImageSizeAsync(
+        Guid projectId,
+        CancellationToken cancellationToken = default)
+    {
+        await using var context = await dbContextFactory.CreateDbContextAsync(cancellationToken);
+        var path = await context.Projects.AsNoTracking()
+            .Where(project => project.Id == projectId)
+            .Select(project => project.PreviewImagePath)
+            .SingleOrDefaultAsync(cancellationToken);
+        if (path is null || !TryGetStoredPath(path, out var fullPath) || !File.Exists(fullPath))
+        {
+            return null;
+        }
+
+        return new FileInfo(fullPath).Length;
+    }
+
     private static string ResolveStorageRoot(IWebHostEnvironment environment, string directory)
     {
         var root = Path.GetFullPath(Path.IsPathRooted(directory)

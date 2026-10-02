@@ -1,6 +1,7 @@
 using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using Portfolio.Application.Blog;
+using Portfolio.Domain.Entities;
 
 namespace Portfolio.Infrastructure.Services;
 
@@ -15,7 +16,7 @@ public sealed class BlogPostQueryService(
 
         var blogPosts = await context.BlogPosts
             .AsNoTracking()
-            .Where(blogPost => blogPost.IsPublished
+            .Where(blogPost => blogPost.EditorialStatus == BlogPostEditorialStatus.Published
                 && blogPost.PublishedOn.HasValue
                 && blogPost.PublishedOn <= now)
             .Include(blogPost => blogPost.Translations)

@@ -1,0 +1,119 @@
+@using Microsoft.Extensions.Localization
+@using Microsoft.Extensions.Logging
+@using Microsoft.JSInterop
+@inject IStringLocalizer<SharedResource> Localizer
+@inject ILogger<BlogPostContentEditor> Logger
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<textarea id="@Id" class="blog-rich-text-editor" aria-label="@Label">@Value</textarea>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Id { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string Label { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Value { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
+
+    [Parameter]
+    public string Language { get; set; } = "es";
+
+    [Parameter]
+    public EventCallback OnImageUploaded { get; set; }
+
+    private IJSObjectReference? module;
+    private DotNetObjectReference<BlogPostContentEditor>? objectReference;
+    private bool initializationStarted;
+    private bool disposed;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender || initializationStarted || disposed)
+        {
+            return;
+        }
+
+        initializationStarted = true;
+        var startedAt = System.Diagnostics.Stopwatch.GetTimestamp();
+        Logger.LogDebug("Starting TinyMCE initialization for editor {EditorId}.", Id);
+
+        try
+        {
+            module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/blog-tinymce.js?v=4");
+            if (disposed)
+            {
+                await module.DisposeAsync();
+                module = null;
+                return;
+            }
+
+            objectReference = DotNetObjectReference.Create(this);
+            await module.InvokeVoidAsync(
+                "initialize",
+                Id,
+                Value,
+                Language,
+                BlogPostId,
+                objectReference,
+                Localizer["BlogImageSaveArticleFirst"].Value);
+            Logger.LogDebug(
+                "TinyMCE initialized for editor {EditorId} in {ElapsedMilliseconds} ms.",
+                Id,
+                System.Diagnostics.Stopwatch.GetElapsedTime(startedAt).TotalMilliseconds);
+        }
+        catch (JSDisconnectedException) when (disposed)
+        {
+            Logger.LogDebug("TinyMCE initialization ended after editor {EditorId} was disposed.", Id);
+        }
+        catch (TaskCanceledException) when (disposed)
+        {
+            Logger.LogDebug("TinyMCE initialization was canceled after editor {EditorId} was disposed.", Id);
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "TinyMCE initialization failed for editor {EditorId}.", Id);
+            throw;
+        }
+    }
+
+    public async Task<string> GetContentAsync() => module is null
+        ? Value
+        : await module.InvokeAsync<string>("getContent", Id);
+
+    [JSInvokable]
+    public async Task ContentChanged(string content) => await ValueChanged.InvokeAsync(content);
+
+    [JSInvokable]
+    public async Task ImageUploaded() => await OnImageUploaded.InvokeAsync();
+
+    [Parameter, EditorRequired]
+    public Guid? BlogPostId { get; set; }
+
+    public async ValueTask DisposeAsync()
+    {
+        disposed = true;
+
+        if (module is not null)
+        {
+            try
+            {
+                await module.InvokeVoidAsync("dispose", Id);
+                await module.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+            catch (TaskCanceledException)
+            {
+            }
+        }
+
+        objectReference?.Dispose();
+    }
+}

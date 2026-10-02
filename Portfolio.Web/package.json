@@ -7,7 +7,9 @@
     "assets:copy": "node ./scripts/copy-pdfjs.mjs"
   },
   "dependencies": {
-    "pdfjs-dist": "4.10.38"
+    "pdfjs-dist": "4.10.38",
+    "tinymce": "^8.9.2",
+    "tinymce-i18n": "^26.9.28"
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.1.13",

@@ -1,0 +1,124 @@
+@page "/admin/blog"
+@attribute [Authorize(Policy = PortfolioAuthorization.AdministratorPolicy)]
+@layout AdminLayout
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.Extensions.Localization
+@using Portfolio.Application.Blog
+@using Portfolio.Domain.Entities
+@using Portfolio.Infrastructure.Identity
+@inject IBlogPostAdministrationService BlogPostService
+@inject IStringLocalizer<SharedResource> Localizer
+
+<PageTitle>@Localizer["BlogAdminTitle"]</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="admin-dashboard">
+    <header class="admin-dashboard__heading">
+        <MudText Typo="Typo.h1" Tag="@("h1")">@Localizer["BlogAdminTitle"]</MudText>
+        <MudText Typo="Typo.body1">@Localizer["BlogAdminDescription"]</MudText>
+    </header>
+    <MudButton Href="/admin/blog/edit" Color="Color.Primary" Variant="Variant.Filled" Class="mb-4" data-unsaved-navigation>
+        @Localizer["BlogPostCreate"]
+    </MudButton>
+
+    @if (posts is null)
+    {
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary" aria-label="@Localizer["Loading"]" />
+    }
+    else if (posts.Count == 0)
+    {
+        <MudPaper Elevation="1" Class="pa-5"><MudText>@Localizer["BlogAdminEmpty"]</MudText></MudPaper>
+    }
+    else
+    {
+        <MudTable Items="posts" Hover="true" Breakpoint="Breakpoint.Sm">
+            <HeaderContent>
+                <MudTh>@Localizer["BlogPostTitle"]</MudTh>
+                <MudTh>@Localizer["BlogPostEditorialStatus"]</MudTh>
+                <MudTh>@Localizer["BlogPostFeatured"]</MudTh>
+                <MudTh>@Localizer["BlogPostTranslations"]</MudTh>
+                <MudTh>@Localizer["BlogPostImages"]</MudTh>
+                <MudTh><span class="visually-hidden">@Localizer["Actions"]</span></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="@Localizer["BlogPostTitle"]">@context.SpanishTitle</MudTd>
+                <MudTd DataLabel="@Localizer["BlogPostEditorialStatus"]">@StatusLabel(context.EditorialStatus)</MudTd>
+                <MudTd DataLabel="@Localizer["BlogPostFeatured"]">
+                    @Localizer[context.IsFeatured ? "BlogPostFeatured" : "BlogPostNotFeatured"]
+                </MudTd>
+                <MudTd DataLabel="@Localizer["BlogPostTranslations"]">
+                    @if (!context.HasSpanishTranslation)
+                    {
+                        <MudChip T="string" Color="Color.Warning" Variant="Variant.Outlined">@Localizer["BlogPostTranslationMissingSpanish"]</MudChip>
+                    }
+                    @if (!context.HasEnglishTranslation)
+                    {
+                        <MudChip T="string" Color="Color.Warning" Variant="Variant.Outlined">@Localizer["BlogPostTranslationMissingEnglish"]</MudChip>
+                    }
+                </MudTd>
+                <MudTd DataLabel="@Localizer["BlogPostImages"]">@context.ImageCount</MudTd>
+                <MudTd>
+                    <MudButton Href="@($"/admin/blog/edit/{context.Id}")" Variant="Variant.Outlined" Color="Color.Primary" data-unsaved-navigation>@Localizer["Edit"]</MudButton>
+                    <MudButton OnClick="@(() => RequestDelete(context.Id))" Variant="Variant.Outlined" Color="Color.Error">@Localizer["Delete"]</MudButton>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    }
+
+    @if (deleteId is { } pendingId)
+    {
+        <MudAlert Severity="Severity.Warning" Class="mt-4" Role="alert">
+            @Localizer["BlogPostDeleteConfirmation"]
+            <MudButton OnClick="@(() => ConfirmDeleteAsync(pendingId))" Color="Color.Error" Variant="Variant.Filled">@Localizer["Delete"]</MudButton>
+            <MudButton OnClick="CancelDelete" Variant="Variant.Outlined">@Localizer["Cancel"]</MudButton>
+        </MudAlert>
+    }
+    @if (operationMessage is not null)
+    {
+        <MudAlert Severity="@operationSeverity" Class="mt-4" Role="status">@operationMessage</MudAlert>
+    }
+</MudContainer>
+
+@code {
+    private IReadOnlyList<BlogPostAdminListItem>? posts;
+    private Guid? deleteId;
+    private string? operationMessage;
+    private Severity operationSeverity = Severity.Info;
+
+    protected override async Task OnInitializedAsync() => await ReloadAsync();
+
+    private async Task ReloadAsync() => posts = await BlogPostService.GetBlogPostsAsync();
+
+    private string StatusLabel(BlogPostEditorialStatus status) => Localizer[status switch
+    {
+        BlogPostEditorialStatus.Draft => "BlogPostStatusDraft",
+        BlogPostEditorialStatus.ReadyToPublish => "BlogPostStatusReadyToPublish",
+        _ => "BlogPostStatusPublished"
+    }];
+
+    private void RequestDelete(Guid id)
+    {
+        deleteId = id;
+        operationMessage = null;
+    }
+
+    private void CancelDelete() => deleteId = null;
+
+    private async Task ConfirmDeleteAsync(Guid id)
+    {
+        var result = await BlogPostService.DeleteAsync(id);
+        deleteId = null;
+        if (result == BlogPostDeleteResult.Deleted)
+        {
+            operationMessage = Localizer["BlogPostDeleted"];
+            operationSeverity = Severity.Success;
+            await ReloadAsync();
+        }
+        else
+        {
+            operationMessage = Localizer[result == BlogPostDeleteResult.HasImages
+                ? "BlogPostDeleteHasImages"
+                : "BlogPostNotFound"];
+            operationSeverity = Severity.Error;
+        }
+    }
+}

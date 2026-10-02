@@ -2,8 +2,7 @@
 
 ## Project context
 
-- Consult `../PORTFOLIO_PROJECT.md` when the task depends on project architecture, technology choices, conventions, routes, UX decisions or other project-level requirements.
-- Treat `../PORTFOLIO_PROJECT.md` as the source of truth for project decisions.
+- Consult `Portfolio\PORTFOLIO_PROJECT.md` when the task depends on project architecture, technology choices, conventions, routes, UX decisions or other project-level requirements. Treat `Portfolio\PORTFOLIO_PROJECT.md` as the source of truth for project decisions.
 - Do not introduce alternatives that conflict with the project specification without identifying the conflict first.
 - Keep changes focused on the requested task. Do not modify unrelated projects, files or architecture.
 
@@ -50,9 +49,11 @@
 - Preserve the Experience editor's existing save flow and unsaved-change behavior. Show its localized success message only after the experience and all pending attachment changes have saved successfully; do not report success when validation or persistence fails. Keep attachment display-name/visibility edits within unsaved-change tracking, ask for confirmation before deleting an attachment or publishing it, and do not trigger the document-exit warning as part of a successful save. Avoid `@bind-Value:event="oninput"` on the editor's `InputText`/`InputTextArea` controls; the existing binding pattern avoids a Blazor event-argument type mismatch in Interactive Server.
 - Preserve the Projects editor's unsaved-change protection: use the localized application dialog for marked internal navigation and logout, and browser-native `beforeunload`/navigation confirmation for document exits such as refresh, close and back. Keep successful saves from triggering the exit warning and leave protection active after validation or persistence failures. Project preview image uploads/deletions persist immediately and must not activate unsaved-form warnings by themselves; cache-bust the preview after replacement.
 - In the Projects editor, require a complete Spanish title/summary for public fallback; English may be omitted and its absence must be clearly localized. Keep localized project slugs optional and disabled in the editor until project detail pages are implemented; preserve any existing values and do not generate placeholder slugs. Preserve the public order and translation fallback. `IsFeatured` visually emphasizes the card without reordering projects; the card can expand its localized long description. Preview images are public JPG/JPEG/PNG files up to 10 MiB, stored outside `wwwroot` and SQL Server using the configurable `Portfolio:ProjectPreviewImages` options. The public preview URL must include a version based on its opaque stored filename so replacing an image updates the rendered card without a full page refresh. Do not add categories, tags, technologies or relationships unless the specification changes.
-- In the Certifications editor/public cards, keep `Details` localized, optional, and limited to 1,000 characters; render it collapsed with an accessible "Ver detalles" control after the credential ID. Show certificate dates as month/year while preserving the full date value. Attachment cards use editable `DisplayName` rather than `OriginalFileName` for user-visible text; keep the original filename and opaque storage key unchanged. The admin list shows size in KB, stacks each attachment vertically, and the general save action also persists pending display-name edits; only report success after all persistence succeeds.
-- Certification card attachments are public JPG/JPEG/PNG/PDF assets stored outside `wwwroot` and SQL Server. Do not turn the decorative plus placeholder (shown when a card image is missing) into an interactive control unless the specification explicitly changes.
-- Keep certification `Details` and project translation `Description` limited to 1,000 characters in validation, editor controls, and EF mappings. The generated project-description migration truncates existing values beyond 1,000 characters before changing the SQL column; do not apply migrations automatically or rewrite migration history for an already-applied schema.
+- In Blog administration, keep the editorial state explicit (`Draft`, `ReadyToPublish`, `Published`) and separate from translation completeness; preserve the existing published-post Home selection and Spanish fallback. Use local TinyMCE 8 only for `BlogPostTranslation.Content`. Blog images are JPG/JPEG/PNG/WebP/SVG up to 10 MiB, stored outside `wwwroot` and SQL Server per article with opaque keys; validate content and serve administrative previews only to administrators. Upload through authenticated multipart HTTP with antiforgery, not base64 JS interop. Public image reads must require a published post with a non-future publication date. Keep the generated Blog administration migration unapplied automatically.
+  - La Home presenta el artículo destacado como resumen no enlazado; no existe página pública de detalle ni consulta por slug. No crear ni asumir esa ruta sin una solicitud explícita de implementación.
+  - El listado admin muestra «Artículo destacado» después del estado editorial, y sus valores deben usar recursos propios del blog (`BlogPostFeatured` / `BlogPostNotFeatured`), no claves de proyectos.
+  - Mantener el espaciado vertical del bloque de subida/lista de imágenes del blog entre selector y tarjetas y entre cada tarjeta.
+  - La inicialización TinyMCE debe evitar llamadas duplicadas y manejar disposal concurrente; filtros de diagnóstico SignalR/circuitos solo en Development.
 
 ## Contact email
 
@@ -71,5 +72,5 @@
 
 - Prefer simple solutions over unnecessary abstractions or patterns.
 - Reuse existing components, services, styles and utilities before creating new ones.
-- Before introducing a new dependency, library or architectural pattern, verify that it is consistent with `../PORTFOLIO_PROJECT.md`.
-- Do not change established project decisions unless the task explicitly requires it.
+- Before introducing a new dependency, library or architectural pattern, verify that it is consistent with `Portfolio\PORTFOLIO_PROJECT.md`.
+- Do not change established project decisions unless the task explicitly requires it.- Do not change established project decisions unless the task explicitly requires it.

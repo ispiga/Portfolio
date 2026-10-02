@@ -14,6 +14,8 @@ public interface IProjectPreviewImageService
 
     Task<bool> DeleteAsync(Guid projectId, CancellationToken cancellationToken = default);
 
+    Task<long?> GetPreviewImageSizeAsync(Guid projectId, CancellationToken cancellationToken = default);
+
     Task<ProjectImageContent?> OpenPublicReadAsync(Guid projectId, CancellationToken cancellationToken = default);
 }
 

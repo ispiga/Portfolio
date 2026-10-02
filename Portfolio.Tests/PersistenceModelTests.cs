@@ -194,6 +194,26 @@ public sealed class PersistenceModelTests
     }
 
     [Fact]
+    public void Blog_editorial_status_is_persisted_as_an_enum_and_images_restrict_article_deletion()
+    {
+        using var context = CreateContext();
+        var postEntity = context.Model.FindEntityType(typeof(BlogPost))!;
+        var status = postEntity.FindProperty(nameof(BlogPost.EditorialStatus))!;
+        Assert.Equal(typeof(BlogPostEditorialStatus), status.ClrType);
+        Assert.Equal("int", status.GetColumnType());
+        Assert.Equal(BlogPostEditorialStatus.Draft, status.GetDefaultValue());
+
+        var imageEntity = context.Model.FindEntityType(typeof(BlogPostImage))!;
+        var foreignKey = Assert.Single(imageEntity.GetForeignKeys());
+        Assert.Equal(DeleteBehavior.Restrict, foreignKey.DeleteBehavior);
+
+        var designTimePostEntity = context.GetService<IDesignTimeModel>().Model.FindEntityType(typeof(BlogPost))!;
+        var statusConstraint = Assert.Single(designTimePostEntity.GetCheckConstraints());
+        Assert.Equal("CK_BlogPosts_EditorialStatus", statusConstraint.Name);
+        Assert.Contains("0, 1, 2", statusConstraint.Sql);
+    }
+
+    [Fact]
     public void Project_translation_slugs_are_optional_and_unique_when_present()
     {
         using var context = CreateContext();
@@ -645,7 +665,7 @@ public sealed class PersistenceModelTests
         {
             Id = id,
             PublishedOn = publishedOn,
-            IsPublished = true,
+            EditorialStatus = BlogPostEditorialStatus.Published,
             IsFeatured = isFeatured,
             Translations = translations
         };

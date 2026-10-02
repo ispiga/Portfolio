@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.Logging;
 using MudBlazor.Services;
 using Portfolio.Infrastructure;
 using Portfolio.Infrastructure.Identity;
@@ -11,6 +12,13 @@ using Portfolio.Web.Authentication;
 using Portfolio.Web.Components;
 
 var builder = WebApplication.CreateBuilder(args);
+
+if (builder.Environment.IsDevelopment())
+{
+    builder.Logging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Debug);
+    builder.Logging.AddFilter("Microsoft.AspNetCore.Http.Connections", LogLevel.Debug);
+    builder.Logging.AddFilter("Microsoft.AspNetCore.Components.Server.Circuits", LogLevel.Debug);
+}
 
 builder.Services.AddLocalization();
 builder.Services.AddPortfolioPersistence(builder.Configuration);
@@ -118,6 +126,7 @@ app.MapAdminAuthentication();
 app.MapExperienceAttachmentEndpoints();
 app.MapProjectPreviewImageEndpoints();
 app.MapCertificationMediaEndpoints();
+app.MapBlogPostImageEndpoints();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 

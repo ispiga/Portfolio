@@ -47,6 +47,7 @@ public sealed class ProjectPreviewImageStorageTests : IDisposable
         Assert.Equal(ProjectImageError.None, result.Error);
         Assert.NotNull(result.ImagePath);
         Assert.DoesNotContain("client-name", result.ImagePath, StringComparison.Ordinal);
+        Assert.Equal(pngHeader.Length, await service.GetPreviewImageSizeAsync(project.Id));
         var content = await service.OpenPublicReadAsync(project.Id);
         Assert.NotNull(content);
         Assert.Equal("image/png", content.ContentType);
@@ -56,6 +57,7 @@ public sealed class ProjectPreviewImageStorageTests : IDisposable
         }
 
         Assert.True(await service.DeleteAsync(project.Id));
+        Assert.Null(await service.GetPreviewImageSizeAsync(project.Id));
         await using var context = factory.CreateDbContext();
         Assert.Null((await context.Projects.SingleAsync(candidate => candidate.Id == project.Id)).PreviewImagePath);
     }
