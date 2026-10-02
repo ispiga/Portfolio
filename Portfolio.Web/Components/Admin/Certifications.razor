@@ -32,14 +32,14 @@
         <MudTable Items="certifications" Hover="true" Breakpoint="Breakpoint.Sm">
             <HeaderContent>
                 <MudTh>@Localizer["CertificationOrder"]</MudTh>
-                <MudTh>@Localizer["CertificationSpanish"]</MudTh>
+                <MudTh>@Localizer["CertificationName"]</MudTh>
                 <MudTh>@Localizer["CertificationMedia"]</MudTh>
                 <MudTh>@Localizer["ProjectTranslations"]</MudTh>
                 <MudTh><span class="visually-hidden">@Localizer["Actions"]</span></MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd DataLabel="@Localizer["CertificationOrder"]">@context.DisplayOrder</MudTd>
-                <MudTd DataLabel="@Localizer["CertificationSpanish"]">@context.SpanishName</MudTd>
+                <MudTd DataLabel="@Localizer["CertificationName"]">@context.SpanishName</MudTd>
                 <MudTd DataLabel="@Localizer["CertificationMedia"]">
                     @if (context.HasImage)
                     {

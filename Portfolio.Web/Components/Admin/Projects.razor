@@ -33,14 +33,14 @@
         <MudTable Items="projects" Hover="true" Breakpoint="Breakpoint.Sm">
             <HeaderContent>
                 <MudTh>@Localizer["ProjectOrder"]</MudTh>
-                <MudTh>@Localizer["ProjectSpanish"]</MudTh>
+                <MudTh>@Localizer["ProjectTitle"]</MudTh>
                 <MudTh>@Localizer["ProjectFeatured"]</MudTh>
                 <MudTh>@Localizer["ProjectTranslations"]</MudTh>
                 <MudTh><span class="visually-hidden">@Localizer["Actions"]</span></MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd DataLabel="@Localizer["ProjectOrder"]">@context.DisplayOrder</MudTd>
-                <MudTd DataLabel="@Localizer["ProjectSpanish"]">@context.SpanishTitle</MudTd>
+                <MudTd DataLabel="@Localizer["ProjectTitle"]">@context.SpanishTitle</MudTd>
                 <MudTd DataLabel="@Localizer["ProjectFeatured"]">@Localizer[context.IsFeatured ? "ProjectFeatured" : "ProjectNotFeatured"]</MudTd>
                 <MudTd DataLabel="@Localizer["ProjectTranslations"]">
                     @if (!context.HasSpanishTranslation)

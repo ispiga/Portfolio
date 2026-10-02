@@ -13,7 +13,9 @@ public sealed class ExperienceAdministrationService(
         await using var context = await dbContextFactory.CreateDbContextAsync(cancellationToken);
         var experiences = await context.Experiences
             .AsNoTracking()
+            .AsSplitQuery()
             .Include(experience => experience.Translations)
+            .Include(experience => experience.Attachments)
             .OrderBy(experience => experience.DisplayOrder)
             .ThenBy(experience => experience.Id)
             .ToListAsync(cancellationToken);
@@ -29,7 +31,8 @@ public sealed class ExperienceAdministrationService(
                 experience.EndDate,
                 experience.DisplayOrder,
                 IsComplete(spanish),
-                IsComplete(FindTranslation(experience, "en-US")));
+                IsComplete(FindTranslation(experience, "en-US")),
+                experience.Attachments.Count);
         }).ToArray();
     }
 

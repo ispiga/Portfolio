@@ -33,15 +33,24 @@
         <MudTable Items="experiences" Hover="true" Breakpoint="Breakpoint.Sm">
             <HeaderContent>
                 <MudTh>@Localizer["ExperienceOrder"]</MudTh>
-                <MudTh>@Localizer["ExperienceSpanish"]</MudTh>
+                <MudTh>@Localizer["ExperienceRole"]</MudTh>
                 <MudTh>@Localizer["ExperienceCompany"]</MudTh>
+                <MudTh>@Localizer["CertificationMedia"]</MudTh>
                 <MudTh>@Localizer["ExperienceTranslations"]</MudTh>
                 <MudTh><span class="visually-hidden">@Localizer["Actions"]</span></MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd DataLabel="@Localizer["ExperienceOrder"]">@context.DisplayOrder</MudTd>
-                <MudTd DataLabel="@Localizer["ExperienceSpanish"]">@context.SpanishRoleTitle</MudTd>
+                <MudTd DataLabel="@Localizer["ExperienceRole"]">@context.SpanishRoleTitle</MudTd>
                 <MudTd DataLabel="@Localizer["ExperienceCompany"]">@context.SpanishCompanyName</MudTd>
+                <MudTd DataLabel="@Localizer["CertificationMedia"]">
+                    @if (context.AttachmentCount > 0)
+                    {
+                        <MudChip T="string" Color="Color.Info" Variant="Variant.Outlined">
+                            @Localizer["CertificationAttachmentCount", context.AttachmentCount]
+                        </MudChip>
+                    }
+                </MudTd>
                 <MudTd DataLabel="@Localizer["ExperienceTranslations"]">
                     @if (!context.HasSpanishTranslation)
                     {

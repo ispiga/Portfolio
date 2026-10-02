@@ -8,7 +8,8 @@ public sealed record ExperienceAdminListItem(
     DateOnly? EndDate,
     int DisplayOrder,
     bool HasSpanishTranslation,
-    bool HasEnglishTranslation);
+    bool HasEnglishTranslation,
+    int AttachmentCount = 0);
 
 public sealed record ExperienceAdminDetails(
     Guid Id,
