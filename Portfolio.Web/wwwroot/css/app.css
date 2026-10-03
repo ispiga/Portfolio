@@ -968,11 +968,10 @@ p {
     gap: 0.75rem;
 }
 
-.experience-attachment-list { padding-inline-start: 1.25rem; }
+.experience-attachment-list { display: grid; gap: 0.75rem; margin: 1rem 0; }
 
 .experience-attachment-list__item {
     align-items: flex-start;
-    margin-block: 0.75rem;
     padding: 0.75rem;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-medium);
@@ -1052,6 +1051,12 @@ p {
     }
     .admin-header { align-items: flex-start; flex-direction: column; }
     .admin-account { justify-content: space-between; width: 100%; }
+    .experience-attachment-list__item { flex-direction: column; }
+    .experience-attachment-list__controls { flex: 1 1 auto; flex-direction: column; flex-wrap: nowrap; align-items: stretch; width: 100%; }
+    .experience-attachment-name { width: 100%; flex: 0 0 auto; }
+    .experience-attachment-actions { display: flex; flex-wrap: nowrap; align-items: center; gap: 0.5rem; width: 100%; }
+    .experience-attachment-visibility { flex: 0 0 auto; }
+    .experience-attachment-actions .mud-button-root { min-width: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {

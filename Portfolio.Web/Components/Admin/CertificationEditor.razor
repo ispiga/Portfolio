@@ -110,87 +110,6 @@
                 </div>
             </MudPaper>
 
-            @if (id is { } certificationId)
-            {
-                <MudPaper Elevation="1" Class="pa-5 mb-4">
-                    <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["CertificationCardImage"]</MudText>
-                    <MudText Typo="Typo.body2">@Localizer["CertificationImageRules", MediaService.MaximumFileSizeBytes / 1024 / 1024]</MudText>
-                    @if (!string.IsNullOrWhiteSpace(model.ImagePath))
-                    {
-                        <img class="certification-card__image certification-editor__image" src="@CardImageUrl" alt="@Localizer["CertificationCardImageAlt", model.SpanishName]" />
-                        <MudButton OnClick="RequestCardImageDelete" Color="Color.Error" Variant="Variant.Outlined">@Localizer["CertificationImageDelete"]</MudButton>
-                    }
-                    <div class="admin-field">
-                        <label for="certification-card-image-upload">@Localizer["CertificationImageUpload"]</label>
-                        <InputFile @key="imageInputVersion" id="certification-card-image-upload" class="certification-media-upload" OnChange="UploadCardImageAsync" accept="image/jpeg,image/png,.jpg,.jpeg,.png" data-ignore-unsaved-changes />
-                    </div>
-                    @if (pendingCardImageDelete)
-                    {
-                        <MudAlert Severity="Severity.Warning" Role="alert">
-                            @Localizer["CertificationImageDeleteConfirmation"]
-                            <MudButton OnClick="DeleteCardImageAsync" Color="Color.Error" Variant="Variant.Filled">@Localizer["Delete"]</MudButton>
-                            <MudButton OnClick="CancelCardImageDelete" Variant="Variant.Outlined">@Localizer["Cancel"]</MudButton>
-                        </MudAlert>
-                    }
-                    @if (imageMessage is not null)
-                    {
-                        <MudAlert Severity="@imageSeverity" Role="status">@imageMessage</MudAlert>
-                    }
-                </MudPaper>
-
-                <MudPaper Elevation="1" Class="pa-5 mb-4">
-                    <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["CertificationAttachments"]</MudText>
-                    <MudText Typo="Typo.body2">@Localizer["CertificationAttachmentRules", MediaService.MaximumFileSizeBytes / 1024 / 1024]</MudText>
-                    <MudAlert Severity="Severity.Warning" Role="note">@Localizer["CertificationPublicFilesWarning"]</MudAlert>
-                    <div class="admin-field">
-                        <label for="certification-attachment-upload">@Localizer["CertificationAttachmentUpload"]</label>
-                        <InputFile @key="attachmentInputVersion" id="certification-attachment-upload" class="certification-media-upload" OnChange="UploadAttachmentAsync" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png" data-ignore-unsaved-changes />
-                    </div>
-                    @if (attachments.Count > 0)
-                    {
-                        <div class="certification-attachment-list">
-                            @foreach (var attachment in attachments)
-                            {
-                                <div class="certification-attachment-list__item">
-                                    <CertificationAttachmentPreview DisplayName="@GetAttachmentDisplayNameDraft(attachment)" ContentType="@attachment.ContentType" ContentUrl="@($"/certification-attachments/{attachment.Id}")" />
-                                    <span class="certification-attachment-list__size">@(attachment.SizeBytes / 1024) KB</span>
-                                    <div class="certification-attachment-list__controls">
-                                        <div class="admin-field certification-attachment-name">
-                                            <label for="@($"certification-attachment-name-{attachment.Id}")">@Localizer["CertificationAttachmentDisplayName"]</label>
-                                            <input id="@($"certification-attachment-name-{attachment.Id}")"
-                                                   type="text"
-                                                   maxlength="255"
-                                                   required
-                                                   value="@GetAttachmentDisplayNameDraft(attachment)"
-                                                   @oninput="@(args => SetAttachmentDisplayNameDraft(attachment.Id, args))" />
-                                        </div>
-                                        <MudButton OnClick="@(() => SaveAttachmentDisplayNameAsync(attachment))"
-                                                   Color="Color.Primary"
-                                                   Variant="Variant.Outlined"
-                                                   Disabled="@(!CanSaveAttachmentDisplayName(attachment) || saving)">
-                                            @Localizer["CertificationAttachmentSaveChanges"]
-                                        </MudButton>
-                                        <MudButton OnClick="@(() => RequestAttachmentDelete(attachment.Id))" Color="Color.Error" Variant="Variant.Outlined">@Localizer["Delete"]</MudButton>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                    }
-                    @if (pendingAttachmentDelete is { } pendingAttachment)
-                    {
-                        <MudAlert Severity="Severity.Warning" Role="alert">
-                            @Localizer["CertificationAttachmentDeleteConfirmation"]
-                            <MudButton OnClick="@(() => DeleteAttachmentAsync(pendingAttachment))" Color="Color.Error" Variant="Variant.Filled">@Localizer["Delete"]</MudButton>
-                            <MudButton OnClick="CancelAttachmentDelete" Variant="Variant.Outlined">@Localizer["Cancel"]</MudButton>
-                        </MudAlert>
-                    }
-                    @if (attachmentMessage is not null)
-                    {
-                        <MudAlert Severity="@attachmentSeverity" Role="status">@attachmentMessage</MudAlert>
-                    }
-                </MudPaper>
-            }
-
             @if (saveError is not null)
             {
                 <MudAlert Severity="Severity.Error" Role="alert">@saveError</MudAlert>
@@ -205,7 +124,95 @@
                 </MudButton>
                 <NavLink class="button button--secondary" href="/admin/certifications" data-unsaved-navigation>@Localizer["Cancel"]</NavLink>
             </div>
+            
+            <MudPaper Elevation="1" Class="pa-5 mt-6">
+                <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["CertificationCardImage"]</MudText>
+                <MudText Typo="Typo.body2">@Localizer["CertificationImageRules", MediaService.MaximumFileSizeBytes / 1024 / 1024]</MudText>
+                <div class="admin-field">
+                    <label for="certification-card-image-upload">@Localizer["CertificationImageUpload"]</label>
+                    <InputFile @key="imageInputVersion" id="certification-card-image-upload" class="certification-media-upload" OnChange="UploadCardImageAsync" accept="image/jpeg,image/png,.jpg,.jpeg,.png" data-ignore-unsaved-changes />
+                </div>
+                @if (!string.IsNullOrWhiteSpace(model.ImagePath))
+                {
+                    <div class="certification-attachment-list">
+                        <div class="certification-attachment-list__item project-preview-image-row">                          
+                            <img class="certification-card__image certification-editor__image" src="@CardImageUrl" alt="@Localizer["CertificationCardImageAlt", model.SpanishName]" />
+                            <span class="certification-attachment-list__size">@(model.ImageSizeBytes is null ? "" : $"{model.ImageSizeBytes / 1024} KB")</span>
+                            <div class="certification-attachment-list__controls">
+                                <MudButton OnClick="RequestCardImageDelete" Color="Color.Error" Variant="Variant.Outlined">@Localizer["CertificationImageDelete"]</MudButton>
+                            </div>                           
+                        </div>
+                    </div>
+                }
+                @if (pendingCardImageDelete)
+                {
+                    <MudAlert Severity="Severity.Warning" Role="alert">
+                        @Localizer["CertificationImageDeleteConfirmation"]
+                        <MudButton OnClick="DeleteCardImageAsync" Color="Color.Error" Variant="Variant.Filled">@Localizer["Delete"]</MudButton>
+                        <MudButton OnClick="CancelCardImageDelete" Variant="Variant.Outlined">@Localizer["Cancel"]</MudButton>
+                    </MudAlert>
+                }
+                @if (imageMessage is not null)
+                {
+                    <MudAlert Severity="@imageSeverity" Role="status">@imageMessage</MudAlert>
+                }
+            </MudPaper>        
         </EditForm>
+
+        @if (id is { } certificationId)
+        {
+            <MudPaper Elevation="1" Class="pa-5 mt-6">
+                <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["CertificationAttachments"]</MudText>
+                <MudText Typo="Typo.body2">@Localizer["CertificationAttachmentRules", MediaService.MaximumFileSizeBytes / 1024 / 1024]</MudText>
+                <MudAlert Severity="Severity.Warning" Role="note">@Localizer["CertificationPublicFilesWarning"]</MudAlert>
+                <div class="admin-field">
+                    <label for="certification-attachment-upload">@Localizer["CertificationAttachmentUpload"]</label>
+                    <InputFile @key="attachmentInputVersion" id="certification-attachment-upload" class="certification-media-upload" OnChange="UploadAttachmentAsync" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png" data-ignore-unsaved-changes />
+                </div>
+                @if (attachments.Count > 0)
+                {
+                    <div class="certification-attachment-list">
+                        @foreach (var attachment in attachments)
+                        {
+                            <div class="certification-attachment-list__item">
+                                <CertificationAttachmentPreview DisplayName="@GetAttachmentDisplayNameDraft(attachment)" ContentType="@attachment.ContentType" ContentUrl="@($"/certification-attachments/{attachment.Id}")" />
+                                <span class="certification-attachment-list__size">@(attachment.SizeBytes / 1024) KB</span>
+                                <div class="certification-attachment-list__controls">
+                                    <div class="admin-field certification-attachment-name">
+                                        <label for="@($"certification-attachment-name-{attachment.Id}")">@Localizer["CertificationAttachmentDisplayName"]</label>
+                                        <input id="@($"certification-attachment-name-{attachment.Id}")"
+                                        type="text"
+                                        maxlength="255"
+                                        required
+                                        value="@GetAttachmentDisplayNameDraft(attachment)"
+                                        @oninput="@(args => SetAttachmentDisplayNameDraft(attachment.Id, args))" />
+                                    </div>
+                                    <MudButton OnClick="@(() => SaveAttachmentDisplayNameAsync(attachment))"
+                                    Color="Color.Primary"
+                                    Variant="Variant.Outlined"
+                                    Disabled="@(!CanSaveAttachmentDisplayName(attachment) || saving)">
+                                        @Localizer["CertificationAttachmentSaveChanges"]
+                                    </MudButton>
+                                    <MudButton OnClick="@(() => RequestAttachmentDelete(attachment.Id))" Color="Color.Error" Variant="Variant.Outlined">@Localizer["Delete"]</MudButton>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                @if (pendingAttachmentDelete is { } pendingAttachment)
+                {
+                    <MudAlert Severity="Severity.Warning" Role="alert" Class="mt-4">
+                        @Localizer["CertificationAttachmentDeleteConfirmation"]
+                        <MudButton OnClick="@(() => DeleteAttachmentAsync(pendingAttachment))" Color="Color.Error" Variant="Variant.Filled">@Localizer["Delete"]</MudButton>
+                        <MudButton OnClick="CancelAttachmentDelete" Variant="Variant.Outlined">@Localizer["Cancel"]</MudButton>
+                    </MudAlert>
+                }
+                @if (attachmentMessage is not null)
+                {
+                    <MudAlert Severity="@attachmentSeverity" Class="mt-4" Role="status">@attachmentMessage</MudAlert>
+                }
+            </MudPaper>
+        }
     }
 </MudContainer>
 
@@ -319,6 +326,16 @@
         {
             attachmentDisplayNameDrafts[attachment.Id] = attachment.DisplayName;
         }
+
+        if (!string.IsNullOrWhiteSpace(details.ImagePath))
+        {
+            var imageDetails = await MediaService.OpenCardImageAsync(details.Id);
+            if (imageDetails != null && imageDetails.Content.CanSeek)
+            {
+                model.ImageSizeBytes = imageDetails.Content.Length;
+            }
+        }
+
         initialSnapshot = CaptureSnapshot();
         loaded = true;
     }
@@ -427,6 +444,7 @@
             if (result.Succeeded)
             {
                 model.ImagePath = (await CertificationService.GetCertificationAsync(certificationId))?.ImagePath;
+                model.ImageSizeBytes = file.Size;
             }
         }
         catch (IOException)
@@ -485,6 +503,7 @@
         if (id is { } certificationId && await MediaService.DeleteCardImageAsync(certificationId))
         {
             model.ImagePath = null;
+            model.ImageSizeBytes = null;
             imageMessage = Localizer["CertificationImageDeleted"];
             imageSeverity = Severity.Success;
         }
@@ -608,6 +627,7 @@
         public string EnglishName { get; set; } = string.Empty;
         public string EnglishIssuer { get; set; } = string.Empty;
         public string EnglishDetails { get; set; } = string.Empty;
+        public long? ImageSizeBytes { get; set; }
     }
 
     private sealed record CertificationSnapshot(

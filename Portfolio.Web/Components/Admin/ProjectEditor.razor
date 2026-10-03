@@ -112,41 +112,6 @@
                     @FieldErrors("English.Description")
                 </div>
             </MudPaper>
-
-            @if (id is { } projectId)
-            {
-                <MudPaper Elevation="1" Class="pa-5 mb-4">
-                    <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["ProjectPreviewImage"]</MudText>
-                    <MudText Typo="Typo.body2">@Localizer["ProjectImageRules", ImageService.MaximumFileSizeBytes / 1024 / 1024]</MudText>
-                    @if (!string.IsNullOrWhiteSpace(model.PreviewImagePath))
-                    {
-                        <div class="certification-attachment-list__item project-preview-image-row">
-                            <img class="admin-image-preview" src="@($"/project-preview-images/{projectId}?v={previewImageVersion}")" alt="@Localizer["ProjectPreviewImageAlt", model.SpanishTitle]" />
-                            <span class="certification-attachment-list__size">@(previewImageSizeBytes is { } size ? $"{size / 1024} KB" : "—")</span>
-                            <div class="certification-attachment-list__controls">
-                                <MudButton OnClick="RequestImageDelete" Color="Color.Error" Variant="Variant.Outlined">@Localizer["ProjectImageDelete"]</MudButton>
-                            </div>
-                        </div>
-                    }
-                    <div class="admin-field">
-                        <label for="project-preview-upload">@Localizer["ProjectImageUpload"]</label>
-                        <InputFile id="project-preview-upload" OnChange="UploadImageAsync" accept="image/jpeg,image/png,.jpg,.jpeg,.png" data-ignore-unsaved-changes />
-                    </div>
-                    @if (pendingImageDelete)
-                    {
-                        <MudAlert Severity="Severity.Warning" Role="alert">
-                            @Localizer["ProjectImageDeleteConfirmation"]
-                            <MudButton OnClick="DeleteImageAsync" Color="Color.Error" Variant="Variant.Filled">@Localizer["Delete"]</MudButton>
-                            <MudButton OnClick="CancelImageDelete" Variant="Variant.Outlined">@Localizer["Cancel"]</MudButton>
-                        </MudAlert>
-                    }
-                    @if (imageMessage is not null)
-                    {
-                        <MudAlert Severity="@imageSeverity" Role="status">@imageMessage</MudAlert>
-                    }
-                </MudPaper>
-            }
-
             @if (saveError is not null)
             {
                 <MudAlert Severity="Severity.Error" Role="alert">@saveError</MudAlert>
@@ -162,6 +127,41 @@
                 <NavLink class="button button--secondary" href="/admin/projects" data-unsaved-navigation>@Localizer["Cancel"]</NavLink>
             </div>
         </EditForm>
+        @if (id is { } projectId)
+        {
+            <MudPaper Elevation="1" Class="pa-5 mt-6">
+                <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["ProjectPreviewImage"]</MudText>
+                <MudText Typo="Typo.body2">@Localizer["ProjectImageRules", ImageService.MaximumFileSizeBytes / 1024 / 1024]</MudText>
+                <div class="admin-field">
+                    <label for="project-preview-upload">@Localizer["ProjectImageUpload"]</label>
+                    <InputFile id="project-preview-upload" OnChange="UploadImageAsync" accept="image/jpeg,image/png,.jpg,.jpeg,.png" data-ignore-unsaved-changes />
+                </div>
+                @if (!string.IsNullOrWhiteSpace(model.PreviewImagePath))
+                {
+                    <div class="certification-attachment-list">
+                        <div class="certification-attachment-list__item project-preview-image-row">
+                            <img class="admin-image-preview" src="@($"/project-preview-images/{projectId}?v={previewImageVersion}")" alt="@Localizer["ProjectPreviewImageAlt", model.SpanishTitle]" />
+                            <span class="certification-attachment-list__size">@(previewImageSizeBytes is { } size ? $"{size / 1024} KB" : "—")</span>
+                            <div class="certification-attachment-list__controls">
+                                <MudButton OnClick="RequestImageDelete" Color="Color.Error" Variant="Variant.Outlined">@Localizer["ProjectImageDelete"]</MudButton>
+                            </div>
+                        </div>
+                    </div>
+                }
+                @if (pendingImageDelete)
+                {
+                    <MudAlert Severity="Severity.Warning" Role="alert">
+                        @Localizer["ProjectImageDeleteConfirmation"]
+                        <MudButton OnClick="DeleteImageAsync" Color="Color.Error" Variant="Variant.Filled">@Localizer["Delete"]</MudButton>
+                        <MudButton OnClick="CancelImageDelete" Variant="Variant.Outlined">@Localizer["Cancel"]</MudButton>
+                    </MudAlert>
+                }
+                @if (imageMessage is not null)
+                {
+                    <MudAlert Severity="@imageSeverity" Role="status">@imageMessage</MudAlert>
+                }
+            </MudPaper>
+        }
     }
 </MudContainer>
 

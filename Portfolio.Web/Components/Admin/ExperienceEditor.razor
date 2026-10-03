@@ -123,12 +123,19 @@
             <MudPaper Elevation="1" Class="pa-5 mt-6">
                 <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["ExperienceAttachments"]</MudText>
                 <MudText Typo="Typo.body2">@Localizer["ExperienceAttachmentRules", AttachmentService.MaximumFileCount, AttachmentService.MaximumFileSizeBytes / 1024 / 1024]</MudText>
+                @if (attachments.Count < AttachmentService.MaximumFileCount)
+                {
+                    <div class="admin-field">
+                        <label for="experience-attachment-upload">@Localizer["ExperienceAttachmentUpload"]</label>
+                        <InputFile id="experience-attachment-upload" OnChange="UploadAttachmentAsync" accept=".pdf,.jpg,.jpeg,.png" />
+                    </div>
+                }
                 @if (attachments.Count > 0)
                 {
                     <div class="experience-attachment-list">
                         @foreach (var attachment in attachments)
                         {
-                            <article class="experience-attachment-list__item">
+                            <div class="experience-attachment-list__item">
                                 <ExperienceAttachmentPreview @key="attachment.Id"
                                                              DisplayName="@attachment.DisplayName"
                                                              ContentType="@attachment.ContentType"
@@ -144,26 +151,28 @@
                                                value="@GetDisplayNameDraft(attachment)"
                                                @oninput="@(args => SetDisplayNameDraft(attachment.Id, args))" />
                                     </div>
-                                    <MudButton OnClick="@(() => SaveAttachmentChangesAsync(attachment))"
-                                               Color="Color.Primary"
-                                               Variant="Variant.Outlined"
-                                               Disabled="@(!CanSaveAttachmentChanges(attachment))">
-                                        @Localizer["ExperienceAttachmentSaveChanges"]
-                                    </MudButton>
-                                    <label class="experience-attachment-visibility" for="@($"attachment-public-{attachment.Id}")">
-                                        <input id="@($"attachment-public-{attachment.Id}")"
-                                               type="checkbox"
-                                               checked="@GetVisibilityDraft(attachment)"
-                                               aria-describedby="@($"attachment-visibility-description-{attachment.Id}")"
-                                               @onchange="@(args => RequestAttachmentVisibilityAsync(attachment, args))" />
-                                        @Localizer[attachment.IsPublic ? "ExperienceAttachmentPublic" : "ExperienceAttachmentPrivate"]
-                                    </label>
+                                    <div class="experience-attachment-actions">
+                                        <label class="experience-attachment-visibility" for="@($"attachment-public-{attachment.Id}")">
+                                            <input id="@($"attachment-public-{attachment.Id}")"
+                                                   type="checkbox"
+                                                   checked="@GetVisibilityDraft(attachment)"
+                                                   aria-describedby="@($"attachment-visibility-description-{attachment.Id}")"
+                                                   @onchange="@(args => RequestAttachmentVisibilityAsync(attachment, args))" />
+                                            @Localizer[attachment.IsPublic ? "ExperienceAttachmentPublic" : "ExperienceAttachmentPrivate"]
+                                        </label>
+                                        <MudButton OnClick="@(() => SaveAttachmentChangesAsync(attachment))"
+                                                   Color="Color.Primary"
+                                                   Variant="Variant.Outlined"
+                                                   Disabled="@(!CanSaveAttachmentChanges(attachment))">
+                                            @Localizer["ExperienceAttachmentSaveChanges"]
+                                        </MudButton>
+                                        <MudButton OnClick="@(() => RequestDeleteAttachment(attachment))" Color="Color.Error" Variant="Variant.Outlined">@Localizer["Delete"]</MudButton>
+                                    </div>
                                     <span id="@($"attachment-visibility-description-{attachment.Id}")" class="visually-hidden">
                                         @Localizer[attachment.IsPublic ? "ExperienceAttachmentPublicDescription" : "ExperienceAttachmentPrivateDescription"]
                                     </span>
-                                    <MudButton OnClick="@(() => RequestDeleteAttachment(attachment))" Color="Color.Error" Variant="Variant.Outlined">@Localizer["Delete"]</MudButton>
                                 </div>
-                            </article>
+                            </div>
                         }
                     </div>
                 }
@@ -182,14 +191,7 @@
                         <MudButton OnClick="ConfirmPublishAttachmentAsync" Color="Color.Warning" Variant="Variant.Filled">@Localizer["ExperienceAttachmentPublish"]</MudButton>
                         <MudButton OnClick="CancelPublishAttachment" Variant="Variant.Outlined">@Localizer["Cancel"]</MudButton>
                     </MudAlert>
-                }
-                @if (attachments.Count < AttachmentService.MaximumFileCount)
-                {
-                    <div class="admin-field">
-                        <label for="experience-attachment-upload">@Localizer["ExperienceAttachmentUpload"]</label>
-                        <InputFile id="experience-attachment-upload" OnChange="UploadAttachmentAsync" accept=".pdf,.jpg,.jpeg,.png" />
-                    </div>
-                }
+                }            
                 @if (attachmentMessage is not null)
                 {
                     <MudAlert Severity="@attachmentSeverity" Role="status">@attachmentMessage</MudAlert>
