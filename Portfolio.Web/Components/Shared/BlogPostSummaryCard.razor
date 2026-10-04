@@ -1,0 +1,43 @@
+@using System.Globalization
+@using Microsoft.Extensions.Localization
+@using Portfolio.Application.Blog
+@inject IStringLocalizer<SharedResource> Localizer
+
+<article class="blog-post-summary @(IsArchive ? "blog-post-summary--archive" : null) @(Post.IsFeatured ? "blog-post-summary--featured" : null)">
+    @if (!string.IsNullOrWhiteSpace(Post.FeaturedImagePath))
+    {
+        <img class="blog-post-summary__image" src="@Post.FeaturedImagePath" alt="@Post.FeaturedImageAlt" loading="lazy" />
+    }
+    else
+    {
+        <div class="blog-post-summary__visual" aria-hidden="true">@Localizer["BlogPlaceholderVisual"]</div>
+    }
+    <div class="blog-post-summary__content">
+        @if (Post.IsFeatured)
+        {
+            <p class="blog-post-summary__featured-label">@Localizer["BlogPostFeatured"]</p>
+        }
+        <h3><a href="@ArticleUrl">@Post.Title</a></h3>
+        <p class="blog-post-summary__date">
+            <span>@Localizer["BlogPostPublishedOn"]</span>
+            <time datetime="@Post.PublishedOn.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)">
+                @Post.PublishedOn.ToString("d", CultureInfo.CurrentUICulture)
+            </time>
+        </p>
+        <p class="blog-post-summary__excerpt">@Post.Excerpt</p>
+        <a class="blog-post-summary__link" href="@ArticleUrl">
+            @Localizer["BlogReadPost"]
+            <span class="visually-hidden">: @Post.Title</span>
+        </a>
+    </div>
+</article>
+
+@code {
+    [Parameter, EditorRequired]
+    public BlogPostReadModel Post { get; set; } = null!;
+
+    [Parameter]
+    public bool IsArchive { get; set; }
+
+    private string ArticleUrl => $"/blog/{Uri.EscapeDataString(Post.Slug)}";
+}

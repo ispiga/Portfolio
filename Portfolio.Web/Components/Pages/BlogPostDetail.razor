@@ -1,0 +1,52 @@
+@page "/blog/{Slug}"
+@using System.Globalization
+@using Microsoft.Extensions.Localization
+@using Portfolio.Application.Blog
+@inject IBlogPostQueryService BlogPostQueryService
+@inject IStringLocalizer<SharedResource> Localizer
+@inject NavigationManager Navigation
+
+<PageTitle>@(post?.Title ?? Localizer["BlogPostNotFound"])</PageTitle>
+
+@if (post is not null)
+{
+    <article class="blog-post-detail" aria-labelledby="blog-post-title">
+        <header class="blog-post-detail__header">
+            @if (post.IsFeatured)
+            {
+                <p class="blog-post-detail__featured">@Localizer["BlogPostFeatured"]</p>
+            }
+            <h1 id="blog-post-title">@post.Title</h1>
+            <p class="blog-post-detail__date">
+                <span>@Localizer["BlogPostPublishedOn"]</span>
+                <time datetime="@post.PublishedOn.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)">
+                    @post.PublishedOn.ToString("d", CultureInfo.CurrentUICulture)
+                </time>
+            </p>
+        </header>
+        @if (!string.IsNullOrWhiteSpace(post.FeaturedImagePath))
+        {
+            <img class="blog-post-detail__image" src="@post.FeaturedImagePath" alt="@post.FeaturedImageAlt" />
+        }
+        <div class="blog-post-detail__content">
+            @((MarkupString)post.Content)
+        </div>
+        <a class="button button--secondary blog-post-detail__back" href="/blog">@Localizer["BlogBackToArchive"]</a>
+    </article>
+}
+
+@code {
+    [Parameter]
+    public string Slug { get; set; } = string.Empty;
+
+    private BlogPostReadModel? post;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        post = await BlogPostQueryService.GetPublishedPostBySlugAsync(Slug);
+        if (post is null)
+        {
+            Navigation.NotFound();
+        }
+    }
+}

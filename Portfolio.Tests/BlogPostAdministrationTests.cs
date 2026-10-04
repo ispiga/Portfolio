@@ -132,6 +132,112 @@ public sealed class BlogPostAdministrationTests
     }
 
     [Fact]
+    public async Task Home_query_returns_featured_posts_first_then_recent_posts_without_duplicates()
+    {
+        var factory = CreateFactory();
+        var featuredOld = ValidPost(Guid.NewGuid(), DateTimeOffset.UtcNow.AddDays(-5), BlogPostEditorialStatus.Published, isFeatured: true);
+        var featuredNew = ValidPost(Guid.NewGuid(), DateTimeOffset.UtcNow.AddDays(-2), BlogPostEditorialStatus.Published, isFeatured: true);
+        var recent = ValidPost(Guid.NewGuid(), DateTimeOffset.UtcNow.AddDays(-1), BlogPostEditorialStatus.Published, isFeatured: false);
+        var oldest = ValidPost(Guid.NewGuid(), DateTimeOffset.UtcNow.AddDays(-10), BlogPostEditorialStatus.Published, isFeatured: false);
+        await using (var context = factory.CreateDbContext())
+        {
+            context.BlogPosts.AddRange(featuredOld, featuredNew, recent, oldest);
+            await context.SaveChangesAsync();
+        }
+
+        var posts = await new BlogPostQueryService(factory).GetHomePostsAsync();
+
+        Assert.Collection(posts,
+            post => Assert.Equal(featuredNew.Id, post.Id),
+            post => Assert.Equal(featuredOld.Id, post.Id),
+            post => Assert.Equal(recent.Id, post.Id));
+        Assert.Equal(3, posts.Select(post => post.Id).Distinct().Count());
+    }
+
+    [Fact]
+    public async Task Archive_query_orders_newest_first_and_does_not_prioritize_featured_posts()
+    {
+        var factory = CreateFactory();
+        var featuredOld = ValidPost(Guid.NewGuid(), DateTimeOffset.UtcNow.AddDays(-5), BlogPostEditorialStatus.Published, isFeatured: true);
+        var recent = ValidPost(Guid.NewGuid(), DateTimeOffset.UtcNow.AddDays(-1), BlogPostEditorialStatus.Published, isFeatured: false);
+        var featuredNew = ValidPost(Guid.NewGuid(), DateTimeOffset.UtcNow.AddDays(-2), BlogPostEditorialStatus.Published, isFeatured: true);
+        await using (var context = factory.CreateDbContext())
+        {
+            context.BlogPosts.AddRange(featuredOld, recent, featuredNew);
+            await context.SaveChangesAsync();
+        }
+
+        var posts = await new BlogPostQueryService(factory).GetPublishedPostsAsync();
+
+        Assert.Collection(posts,
+            post => Assert.Equal(recent.Id, post.Id),
+            post => Assert.Equal(featuredNew.Id, post.Id),
+            post => Assert.Equal(featuredOld.Id, post.Id));
+    }
+
+    [Fact]
+    public async Task Detail_query_uses_active_language_slug_and_falls_back_to_spanish_only_when_translation_is_missing()
+    {
+        var factory = CreateFactory();
+        var spanishOnly = ValidPost(Guid.NewGuid(), DateTimeOffset.UtcNow.AddDays(-2), BlogPostEditorialStatus.Published, isFeatured: false);
+        spanishOnly.Translations.Single().Slug = "articulo-espanol";
+        var translated = ValidPost(Guid.NewGuid(), DateTimeOffset.UtcNow.AddDays(-1), BlogPostEditorialStatus.Published, isFeatured: false);
+        translated.Translations.Single().Slug = "articulo-traducido-es";
+        translated.Translations.Add(new BlogPostTranslation
+        {
+            LanguageCode = "en-US",
+            Title = "Translated article",
+            Slug = "translated-article",
+            Excerpt = "Excerpt",
+            Content = "English content"
+        });
+        var draft = ValidPost(Guid.NewGuid(), DateTimeOffset.UtcNow, BlogPostEditorialStatus.Draft, isFeatured: false);
+        draft.Translations.Add(new BlogPostTranslation
+        {
+            LanguageCode = "en-US",
+            Title = "Draft article",
+            Slug = "draft-article",
+            Excerpt = "Excerpt",
+            Content = "Draft content"
+        });
+        var future = ValidPost(Guid.NewGuid(), DateTimeOffset.UtcNow.AddDays(1), BlogPostEditorialStatus.Published, isFeatured: false);
+        future.Translations.Add(new BlogPostTranslation
+        {
+            LanguageCode = "en-US",
+            Title = "Future article",
+            Slug = "future-article",
+            Excerpt = "Excerpt",
+            Content = "Future content"
+        });
+        await using (var context = factory.CreateDbContext())
+        {
+            context.BlogPosts.AddRange(spanishOnly, translated, draft, future);
+            await context.SaveChangesAsync();
+        }
+
+        var previousCulture = System.Globalization.CultureInfo.CurrentUICulture;
+        try
+        {
+            System.Globalization.CultureInfo.CurrentUICulture = System.Globalization.CultureInfo.GetCultureInfo("en-US");
+            var service = new BlogPostQueryService(factory);
+
+            var englishPost = await service.GetPublishedPostBySlugAsync("translated-article");
+            var spanishFallback = await service.GetPublishedPostBySlugAsync("articulo-espanol");
+
+            Assert.Equal("Translated article", englishPost?.Title);
+            Assert.Equal("Artículo", spanishFallback?.Title);
+            Assert.Null(await service.GetPublishedPostBySlugAsync("articulo-traducido-es"));
+            Assert.Null(await service.GetPublishedPostBySlugAsync("draft-article"));
+            Assert.Null(await service.GetPublishedPostBySlugAsync("future-article"));
+            Assert.Null(await service.GetPublishedPostBySlugAsync("missing-article"));
+        }
+        finally
+        {
+            System.Globalization.CultureInfo.CurrentUICulture = previousCulture;
+        }
+    }
+
+    [Fact]
     public async Task Delete_requires_images_to_be_removed_first_and_cleans_translations()
     {
         var factory = CreateFactory();

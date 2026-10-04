@@ -54,11 +54,20 @@
   <data name="CertificationPlaceholderTitle" xml:space="preserve"><value>Certificación pendiente de publicar</value></data>
   <data name="CertificationPlaceholderDescription" xml:space="preserve"><value>Los detalles de la certificación se mostrarán cuando estén disponibles.</value></data>
   <data name="BlogEyebrow" xml:space="preserve"><value>Ideas y aprendizaje</value></data>
-  <data name="BlogTitle" xml:space="preserve"><value>Último artículo publicado</value></data>
+	<data name="BlogTitle" xml:space="preserve"><value>Artículos recientes</value></data>
   <data name="BlogPlaceholderVisual" xml:space="preserve"><value>Artículo destacado</value></data>
 	<data name="BlogFeatured" xml:space="preserve"><value>Artículo destacado</value></data>
   <data name="BlogPublishedOn" xml:space="preserve"><value>Publicado:</value></data>
   <data name="BlogEmpty" xml:space="preserve"><value>Aún no hay artículos publicados para destacar.</value></data>
+	<data name="BlogReadPost" xml:space="preserve"><value>Leer artículo</value></data>
+  <data name="BlogViewAll" xml:space="preserve"><value>Ver todos los artículos</value></data>
+  <data name="BlogArchiveTitle" xml:space="preserve"><value>Todos los artículos</value></data>
+  <data name="BlogArchiveDescription" xml:space="preserve"><value>Artículos publicados en el blog.</value></data>
+  <data name="BlogArchiveEmpty" xml:space="preserve"><value>Todavía no hay artículos publicados.</value></data>
+  <data name="BlogBackHome" xml:space="preserve"><value>Volver al inicio</value></data>
+  <data name="BlogBackToArchive" xml:space="preserve"><value>Volver a todos los artículos</value></data>
+  <data name="PageNotFoundTitle" xml:space="preserve"><value>Página no encontrada</value></data>
+  <data name="PageNotFoundDescription" xml:space="preserve"><value>La página solicitada no existe.</value></data>
   <data name="ContactEyebrow" xml:space="preserve"><value>Conversemos</value></data>
   <data name="ContactTitle" xml:space="preserve"><value>Contacto</value></data>
 	<data name="ContactIntro" xml:space="preserve"><value>¿Tienes una idea o una oportunidad? Envíame un mensaje.</value></data>

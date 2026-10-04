@@ -1,0 +1,42 @@
+@page "/blog"
+@using Microsoft.Extensions.Localization
+@using Portfolio.Application.Blog
+@inject IBlogPostQueryService BlogPostQueryService
+@inject IStringLocalizer<SharedResource> Localizer
+
+<PageTitle>@Localizer["BlogArchiveTitle"]</PageTitle>
+
+<section class="blog-archive" aria-labelledby="blog-archive-title">
+    <header class="blog-archive__heading">
+        <p class="eyebrow">@Localizer["BlogEyebrow"]</p>
+        <h1 id="blog-archive-title">@Localizer["BlogArchiveTitle"]</h1>
+        <p>@Localizer["BlogArchiveDescription"]</p>
+    </header>
+
+    @if (loaded && posts.Count > 0)
+    {
+        <div class="blog-archive__list">
+            @foreach (var post in posts)
+            {
+                <BlogPostSummaryCard Post="post" IsArchive="true" />
+            }
+        </div>
+    }
+    else if (loaded)
+    {
+        <p class="blog-archive__empty">@Localizer["BlogArchiveEmpty"]</p>
+    }
+
+    <a class="blog-archive__home-link" href="/">@Localizer["BlogBackHome"]</a>
+</section>
+
+@code {
+    private IReadOnlyList<BlogPostReadModel> posts = [];
+    private bool loaded;
+
+    protected override async Task OnInitializedAsync()
+    {
+        posts = await BlogPostQueryService.GetPublishedPostsAsync();
+        loaded = true;
+    }
+}

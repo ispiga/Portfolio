@@ -879,14 +879,9 @@ La tarjeta incluye actualmente:
 
 La consulta pública selecciona primero publicaciones destacadas válidas y después la publicación más reciente por fecha descendente, utilizando el identificador como desempate estable. Excluye artículos cuyo estado no sea `Published` y publicaciones futuras.
 
-La selección de traducción utiliza la cultura actual (`es-ES` o `en-US`) y hace fallback a `es-ES`. Si no existe una destacada válida, se muestra la publicación pública más reciente válida.
+La selección de traducción utiliza la cultura actual (`es-ES` o `en-US`) y hace fallback a `es-ES`. La Home muestra hasta tres publicaciones públicas únicas: primero las destacadas y después las más recientes para completar los espacios disponibles.
 
-Actualmente la sección se limita a la publicación destacada de Home. No se han creado todavía las rutas:
-
-```text
-/blog
-/blog/{slug}
-```
+La ruta `/blog` muestra todas las publicaciones públicas en una lista vertical ordenada por fecha descendente; las destacadas se identifican visualmente sin alterar el orden cronológico. Cada resumen enlaza con `/blog/{slug}`, implementada mediante una única plantilla reutilizable que carga el contenido completo según el slug localizado. Se busca primero el slug del idioma activo y se usa el slug/contenido español únicamente cuando no existe traducción para ese idioma. Ambas rutas excluyen borradores y publicaciones futuras; un slug inexistente o no público devuelve la página 404.
 
 El contenido completo se almacena en `BlogPostTranslation.Content` y se administra desde el panel mediante TinyMCE 8 local. TinyMCE se limita al contenido enriquecido del blog: los demás módulos usan campos estructurados y localizados, no necesitan edición de HTML enriquecido. La carga de imágenes se realiza mediante multipart HTTP autenticado y protegido por antiforgery; los archivos se guardan fuera de `wwwroot` y SQL Server en un directorio configurable, por artículo, con nombre opaco y validación de extensión, MIME, firma y tamaño. Se admiten JPG/JPEG/PNG/WebP/SVG hasta 10 MiB; los SVG pasan validación XML restrictiva. El administrador puede marcar la imagen destacada y borrar imágenes no referenciadas por el contenido. La vista previa administrativa requiere autorización y la ruta pública solo sirve imágenes de artículos publicados con fecha no futura.
 
@@ -1573,7 +1568,7 @@ El almacenamiento de archivos se implementa como infraestructura reutilizable me
 - CRUD administrativo en `/admin/blog` y `/admin/blog/edit[/{id}]`, protegido con `AdministratorOnly` e integrado en la navegación y el Dashboard. El formulario único administra los campos comunes, las traducciones `es-ES`/`en-US` y el contenido HTML mediante TinyMCE 8 local, limitado al ancho disponible y con toolbar deslizante (`toolbar_mode: "sliding"`) en pantallas estrechas. Los estados editoriales explícitos son `Draft`, `ReadyToPublish` y `Published`; la completitud de traducciones no determina el estado y `PublishedOn` se establece al publicar por primera vez.
 - El español completo es necesario para preparar contenido publicable; pueden guardarse borradores incompletos. El listado informa del estado editorial, traducciones ausentes e imágenes. El editor protege cambios no guardados y separa el guardado del artículo de la gestión inmediata de imágenes.
 - Las imágenes admitidas son JPG/JPEG/PNG/WebP/SVG de hasta 10 MiB; se validan extensión, MIME, tamaño real, firma y seguridad XML de SVG. Se almacenan con identificador opaco en directorio configurable, fuera de `wwwroot` y SQL Server, en una carpeta por artículo. TinyMCE envía archivos con multipart HTTP al endpoint administrativo autenticado con antiforgery. El administrador puede seleccionar la imagen destacada y borrar las no referenciadas por el contenido; las vistas administrativas no se almacenan en caché. Las rutas públicas solo sirven imágenes de artículos publicados y con fecha no futura.
-- Home conserva la selección de artículo destacado publicado válido más reciente y el fallback público localizado. No se implementan rutas públicas `/blog` ni `/blog/{slug}`.
+- La Home muestra hasta tres artículos públicos únicos, priorizando los destacados y completando con los más recientes. `/blog` lista todas las publicaciones públicas en orden cronológico descendente y marca las destacadas sin reordenarlas. `/blog/{slug}` utiliza una plantilla de detalle reutilizable que muestra `BlogPostTranslation.Content`; resuelve el slug del idioma actual y recurre al slug/contenido español solo cuando falta esa traducción. Las tres vistas excluyen borradores y publicaciones futuras.
 - Migración generada: `20261001164735_AddBlogPostAdministration`, que convierte `IsPublished` en `EditorialStatus` conservando el estado publicado existente y crea `BlogPostImages`. **No se ha aplicado automáticamente**; debe aplicarse explícitamente en el destino antes de utilizar la nueva persistencia.
 - La compilación completa es correcta y las 103 pruebas de `Portfolio.Tests` pasan.
 

@@ -268,7 +268,7 @@
     <value>Ideas and learning</value>
   </data>
   <data name="BlogTitle" xml:space="preserve">
-    <value>Latest published article</value>
+    <value>Latest articles</value>
   </data>
   <data name="BlogPlaceholderVisual" xml:space="preserve">
     <value>Featured article</value>
@@ -281,6 +281,33 @@
   </data>
   <data name="BlogEmpty" xml:space="preserve">
     <value>There are no published articles to feature yet.</value>
+  </data>
+  <data name="BlogReadPost" xml:space="preserve">
+    <value>Read article</value>
+  </data>
+  <data name="BlogViewAll" xml:space="preserve">
+    <value>View all articles</value>
+  </data>
+  <data name="BlogArchiveTitle" xml:space="preserve">
+    <value>All articles</value>
+  </data>
+  <data name="BlogArchiveDescription" xml:space="preserve">
+    <value>Published articles from the blog.</value>
+  </data>
+  <data name="BlogArchiveEmpty" xml:space="preserve">
+    <value>There are no published articles yet.</value>
+  </data>
+  <data name="BlogBackHome" xml:space="preserve">
+    <value>Back to home</value>
+  </data>
+  <data name="BlogBackToArchive" xml:space="preserve">
+    <value>Back to all articles</value>
+  </data>
+  <data name="PageNotFoundTitle" xml:space="preserve">
+    <value>Page not found</value>
+  </data>
+  <data name="PageNotFoundDescription" xml:space="preserve">
+    <value>The requested page could not be found.</value>
   </data>
   <data name="ContactEyebrow" xml:space="preserve">
     <value>Let's connect</value>

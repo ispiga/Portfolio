@@ -1,4 +1,6 @@
 @page "/not-found"
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> Localizer
 
-<h1>Página no encontrada</h1>
-<p>La página solicitada no existe.</p>
+<h1>@Localizer["PageNotFoundTitle"]</h1>
+<p>@Localizer["PageNotFoundDescription"]</p>
