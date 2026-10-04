@@ -32,6 +32,8 @@ async function createEditor(entry, content, darkTheme) {
         menubar: false,
         plugins: "image link lists table code",
         toolbar: "undo redo | blocks | bold italic underline | bullist numlist | link image table | alignleft aligncenter alignright | removeformat | code",
+        toolbar_mode: "sliding",
+        width: "100%",
         height: 440,
         branding: false,
         promotion: false,

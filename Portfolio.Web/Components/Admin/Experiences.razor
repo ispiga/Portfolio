@@ -30,7 +30,7 @@
     }
     else
     {
-        <MudTable Items="experiences" Hover="true" Breakpoint="Breakpoint.Sm">
+        <MudTable Items="experiences" Hover="true" Breakpoint="Breakpoint.Sm" Class="admin-list-table">
             <HeaderContent>
                 <MudTh>@Localizer["ExperienceOrder"]</MudTh>
                 <MudTh>@Localizer["ExperienceRole"]</MudTh>
@@ -62,12 +62,14 @@
                     }
                 </MudTd>
                 <MudTd>
-                    <MudButton Href="@($"/admin/experiences/edit/{context.Id}")" Variant="Variant.Outlined" Color="Color.Primary">
-                        @Localizer["Edit"]
-                    </MudButton>
-                    <MudButton OnClick="@(() => RequestDelete(context.Id))" Variant="Variant.Outlined" Color="Color.Error">
-                        @Localizer["Delete"]
-                    </MudButton>
+                    <div class="admin-list-actions">
+                        <MudButton Href="@($"/admin/experiences/edit/{context.Id}")" Variant="Variant.Outlined" Color="Color.Primary">
+                            @Localizer["Edit"]
+                        </MudButton>
+                        <MudButton OnClick="@(() => RequestDelete(context.Id))" Variant="Variant.Outlined" Color="Color.Error">
+                            @Localizer["Delete"]
+                        </MudButton>
+                    </div>
                 </MudTd>
             </RowTemplate>
         </MudTable>

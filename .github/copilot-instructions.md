@@ -27,7 +27,7 @@
 - Do not use Bootstrap.
 - Do not hard-code colors using palette-specific names.
 - Use local/system fonts only. Do not load fonts from CDNs or remote services.
-- Keep the UI responsive, semantic and accessible.
+- Keep the public UI responsive, semantic and accessible.
 - Support keyboard navigation, `:focus-visible`, adequate touch targets, sufficient contrast and `prefers-reduced-motion`.
 - Use ARIA only when semantically necessary.
 - Mobile menus must expose their state with `aria-expanded`, support keyboard interaction and avoid unexpected focus loss.
@@ -45,6 +45,8 @@
 - Preserve the 15-minute administrator inactivity timeout, renew it only on authenticated activity, and keep HTTP cookie expiry validation and Blazor circuit revalidation aligned.
 - Keep logout as an antiforgery-protected POST and expose it in both public and admin navigation when the administrator is authenticated; do not display the admin email in the public navbar.
 - Keep theme and language selectors available in both layouts and accessible when their visible labels are omitted.
+- Keep the administration shell and all admin routes responsive at mobile widths without horizontal overflow. Reuse `wwwroot/css/app.css`, retain usable touch targets, and let MudBlazor tables, form controls, attachment previews and action buttons adapt to narrow screens.
+- File-storage services must create missing configured directories and parent folders when preparing an upload; do not require operators to pre-create them. Keep every `App_Data` directory ignored in Git (`**/App_Data/`).
 - In the Experience editor, preserve unsaved-change protection: use the localized application dialog for marked internal navigation and logout, and the browser-native `beforeunload`/navigation confirmation for document exits such as refresh, close and back. Do not call .NET through JS interop to show that dialog when the Interactive Server circuit may be disconnected; keep logout as an antiforgery-protected POST after confirmation.
 - Preserve the Experience editor's existing save flow and unsaved-change behavior. Show its localized success message only after the experience and all pending attachment changes have saved successfully; do not report success when validation or persistence fails. Keep attachment display-name/visibility edits within unsaved-change tracking, ask for confirmation before deleting an attachment or publishing it, and do not trigger the document-exit warning as part of a successful save. Avoid `@bind-Value:event="oninput"` on the editor's `InputText`/`InputTextArea` controls; the existing binding pattern avoids a Blazor event-argument type mismatch in Interactive Server.
 - Preserve the Projects editor's unsaved-change protection: use the localized application dialog for marked internal navigation and logout, and browser-native `beforeunload`/navigation confirmation for document exits such as refresh, close and back. Keep successful saves from triggering the exit warning and leave protection active after validation or persistence failures. Project preview image uploads/deletions persist immediately and must not activate unsaved-form warnings by themselves; cache-bust the preview after replacement.

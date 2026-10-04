@@ -872,6 +872,8 @@ p {
     color: var(--color-text-secondary);
 }
 
+.admin-main .tox-tinymce { max-width: 100%; }
+
 .admin-dashboard { padding: 0 !important; }
 
 .admin-dashboard__heading { margin-bottom: 2rem; }
@@ -921,7 +923,8 @@ p {
 .admin-field label { font-weight: 700; }
 
 .admin-field input,
-.admin-field textarea {
+.admin-field textarea,
+.admin-field select {
     width: 100%;
     min-height: 2.875rem;
     padding: 0.625rem 0.75rem;
@@ -931,8 +934,11 @@ p {
     color: var(--color-text);
 }
 
+.admin-field input[type="checkbox"] { width: auto; min-height: auto; padding: 0; }
+
 .admin-field input:focus-visible,
 .admin-field textarea:focus-visible,
+.admin-field select:focus-visible,
 .admin-navigation a:focus-visible,
 .admin-brand:focus-visible,
 .admin-login__brand:focus-visible {
@@ -967,6 +973,8 @@ p {
     align-items: center;
     gap: 0.75rem;
 }
+
+.admin-list-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
 
 .experience-attachment-list { display: grid; gap: 0.75rem; margin: 1rem 0; }
 
@@ -1042,21 +1050,50 @@ p {
 
 @media (max-width: 48rem) {
     .admin-shell { grid-template-columns: minmax(0, 1fr); }
+    .admin-header { align-items: center; flex-direction: row; flex-wrap: wrap; }
+    .admin-header__controls { justify-content: flex-end; width: 100%; margin-left: 0; }
     .admin-navigation {
-        flex-direction: row;
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.375rem;
         border-right: 0;
         border-bottom: 1px solid var(--color-border);
         padding: 0.5rem var(--space-page);
     }
-    .admin-header { align-items: flex-start; flex-direction: column; }
-    .admin-account { justify-content: space-between; width: 100%; }
+    .admin-navigation__link { min-width: 0; overflow-wrap: anywhere; }
+    .admin-main { padding: 1rem; }
+    .admin-main .tox-tinymce { height: clamp(17.5rem, 65vh, 27.5rem) !important; }
+    .admin-dashboard__heading h1 { overflow-wrap: anywhere; }
+    .admin-main input[type="file"] { max-width: 100%; }
+    .admin-main .mud-alert { min-width: 0; overflow-wrap: anywhere; }
+    .admin-main .mud-chip { max-width: 100%; white-space: normal; }
+    .experience-admin-actions > * { flex: 1 1 8rem; }
+    .admin-list-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; }
+    .admin-list-actions .mud-button-root { min-width: 0; white-space: normal; }
+    .admin-list-table .mud-table-cell { min-width: 0; overflow-wrap: anywhere; }
+    .blog-image-list__item .certification-attachment-list__controls { flex-direction: column; align-items: stretch; }
+    .blog-image-list__item .certification-attachment-list__controls .mud-button-root { min-width: 0; }
+    .admin-header__controls .theme-selector__control,
+    .admin-header__controls .language-selector__control { min-width: 0; max-width: 10rem; }
+    .admin-account { justify-content: flex-end; margin-left: 0; }
     .experience-attachment-list__item { flex-direction: column; }
     .experience-attachment-list__controls { flex: 1 1 auto; flex-direction: column; flex-wrap: nowrap; align-items: stretch; width: 100%; }
     .experience-attachment-name { width: 100%; flex: 0 0 auto; }
     .experience-attachment-actions { display: flex; flex-wrap: nowrap; align-items: center; gap: 0.5rem; width: 100%; }
     .experience-attachment-visibility { flex: 0 0 auto; }
     .experience-attachment-actions .mud-button-root { min-width: 0; }
+}
+
+@media (max-width: 30rem) {
+    .admin-header { gap: 0.5rem; padding-block: 0.625rem; }
+    .admin-header__controls { justify-content: space-between; gap: 0.5rem; }
+    .admin-header__controls .theme-selector__control,
+    .admin-header__controls .language-selector__control { max-width: min(9rem, 38vw); }
+    .admin-navigation { padding-inline: 0.75rem; }
+    .admin-main { padding: 0.75rem; }
+    .experience-attachment-actions { gap: 0.25rem; }
+    .experience-attachment-actions .mud-button-root { padding-inline: 0.375rem; font-size: var(--text-small); }
+    .experience-attachment-visibility { gap: 0.25rem; font-size: var(--text-small); }
 }
 
 @media (prefers-reduced-motion: reduce) {

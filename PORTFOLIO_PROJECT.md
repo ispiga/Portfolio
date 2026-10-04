@@ -208,6 +208,8 @@ Ejemplos:
 
 La aplicación y la base de datos deben permanecer desacopladas del almacenamiento físico de estos archivos.
 
+Las ubicaciones se configuran por módulo mediante las opciones `Portfolio:ProjectPreviewImages:Directory`, `Portfolio:ExperienceAttachments:Directory`, `Portfolio:CertificationMedia:Directory` y `Portfolio:BlogImages:Directory`; sus valores predeterminados están bajo `App_Data`. Los servicios crean automáticamente el directorio configurado y las carpetas padre que falten al preparar la primera carga de un archivo; no se crean durante el arranque ni al guardar contenido que aún no tiene archivos. El patrón `**/App_Data/` de `.gitignore` evita versionar archivos de datos locales en cualquier ubicación del repositorio.
+
 Los documentos de experiencia pueden contener datos personales o información confidencial. No serán públicos por defecto: su publicación deberá ser explícita y contar con autorización. En la Fase 7 se determinará si una experiencia necesita varios adjuntos y cómo modelar sus metadatos y permisos; la entidad `Experience` actual no tiene campos de media.
 
 Esto facilitará el despliegue mediante Docker y evitará perder archivos al recrear un contenedor.
@@ -684,6 +686,10 @@ Administrador autenticado
 La visibilidad del icono es únicamente una decisión de UX. La seguridad real se consigue mediante autenticación y autorización.
 
 Inicialmente solo existirá un usuario administrador.
+
+### Responsive del área administrativa
+
+Las rutas administrativas deben seguir siendo utilizables en móvil sin desbordamiento horizontal. El layout compartido reorganiza cabecera, controles y navegación; por debajo de `48rem`, los enlaces de navegación se disponen en dos columnas. Los listados `MudTable` usan el breakpoint `Sm` para presentar sus filas de forma adaptada y las acciones pueden ajustarse al ancho disponible. Formularios, selectores, botones, alertas, tablas, vistas previas y cargas de archivos también deben reducir o envolver su contenido según el espacio. TinyMCE local se limita al ancho del contenedor y usa `toolbar_mode: "sliding"` para conservar las herramientas en pantallas estrechas.
 
 ---
 
@@ -1564,7 +1570,7 @@ El almacenamiento de archivos se implementa como infraestructura reutilizable me
 
 ### Entrega 5 implementada — Blog
 
-- CRUD administrativo en `/admin/blog` y `/admin/blog/edit[/{id}]`, protegido con `AdministratorOnly` e integrado en la navegación y el Dashboard. El formulario único administra los campos comunes, las traducciones `es-ES`/`en-US` y el contenido HTML mediante TinyMCE 8 local. Los estados editoriales explícitos son `Draft`, `ReadyToPublish` y `Published`; la completitud de traducciones no determina el estado y `PublishedOn` se establece al publicar por primera vez.
+- CRUD administrativo en `/admin/blog` y `/admin/blog/edit[/{id}]`, protegido con `AdministratorOnly` e integrado en la navegación y el Dashboard. El formulario único administra los campos comunes, las traducciones `es-ES`/`en-US` y el contenido HTML mediante TinyMCE 8 local, limitado al ancho disponible y con toolbar deslizante (`toolbar_mode: "sliding"`) en pantallas estrechas. Los estados editoriales explícitos son `Draft`, `ReadyToPublish` y `Published`; la completitud de traducciones no determina el estado y `PublishedOn` se establece al publicar por primera vez.
 - El español completo es necesario para preparar contenido publicable; pueden guardarse borradores incompletos. El listado informa del estado editorial, traducciones ausentes e imágenes. El editor protege cambios no guardados y separa el guardado del artículo de la gestión inmediata de imágenes.
 - Las imágenes admitidas son JPG/JPEG/PNG/WebP/SVG de hasta 10 MiB; se validan extensión, MIME, tamaño real, firma y seguridad XML de SVG. Se almacenan con identificador opaco en directorio configurable, fuera de `wwwroot` y SQL Server, en una carpeta por artículo. TinyMCE envía archivos con multipart HTTP al endpoint administrativo autenticado con antiforgery. El administrador puede seleccionar la imagen destacada y borrar las no referenciadas por el contenido; las vistas administrativas no se almacenan en caché. Las rutas públicas solo sirven imágenes de artículos publicados y con fecha no futura.
 - Home conserva la selección de artículo destacado publicado válido más reciente y el fallback público localizado. No se implementan rutas públicas `/blog` ni `/blog/{slug}`.
