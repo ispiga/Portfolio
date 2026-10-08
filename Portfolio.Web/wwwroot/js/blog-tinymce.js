@@ -1,4 +1,5 @@
 const editors = new Map();
+let tinyMceLoadPromise;
 
 function isDarkTheme() {
     const theme = window.portfolioTheme?.get() || "system";
@@ -10,13 +11,21 @@ function loadTinyMce() {
         return Promise.resolve();
     }
 
-    return new Promise((resolve, reject) => {
-        const script = document.createElement("script");
-        script.src = "/js/vendor/tinymce/tinymce.min.js";
-        script.onload = resolve;
-        script.onerror = () => reject(new Error("TinyMCE failed to load."));
-        document.head.append(script);
-    });
+    if (!tinyMceLoadPromise) {
+        tinyMceLoadPromise = new Promise((resolve, reject) => {
+            const script = document.createElement("script");
+            script.src = "/js/vendor/tinymce/tinymce.min.js";
+            script.onload = resolve;
+            script.onerror = () => {
+                script.remove();
+                tinyMceLoadPromise = null;
+                reject(new Error("TinyMCE failed to load."));
+            };
+            document.head.append(script);
+        });
+    }
+
+    return tinyMceLoadPromise;
 }
 
 async function createEditor(entry, content, darkTheme) {
@@ -114,26 +123,8 @@ async function restartEditor(entry) {
     entry.editor = editor;
 }
 
-export async function initialize(id, initialContent, language, blogPostId, dotNetReference, saveArticleFirstMessage) {
-    const element = document.getElementById(id);
-    if (!element) {
-        return;
-    }
-
-    const entry = {
-        id,
-        element,
-        language,
-        blogPostId,
-        dotNetReference,
-        saveArticleFirstMessage,
-        content: initialContent || "",
-        darkTheme: isDarkTheme(),
-        generation: 0,
-        editor: null,
-        disposed: false
-    };
-    editors.set(id, entry);
+async function initializeEditor(entry) {
+    const { id } = entry;
 
     try {
         await loadTinyMce();
@@ -143,8 +134,11 @@ export async function initialize(id, initialContent, language, blogPostId, dotNe
 
         const editor = await createEditor(entry, entry.content, entry.darkTheme);
         if (entry.disposed || editors.get(id) !== entry) {
-            editor.remove();
+            editor?.remove();
             return;
+        }
+        if (!editor) {
+            throw new Error(`TinyMCE did not create an editor for ${id}.`);
         }
 
         entry.editor = editor;
@@ -165,6 +159,49 @@ export async function initialize(id, initialContent, language, blogPostId, dotNe
     }
 }
 
+export function initialize(id, initialContent, language, blogPostId, dotNetReference, saveArticleFirstMessage) {
+    const element = document.getElementById(id);
+    if (!element) {
+        return Promise.resolve();
+    }
+
+    const currentEntry = editors.get(id);
+    if (currentEntry && !currentEntry.disposed && currentEntry.element === element) {
+        return currentEntry.initializationPromise ?? Promise.resolve();
+    }
+    if (currentEntry) {
+        removeEditor(currentEntry);
+    }
+
+    const entry = {
+        id,
+        element,
+        language,
+        blogPostId,
+        dotNetReference,
+        saveArticleFirstMessage,
+        content: initialContent || "",
+        darkTheme: isDarkTheme(),
+        generation: 0,
+        editor: null,
+        disposed: false
+    };
+    editors.set(id, entry);
+    entry.initializationPromise = initializeEditor(entry);
+    return entry.initializationPromise;
+}
+
+function removeEditor(entry) {
+    entry.disposed = true;
+    entry.generation++;
+    entry.themeObserver?.disconnect();
+    entry.colorScheme?.removeEventListener("change", entry.colorSchemeListener);
+    entry.editor?.remove();
+    if (editors.get(entry.id) === entry) {
+        editors.delete(entry.id);
+    }
+}
+
 export function getContent(id) {
     const entry = editors.get(id);
     return entry?.editor?.getContent() ?? entry?.content ?? document.getElementById(id)?.value ?? "";
@@ -173,11 +210,6 @@ export function getContent(id) {
 export async function dispose(id) {
     const entry = editors.get(id);
     if (entry) {
-        entry.disposed = true;
-        entry.generation++;
-        entry.themeObserver?.disconnect();
-        entry.colorScheme?.removeEventListener("change", entry.colorSchemeListener);
-        entry.editor?.remove();
-        editors.delete(id);
+        removeEditor(entry);
     }
 }
