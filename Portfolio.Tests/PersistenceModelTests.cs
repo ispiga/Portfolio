@@ -72,6 +72,11 @@ public sealed class PersistenceModelTests
         Assert.Equal(255, attachmentEntity.FindProperty(nameof(CertificationAttachment.OriginalFileName))!.GetMaxLength());
         Assert.Equal(255, attachmentEntity.FindProperty(nameof(CertificationAttachment.DisplayName))!.GetMaxLength());
         Assert.Equal(500, attachmentEntity.FindProperty(nameof(CertificationAttachment.StorageKey))!.GetMaxLength());
+        Assert.False(attachmentEntity.FindProperty(nameof(CertificationAttachment.IsPublic))!.IsNullable);
+
+        var designTimeAttachmentEntity = context.GetService<IDesignTimeModel>().Model
+            .FindEntityType(typeof(CertificationAttachment))!;
+        Assert.Equal(false, designTimeAttachmentEntity.FindProperty(nameof(CertificationAttachment.IsPublic))!.GetDefaultValue());
     }
 
     [Fact]

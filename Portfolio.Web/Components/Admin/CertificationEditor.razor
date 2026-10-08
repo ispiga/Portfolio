@@ -125,6 +125,10 @@
                 <NavLink class="button button--secondary" href="/admin/certifications" data-unsaved-navigation>@Localizer["Cancel"]</NavLink>
             </div>
             
+        </EditForm>
+
+        @if (id is { } certificationId)
+        {
             <MudPaper Elevation="1" Class="pa-5 mt-6">
                 <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["CertificationCardImage"]</MudText>
                 <MudText Typo="Typo.body2">@Localizer["CertificationImageRules", MediaService.MaximumFileSizeBytes / 1024 / 1024]</MudText>
@@ -156,11 +160,8 @@
                 {
                     <MudAlert Severity="@imageSeverity" Role="status">@imageMessage</MudAlert>
                 }
-            </MudPaper>        
-        </EditForm>
+            </MudPaper>
 
-        @if (id is { } certificationId)
-        {
             <MudPaper Elevation="1" Class="pa-5 mt-6">
                 <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["CertificationAttachments"]</MudText>
                 <MudText Typo="Typo.body2">@Localizer["CertificationAttachmentRules", MediaService.MaximumFileSizeBytes / 1024 / 1024]</MudText>
@@ -169,13 +170,14 @@
                     <label for="certification-attachment-upload">@Localizer["CertificationAttachmentUpload"]</label>
                     <InputFile @key="attachmentInputVersion" id="certification-attachment-upload" class="certification-media-upload" OnChange="UploadAttachmentAsync" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png" data-ignore-unsaved-changes />
                 </div>
+                <MudText Typo="Typo.body2">@Localizer["CertificationAttachmentVisibilityDescription"]</MudText>
                 @if (attachments.Count > 0)
                 {
                     <div class="certification-attachment-list">
                         @foreach (var attachment in attachments)
                         {
                             <div class="certification-attachment-list__item">
-                                <CertificationAttachmentPreview DisplayName="@GetAttachmentDisplayNameDraft(attachment)" ContentType="@attachment.ContentType" ContentUrl="@($"/certification-attachments/{attachment.Id}")" />
+                                <CertificationAttachmentPreview DisplayName="@GetAttachmentDisplayNameDraft(attachment)" ContentType="@attachment.ContentType" ContentUrl="@($"/admin/certifications/attachments/{attachment.Id}")" />
                                 <span class="certification-attachment-list__size">@(attachment.SizeBytes / 1024) KB</span>
                                 <div class="certification-attachment-list__controls">
                                     <div class="admin-field certification-attachment-name">
@@ -187,10 +189,21 @@
                                         value="@GetAttachmentDisplayNameDraft(attachment)"
                                         @oninput="@(args => SetAttachmentDisplayNameDraft(attachment.Id, args))" />
                                     </div>
-                                    <MudButton OnClick="@(() => SaveAttachmentDisplayNameAsync(attachment))"
+                                    <label class="experience-attachment-visibility" for="@($"certification-attachment-public-{attachment.Id}")">
+                                        <input id="@($"certification-attachment-public-{attachment.Id}")"
+                                               type="checkbox"
+                                               checked="@GetAttachmentVisibilityDraft(attachment)"
+                                               aria-describedby="@($"certification-attachment-visibility-description-{attachment.Id}")"
+                                               @onchange="@(args => RequestAttachmentVisibilityAsync(attachment, args))" />
+                                        @Localizer[attachment.IsPublic ? "CertificationAttachmentPublic" : "CertificationAttachmentPrivate"]
+                                    </label>
+                                    <span id="@($"certification-attachment-visibility-description-{attachment.Id}")" class="visually-hidden">
+                                        @Localizer[attachment.IsPublic ? "CertificationAttachmentPublicDescription" : "CertificationAttachmentPrivateDescription"]
+                                    </span>
+                                    <MudButton OnClick="@(() => SaveAttachmentChangesAsync(attachment))"
                                     Color="Color.Primary"
                                     Variant="Variant.Outlined"
-                                    Disabled="@(!CanSaveAttachmentDisplayName(attachment) || saving)">
+                                    Disabled="@(!CanSaveAttachmentChanges(attachment) || saving)">
                                         @Localizer["CertificationAttachmentSaveChanges"]
                                     </MudButton>
                                     <MudButton OnClick="@(() => RequestAttachmentDelete(attachment.Id))" Color="Color.Error" Variant="Variant.Outlined">@Localizer["Delete"]</MudButton>
@@ -198,6 +211,14 @@
                             </div>
                         }
                     </div>
+                }
+                @if (pendingPublicAttachment is not null)
+                {
+                    <MudAlert Severity="Severity.Warning" Class="mt-4" Role="alert">
+                        @Localizer["CertificationAttachmentPublishConfirmation", pendingPublicAttachment.DisplayName]
+                        <MudButton OnClick="ConfirmPublishAttachmentAsync" Color="Color.Warning" Variant="Variant.Filled">@Localizer["CertificationAttachmentPublish"]</MudButton>
+                        <MudButton OnClick="CancelPublishAttachment" Variant="Variant.Outlined">@Localizer["Cancel"]</MudButton>
+                    </MudAlert>
                 }
                 @if (pendingAttachmentDelete is { } pendingAttachment)
                 {
@@ -223,9 +244,11 @@
     private readonly CertificationFormModel model = new();
     private readonly Dictionary<string, string> fieldErrors = new(StringComparer.Ordinal);
     private readonly Dictionary<Guid, string> attachmentDisplayNameDrafts = [];
+    private readonly Dictionary<Guid, bool> attachmentVisibilityDrafts = [];
     private IReadOnlyList<CertificationAttachmentReadModel> attachments = [];
     private Guid? id;
     private Guid? pendingAttachmentDelete;
+    private CertificationAttachmentReadModel? pendingPublicAttachment;
     private bool loaded;
     private bool loadFailed;
     private bool saving;
@@ -245,13 +268,10 @@
     private bool HasUnsavedChanges => loaded
         && !loadFailed
         && initialSnapshot is not null
-        && (CaptureSnapshot() != initialSnapshot || HasPendingAttachmentDisplayNameChanges);
+        && (CaptureSnapshot() != initialSnapshot || HasPendingAttachmentChanges);
 
-    private bool HasPendingAttachmentDisplayNameChanges => attachments.Any(attachment =>
-        !string.Equals(
-            GetAttachmentDisplayNameDraft(attachment).Trim(),
-            attachment.DisplayName,
-            StringComparison.Ordinal));
+    private bool HasPendingAttachmentChanges => attachments.Any(attachment =>
+        HasAttachmentDisplayNameChange(attachment) || HasAttachmentVisibilityChange(attachment));
 
     private string? CardImageUrl => string.IsNullOrWhiteSpace(model.ImagePath)
         ? null
@@ -322,6 +342,7 @@
         model.EnglishDetails = details.English.Details ?? string.Empty;
         attachments = await MediaService.GetAttachmentsAsync(details.Id);
         attachmentDisplayNameDrafts.Clear();
+        attachmentVisibilityDrafts.Clear();
         foreach (var attachment in attachments)
         {
             attachmentDisplayNameDrafts[attachment.Id] = attachment.DisplayName;
@@ -381,10 +402,10 @@
 
         var wasNew = Id is null;
         id = result.CertificationId;
-        if (!await SavePendingAttachmentDisplayNamesAsync())
+        if (!await SavePendingAttachmentChangesAsync())
         {
             saving = false;
-            saveError = Localizer["CertificationAttachmentDisplayNameSaveFailed"];
+            saveError = Localizer["CertificationAttachmentChangesSaveFailed"];
             return;
         }
 
@@ -518,6 +539,8 @@
     {
         if (await MediaService.DeleteAttachmentAsync(attachmentId) && id is { } certificationId)
         {
+            attachmentDisplayNameDrafts.Remove(attachmentId);
+            attachmentVisibilityDrafts.Remove(attachmentId);
             attachments = await MediaService.GetAttachmentsAsync(certificationId);
             attachmentMessage = Localizer["CertificationAttachmentDeleted"];
             attachmentSeverity = Severity.Success;
@@ -529,52 +552,64 @@
     private string GetAttachmentDisplayNameDraft(CertificationAttachmentReadModel attachment) =>
         attachmentDisplayNameDrafts.TryGetValue(attachment.Id, out var draft) ? draft : attachment.DisplayName;
 
+    private bool GetAttachmentVisibilityDraft(CertificationAttachmentReadModel attachment) =>
+        attachmentVisibilityDrafts.TryGetValue(attachment.Id, out var isPublic) ? isPublic : attachment.IsPublic;
+
     private void SetAttachmentDisplayNameDraft(Guid attachmentId, ChangeEventArgs args) =>
         attachmentDisplayNameDrafts[attachmentId] = args.Value?.ToString() ?? string.Empty;
 
-    private bool CanSaveAttachmentDisplayName(CertificationAttachmentReadModel attachment)
+    private bool CanSaveAttachmentChanges(CertificationAttachmentReadModel attachment)
     {
         var draft = GetAttachmentDisplayNameDraft(attachment);
         return !string.IsNullOrWhiteSpace(draft)
             && draft.Trim().Length <= 255
-            && !string.Equals(draft.Trim(), attachment.DisplayName, StringComparison.Ordinal);
+            && (HasAttachmentDisplayNameChange(attachment) || HasAttachmentVisibilityChange(attachment));
     }
 
-    private async Task SaveAttachmentDisplayNameAsync(CertificationAttachmentReadModel attachment)
+    private async Task SaveAttachmentChangesAsync(CertificationAttachmentReadModel attachment)
     {
-        var displayName = GetAttachmentDisplayNameDraft(attachment);
-        if (!await MediaService.UpdateAttachmentDisplayNameAsync(attachment.Id, displayName)
-            || id is not { } certificationId)
+        if (!CanSaveAttachmentChanges(attachment))
+        {
+            return;
+        }
+
+        if (!await PersistAttachmentChangesAsync(attachment))
         {
             attachmentSeverity = Severity.Error;
-            attachmentMessage = Localizer["CertificationAttachmentDisplayNameSaveFailed"];
+            attachmentMessage = Localizer["CertificationAttachmentChangesSaveFailed"];
+            return;
+        }
+
+        if (id is not { } certificationId)
+        {
             return;
         }
 
         attachments = await MediaService.GetAttachmentsAsync(certificationId);
-        attachmentDisplayNameDrafts[attachment.Id] = displayName.Trim();
+        attachmentDisplayNameDrafts.Remove(attachment.Id);
+        attachmentVisibilityDrafts.Remove(attachment.Id);
         attachmentSeverity = Severity.Success;
-        attachmentMessage = Localizer["ExperienceAttachmentChangesSaved"];
+        attachmentMessage = Localizer["CertificationAttachmentChangesSaved"];
     }
 
-    private async Task<bool> SavePendingAttachmentDisplayNamesAsync()
+    private async Task<bool> SavePendingAttachmentChangesAsync()
     {
-        var changedAttachments = attachments.Where(HasAttachmentDisplayNameChange).ToArray();
-        if (changedAttachments.Any(attachment => !CanSaveAttachmentDisplayName(attachment)))
+        var changedAttachments = attachments.Where(attachment =>
+            HasAttachmentDisplayNameChange(attachment) || HasAttachmentVisibilityChange(attachment)).ToArray();
+        if (changedAttachments.Any(attachment => !CanSaveAttachmentChanges(attachment)))
         {
             return false;
         }
 
         foreach (var attachment in changedAttachments)
         {
-            if (!await MediaService.UpdateAttachmentDisplayNameAsync(
-                    attachment.Id,
-                    GetAttachmentDisplayNameDraft(attachment).Trim()))
+            if (!await PersistAttachmentChangesAsync(attachment))
             {
                 return false;
             }
 
-            attachmentDisplayNameDrafts[attachment.Id] = GetAttachmentDisplayNameDraft(attachment).Trim();
+            attachmentDisplayNameDrafts.Remove(attachment.Id);
+            attachmentVisibilityDrafts.Remove(attachment.Id);
         }
 
         if (id is { } certificationId)
@@ -583,10 +618,25 @@
             foreach (var attachment in attachments)
             {
                 attachmentDisplayNameDrafts[attachment.Id] = attachment.DisplayName;
+                attachmentVisibilityDrafts.Remove(attachment.Id);
             }
         }
 
         return true;
+    }
+
+    private async Task<bool> PersistAttachmentChangesAsync(CertificationAttachmentReadModel attachment)
+    {
+        if (HasAttachmentDisplayNameChange(attachment)
+            && !await MediaService.UpdateAttachmentDisplayNameAsync(
+                attachment.Id,
+                GetAttachmentDisplayNameDraft(attachment).Trim()))
+        {
+            return false;
+        }
+
+        return !HasAttachmentVisibilityChange(attachment)
+            || await MediaService.SetAttachmentPublicAsync(attachment.Id, GetAttachmentVisibilityDraft(attachment));
     }
 
     private bool HasAttachmentDisplayNameChange(CertificationAttachmentReadModel attachment) =>
@@ -594,6 +644,57 @@
             GetAttachmentDisplayNameDraft(attachment).Trim(),
             attachment.DisplayName,
             StringComparison.Ordinal);
+
+    private bool HasAttachmentVisibilityChange(CertificationAttachmentReadModel attachment) =>
+        attachmentVisibilityDrafts.TryGetValue(attachment.Id, out var isPublic) && isPublic != attachment.IsPublic;
+
+    private Task RequestAttachmentVisibilityAsync(CertificationAttachmentReadModel attachment, ChangeEventArgs args)
+    {
+        var isPublic = args.Value is bool value
+            ? value
+            : string.Equals(Convert.ToString(args.Value), "true", StringComparison.OrdinalIgnoreCase);
+        if (isPublic == GetAttachmentVisibilityDraft(attachment))
+        {
+            return Task.CompletedTask;
+        }
+
+        if (isPublic)
+        {
+            pendingPublicAttachment = attachment;
+            attachmentMessage = null;
+            return Task.CompletedTask;
+        }
+
+        SetAttachmentVisibilityDraft(attachment, false);
+        return Task.CompletedTask;
+    }
+
+    private Task ConfirmPublishAttachmentAsync()
+    {
+        if (pendingPublicAttachment is { } attachment)
+        {
+            pendingPublicAttachment = null;
+            SetAttachmentVisibilityDraft(attachment, true);
+            attachmentMessage = Localizer["CertificationAttachmentPublicationPending"];
+            attachmentSeverity = Severity.Warning;
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private void CancelPublishAttachment() => pendingPublicAttachment = null;
+
+    private void SetAttachmentVisibilityDraft(CertificationAttachmentReadModel attachment, bool isPublic)
+    {
+        if (isPublic == attachment.IsPublic)
+        {
+            attachmentVisibilityDrafts.Remove(attachment.Id);
+        }
+        else
+        {
+            attachmentVisibilityDrafts[attachment.Id] = isPublic;
+        }
+    }
 
     public async ValueTask DisposeAsync()
     {

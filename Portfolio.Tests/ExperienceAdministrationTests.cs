@@ -14,7 +14,7 @@ public sealed class ExperienceAdministrationTests
     public async Task Create_and_edit_persist_both_localizations_and_order()
     {
         var factory = CreateFactory();
-        var service = new ExperienceAdministrationService(factory);
+        var service = new ExperienceAdministrationService(factory, null!);
         var request = ValidRequest() with { DisplayOrder = 3 };
 
         var created = await service.SaveAsync(request);
@@ -46,7 +46,7 @@ public sealed class ExperienceAdministrationTests
     public async Task Missing_english_translation_is_allowed_and_reported_while_public_uses_spanish_fallback()
     {
         var factory = CreateFactory();
-        var service = new ExperienceAdministrationService(factory);
+        var service = new ExperienceAdministrationService(factory, null!);
         var result = await service.SaveAsync(ValidRequest() with { English = EmptyTranslation() });
 
         Assert.True(result.Succeeded);
@@ -73,7 +73,7 @@ public sealed class ExperienceAdministrationTests
     public async Task Admin_list_and_public_query_are_sorted_by_display_order()
     {
         var factory = CreateFactory();
-        var service = new ExperienceAdministrationService(factory);
+        var service = new ExperienceAdministrationService(factory, null!);
         var second = await service.SaveAsync(ValidRequest() with { DisplayOrder = 2 });
         var first = await service.SaveAsync(ValidRequest() with { DisplayOrder = 1 });
 
@@ -92,7 +92,7 @@ public sealed class ExperienceAdministrationTests
     public async Task Invalid_dates_order_and_partial_translations_are_rejected_server_side()
     {
         var factory = CreateFactory();
-        var service = new ExperienceAdministrationService(factory);
+        var service = new ExperienceAdministrationService(factory, null!);
         var request = ValidRequest() with
         {
             StartDate = new DateOnly(2025, 1, 1),
@@ -114,7 +114,7 @@ public sealed class ExperienceAdministrationTests
     [Fact]
     public async Task Missing_start_date_is_rejected_server_side()
     {
-        var service = new ExperienceAdministrationService(CreateFactory());
+        var service = new ExperienceAdministrationService(CreateFactory(), null!);
 
         var result = await service.SaveAsync(ValidRequest() with { StartDate = default });
 
@@ -126,7 +126,7 @@ public sealed class ExperienceAdministrationTests
     [Fact]
     public async Task Description_accepts_two_thousand_characters_and_rejects_longer_values()
     {
-        var service = new ExperienceAdministrationService(CreateFactory());
+        var service = new ExperienceAdministrationService(CreateFactory(), null!);
         var description = new string('a', ExperienceEditValidator.MaximumSummaryLength);
 
         var valid = await service.SaveAsync(ValidRequest() with
@@ -147,7 +147,7 @@ public sealed class ExperienceAdministrationTests
     public async Task Deleting_experience_with_attachments_is_blocked()
     {
         var factory = CreateFactory();
-        var service = new ExperienceAdministrationService(factory);
+        var service = new ExperienceAdministrationService(factory, null!);
         var created = await service.SaveAsync(ValidRequest());
         await using (var context = factory.CreateDbContext())
         {
@@ -173,7 +173,7 @@ public sealed class ExperienceAdministrationTests
     public async Task Public_query_includes_only_explicitly_published_attachments()
     {
         var factory = CreateFactory();
-        var service = new ExperienceAdministrationService(factory);
+        var service = new ExperienceAdministrationService(factory, null!);
         var created = await service.SaveAsync(ValidRequest());
         await using (var context = factory.CreateDbContext())
         {

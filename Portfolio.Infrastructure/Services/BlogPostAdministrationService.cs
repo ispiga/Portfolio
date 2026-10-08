@@ -5,7 +5,8 @@ using Portfolio.Domain.Entities;
 namespace Portfolio.Infrastructure.Services;
 
 public sealed class BlogPostAdministrationService(
-    IDbContextFactory<PortfolioDbContext> dbContextFactory) : IBlogPostAdministrationService
+    IDbContextFactory<PortfolioDbContext> dbContextFactory,
+    IBlogPostImageService? imageService = null) : IBlogPostAdministrationService
 {
     public async Task<IReadOnlyList<BlogPostAdminListItem>> GetBlogPostsAsync(
         CancellationToken cancellationToken = default)
@@ -137,6 +138,11 @@ public sealed class BlogPostAdministrationService(
         context.BlogPostTranslations.RemoveRange(post.Translations);
         context.BlogPosts.Remove(post);
         await context.SaveChangesAsync(cancellationToken);
+        if (imageService is not null)
+        {
+            await imageService.CleanupBlogPostDirectoryAsync(id, cancellationToken);
+        }
+
         return BlogPostDeleteResult.Deleted;
     }
 

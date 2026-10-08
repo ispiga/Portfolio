@@ -21,11 +21,20 @@ public interface ICertificationMediaService
         string displayName,
         CancellationToken cancellationToken = default);
 
+    Task<bool> SetAttachmentPublicAsync(
+        Guid attachmentId,
+        bool isPublic,
+        CancellationToken cancellationToken = default);
+
     Task<bool> DeleteAttachmentAsync(
         Guid attachmentId,
         CancellationToken cancellationToken = default);
 
     Task<CertificationAttachmentContent?> OpenAttachmentAsync(
+        Guid attachmentId,
+        CancellationToken cancellationToken = default);
+
+    Task<CertificationAttachmentContent?> OpenPublicAttachmentAsync(
         Guid attachmentId,
         CancellationToken cancellationToken = default);
 
@@ -48,4 +57,6 @@ public interface ICertificationMediaService
     Task DeleteCertificationFilesAsync(
         Guid certificationId,
         CancellationToken cancellationToken = default);
+
+    Task CleanupCertificationDirectoryAsync(Guid certificationId, CancellationToken cancellationToken = default);
 }

@@ -130,6 +130,30 @@ public sealed class ExperienceAttachmentStorageTests : IDisposable
     }
 
     [Fact]
+    public async Task Experience_directory_cleanup_removes_only_the_empty_item_directory()
+    {
+        var payload = System.Text.Encoding.ASCII.GetBytes("%PDF-1.7\\nprivate attachment");
+        var uploaded = await service.UploadAsync(
+            experienceId,
+            "recommendation.pdf",
+            "application/pdf",
+            payload.Length,
+            new MemoryStream(payload));
+
+        Assert.True(uploaded.Succeeded);
+        var experienceDirectory = Path.Combine(root, "private-files", "experience", experienceId.ToString("N"));
+        Assert.True(Directory.Exists(experienceDirectory));
+
+        Assert.True(await service.DeleteAsync(uploaded.Attachment!.Id));
+        Assert.True(Directory.Exists(experienceDirectory));
+
+        await service.CleanupExperienceDirectoryAsync(experienceId);
+
+        Assert.False(Directory.Exists(experienceDirectory));
+        Assert.True(Directory.Exists(Path.Combine(root, "private-files")));
+    }
+
+    [Fact]
     public async Task Upload_rejects_mismatched_signatures_and_oversized_files()
     {
         var invalidPdf = System.Text.Encoding.ASCII.GetBytes("not a pdf");

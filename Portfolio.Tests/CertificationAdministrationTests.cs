@@ -126,6 +126,12 @@ public sealed class CertificationAdministrationTests
         var service = new CertificationAdministrationService(factory, media);
         var created = await service.SaveAsync(ValidRequest());
         var id = created.CertificationId!.Value;
+        await using (var attachmentContext = factory.CreateDbContext())
+        {
+            var certification = await attachmentContext.Certifications.SingleAsync(item => item.Id == id);
+            certification.ImagePath = $"certifications/{id:N}/card/image.png";
+            await attachmentContext.SaveChangesAsync();
+        }
 
         Assert.Equal(CertificationDeleteResult.Deleted, await service.DeleteAsync(id));
         Assert.Equal(CertificationDeleteResult.NotFound, await service.DeleteAsync(id));
@@ -134,6 +140,43 @@ public sealed class CertificationAdministrationTests
         Assert.Empty(await context.Certifications
             .SelectMany(item => item.Translations)
             .ToListAsync());
+    }
+
+    [Fact]
+    public async Task Delete_requires_attachments_to_be_removed_but_not_the_card_image()
+    {
+        var factory = CreateFactory();
+        var media = new TestCertificationMediaService();
+        var service = new CertificationAdministrationService(factory, media);
+        var created = await service.SaveAsync(ValidRequest());
+        var id = created.CertificationId!.Value;
+        await using (var attachmentContext = factory.CreateDbContext())
+        {
+            attachmentContext.CertificationAttachments.Add(new CertificationAttachment
+            {
+                Id = Guid.NewGuid(),
+                CertificationId = id,
+                OriginalFileName = "certificate.pdf",
+                DisplayName = "certificate.pdf",
+                StorageKey = $"certifications/{id:N}/attachments/file.pdf",
+                ContentType = "application/pdf",
+                SizeBytes = 100,
+                CreatedAt = DateTimeOffset.UtcNow
+            });
+            await attachmentContext.SaveChangesAsync();
+        }
+
+        Assert.Equal(CertificationDeleteResult.HasAttachments, await service.DeleteAsync(id));
+        Assert.Equal(0, media.DeleteCertificationFilesCallCount);
+        await using (var cleanupContext = factory.CreateDbContext())
+        {
+            Assert.True(await cleanupContext.Certifications.AnyAsync(item => item.Id == id));
+            cleanupContext.CertificationAttachments.RemoveRange(cleanupContext.CertificationAttachments.Where(item => item.CertificationId == id));
+            await cleanupContext.SaveChangesAsync();
+        }
+
+        Assert.Equal(CertificationDeleteResult.Deleted, await service.DeleteAsync(id));
+        Assert.Equal(1, media.DeleteCertificationFilesCallCount);
     }
 
     [Fact]
@@ -181,8 +224,11 @@ public sealed class CertificationAdministrationTests
             throw new NotSupportedException();
         public Task<bool> UpdateAttachmentDisplayNameAsync(Guid attachmentId, string displayName, CancellationToken cancellationToken = default) =>
             Task.FromResult(false);
+        public Task<bool> SetAttachmentPublicAsync(Guid attachmentId, bool isPublic, CancellationToken cancellationToken = default) =>
+            Task.FromResult(false);
         public Task<bool> DeleteAttachmentAsync(Guid attachmentId, CancellationToken cancellationToken = default) => Task.FromResult(false);
         public Task<CertificationAttachmentContent?> OpenAttachmentAsync(Guid attachmentId, CancellationToken cancellationToken = default) => Task.FromResult<CertificationAttachmentContent?>(null);
+        public Task<CertificationAttachmentContent?> OpenPublicAttachmentAsync(Guid attachmentId, CancellationToken cancellationToken = default) => Task.FromResult<CertificationAttachmentContent?>(null);
         public Task<CertificationCardImageOperationResult> UploadCardImageAsync(Guid certificationId, string fileName, string contentType, long fileSize, Stream content, CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
         public Task<bool> DeleteCardImageAsync(Guid certificationId, CancellationToken cancellationToken = default) => Task.FromResult(false);
@@ -192,5 +238,8 @@ public sealed class CertificationAdministrationTests
             DeleteCertificationFilesCallCount++;
             return Task.CompletedTask;
         }
+
+        public Task CleanupCertificationDirectoryAsync(Guid certificationId, CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
     }
 }

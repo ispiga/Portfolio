@@ -34,5 +34,6 @@ public sealed record CertificationSaveResult(
 public enum CertificationDeleteResult
 {
     Deleted,
-    NotFound
+    NotFound,
+    HasAttachments
 }

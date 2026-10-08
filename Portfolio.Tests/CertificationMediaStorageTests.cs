@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Portfolio.Application.Certifications;
 using Portfolio.Domain.Entities;
@@ -48,11 +49,12 @@ public sealed class CertificationMediaStorageTests : IDisposable
             {
                 Directory = Path.Combine(root, "private-files"),
                 MaximumFileSizeBytes = 32
-            }));
+            }),
+            NullLogger<CertificationMediaStorageService>.Instance);
     }
 
     [Fact]
-    public async Task Attachments_are_stored_outside_web_root_and_publicly_readable()
+    public async Task Attachments_are_private_by_default_and_publication_is_explicit()
     {
         var payload = System.Text.Encoding.ASCII.GetBytes("%PDF-1.7\ncredential");
         var uploaded = await service.UploadAttachmentAsync(
@@ -87,12 +89,25 @@ public sealed class CertificationMediaStorageTests : IDisposable
         Assert.False(await service.UpdateAttachmentDisplayNameAsync(attachment.Id, " "));
         Assert.False(await service.UpdateAttachmentDisplayNameAsync(attachment.Id, new string('x', 256)));
 
-        var publicContent = await service.OpenAttachmentAsync(attachment.Id);
+        Assert.False(attachment.IsPublic);
+        Assert.Null(await service.OpenPublicAttachmentAsync(attachment.Id));
+        var privateContent = await service.OpenAttachmentAsync(attachment.Id);
+        Assert.NotNull(privateContent);
+        await using (privateContent.Content)
+        {
+            Assert.Equal(payload, await ReadAllAsync(privateContent.Content));
+        }
+
+        Assert.True(await service.SetAttachmentPublicAsync(attachment.Id, true));
+        var publicContent = await service.OpenPublicAttachmentAsync(attachment.Id);
         Assert.NotNull(publicContent);
         await using (publicContent.Content)
         {
             Assert.Equal(payload, await ReadAllAsync(publicContent.Content));
         }
+
+        Assert.True(await service.SetAttachmentPublicAsync(attachment.Id, false));
+        Assert.Null(await service.OpenPublicAttachmentAsync(attachment.Id));
 
         await using var context = factory.CreateDbContext();
         var storageKey = await context.CertificationAttachments
@@ -184,7 +199,7 @@ public sealed class CertificationMediaStorageTests : IDisposable
     }
 
     [Fact]
-    public async Task Public_media_endpoints_allow_anonymous_access_and_disable_caching()
+    public async Task Public_media_endpoint_denies_private_attachments_and_serves_published_attachments()
     {
         var payload = System.Text.Encoding.ASCII.GetBytes("%PDF-1.7\npublic");
         var upload = await service.UploadAttachmentAsync(
@@ -202,6 +217,10 @@ public sealed class CertificationMediaStorageTests : IDisposable
         app.MapCertificationMediaEndpoints();
         await app.StartAsync();
 
+        using var privateResponse = await app.GetTestClient().GetAsync($"/certification-attachments/{upload.Attachment!.Id}");
+        Assert.Equal(HttpStatusCode.NotFound, privateResponse.StatusCode);
+
+        Assert.True(await service.SetAttachmentPublicAsync(upload.Attachment.Id, true));
         using var response = await app.GetTestClient().GetAsync($"/certification-attachments/{upload.Attachment!.Id}");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Equal("no-store", response.Headers.CacheControl?.ToString());
@@ -244,12 +263,20 @@ public sealed class CertificationMediaStorageTests : IDisposable
         Assert.True(File.Exists(attachmentFile));
         Assert.True(File.Exists(imageFile));
 
+        var openImage = await service.OpenCardImageAsync(certificationId);
+        Assert.NotNull(openImage);
+        await using var openImageContent = openImage.Content;
+
+        Assert.True(await service.DeleteAttachmentAsync(attachment.Attachment!.Id));
+        Assert.False(File.Exists(attachmentFile));
+
         var result = await new Portfolio.Infrastructure.Services.CertificationAdministrationService(factory, service)
             .DeleteAsync(certificationId);
 
         Assert.Equal(CertificationDeleteResult.Deleted, result);
-        Assert.False(File.Exists(attachmentFile));
         Assert.False(File.Exists(imageFile));
+        Assert.False(Directory.Exists(Path.Combine(root, "private-files", "certifications", certificationId.ToString("N"), "card")));
+        Assert.False(Directory.Exists(Path.Combine(root, "private-files", "certifications", certificationId.ToString("N"))));
         Assert.Null(await service.OpenAttachmentAsync(attachment.Attachment.Id));
         Assert.Null(await service.OpenCardImageAsync(certificationId));
         Assert.Null(await new Portfolio.Infrastructure.Services.CertificationAdministrationService(factory, service)

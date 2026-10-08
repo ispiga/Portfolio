@@ -24,6 +24,8 @@ public interface IBlogPostImageService
         Guid imageId,
         CancellationToken cancellationToken = default);
 
+    Task CleanupBlogPostDirectoryAsync(Guid blogPostId, CancellationToken cancellationToken = default);
+
     Task<BlogPostImageContent?> OpenImageAsync(
         Guid imageId,
         bool administratorCanViewDrafts,

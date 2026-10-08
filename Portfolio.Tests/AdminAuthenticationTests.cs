@@ -18,6 +18,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Portfolio.Application.Experiences;
 using Portfolio.Application.Blog;
+using Portfolio.Application.Certifications;
 using Portfolio.Infrastructure;
 using Portfolio.Infrastructure.Identity;
 using Portfolio.Web.Authentication;
@@ -54,6 +55,7 @@ public sealed class AdminAuthenticationTests : IAsyncLifetime
         builder.Services.AddSingleton<AdminSessionActivityStore>();
         builder.Services.AddSingleton<IExperienceAttachmentService, TestExperienceAttachmentService>();
         builder.Services.AddSingleton<IBlogPostImageService, TestBlogPostImageService>();
+        builder.Services.AddSingleton<ICertificationMediaService, TestCertificationAttachmentService>();
         builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
             .AddCookie(IdentityConstants.ApplicationScheme, options =>
             {
@@ -71,6 +73,7 @@ public sealed class AdminAuthenticationTests : IAsyncLifetime
         app.MapAdminAuthentication();
         app.MapExperienceAttachmentEndpoints();
         app.MapBlogPostImageEndpoints();
+        app.MapCertificationMediaEndpoints();
         app.MapGet("/admin/login", (HttpContext context, IAntiforgery antiforgery) =>
         {
             var tokens = antiforgery.GetAndStoreTokens(context);
@@ -93,6 +96,32 @@ public sealed class AdminAuthenticationTests : IAsyncLifetime
         await roleManager.CreateAsync(new IdentityRole(PortfolioAuthorization.AdministratorRole));
         await CreateUserAsync(AdministratorEmail, isAdministrator: true);
         await CreateUserAsync(RegularUserEmail, isAdministrator: false);
+    }
+
+    [Fact]
+    public async Task Certification_private_attachment_requires_administrator_and_public_route_hides_it()
+    {
+        using (var anonymousResponse = await SendAsync(new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/admin/certifications/attachments/{TestCertificationAttachmentService.AttachmentId}")))
+        {
+            Assert.Equal(HttpStatusCode.Redirect, anonymousResponse.StatusCode);
+            Assert.Equal("/admin/login", anonymousResponse.Headers.Location?.AbsolutePath);
+        }
+
+        using (var publicResponse = await SendAsync(new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/certification-attachments/{TestCertificationAttachmentService.AttachmentId}")))
+        {
+            Assert.Equal(HttpStatusCode.NotFound, publicResponse.StatusCode);
+        }
+
+        using var login = await LoginAsync(AdministratorEmail, TestPassword);
+        using var adminResponse = await SendAsync(new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/admin/certifications/attachments/{TestCertificationAttachmentService.AttachmentId}"));
+        Assert.Equal(HttpStatusCode.OK, adminResponse.StatusCode);
+        Assert.Equal("no-store", adminResponse.Headers.CacheControl?.ToString());
     }
 
     [Fact]
@@ -426,6 +455,8 @@ public sealed class AdminAuthenticationTests : IAsyncLifetime
             throw new NotSupportedException();
         public Task<BlogPostImageError> DeleteImageAsync(Guid imageId, CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
+        public Task CleanupBlogPostDirectoryAsync(Guid blogPostId, CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
         public Task<BlogPostImageContent?> OpenImageAsync(Guid imageId, bool administratorCanViewDrafts, CancellationToken cancellationToken = default) =>
             imageId == ImageId
                 ? Task.FromResult<BlogPostImageContent?>(new(new MemoryStream([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]), "image/png"))
@@ -489,6 +520,35 @@ public sealed class AdminAuthenticationTests : IAsyncLifetime
         return response;
     }
 
+    private sealed class TestCertificationAttachmentService : ICertificationMediaService
+    {
+        public static Guid CertificationId { get; } = Guid.Parse("0b9ad134-3bcf-4e6c-a713-a5de9a5f66cd");
+        public static Guid AttachmentId { get; } = Guid.Parse("91d2edee-849d-4f4d-b8f2-8d4dbb8d95f1");
+        public long MaximumFileSizeBytes => 10 * 1024 * 1024;
+
+        public Task<IReadOnlyList<CertificationAttachmentReadModel>> GetAttachmentsAsync(Guid certificationId, CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<CertificationAttachmentReadModel>>([]);
+        public Task<CertificationAttachmentOperationResult> UploadAttachmentAsync(Guid certificationId, string fileName, string contentType, long fileSize, Stream content, CancellationToken cancellationToken = default) => throw new NotSupportedException();
+        public Task<bool> UpdateAttachmentDisplayNameAsync(Guid attachmentId, string displayName, CancellationToken cancellationToken = default) => Task.FromResult(false);
+        public Task<bool> SetAttachmentPublicAsync(Guid attachmentId, bool isPublic, CancellationToken cancellationToken = default) => Task.FromResult(false);
+        public Task<bool> DeleteAttachmentAsync(Guid attachmentId, CancellationToken cancellationToken = default) => Task.FromResult(false);
+
+        public Task<CertificationAttachmentContent?> OpenAttachmentAsync(Guid attachmentId, CancellationToken cancellationToken = default) =>
+            attachmentId == AttachmentId
+                ? Task.FromResult<CertificationAttachmentContent?>(new(
+                    new CertificationAttachmentReadModel(AttachmentId, CertificationId, "private.pdf", "private.pdf", "application/pdf", 8, DateTimeOffset.UtcNow, false),
+                    new MemoryStream(System.Text.Encoding.ASCII.GetBytes("%PDF-1.7"))))
+                : Task.FromResult<CertificationAttachmentContent?>(null);
+
+        public Task<CertificationAttachmentContent?> OpenPublicAttachmentAsync(Guid attachmentId, CancellationToken cancellationToken = default) =>
+            Task.FromResult<CertificationAttachmentContent?>(null);
+
+        public Task<CertificationCardImageOperationResult> UploadCardImageAsync(Guid certificationId, string fileName, string contentType, long fileSize, Stream content, CancellationToken cancellationToken = default) => throw new NotSupportedException();
+        public Task<bool> DeleteCardImageAsync(Guid certificationId, CancellationToken cancellationToken = default) => Task.FromResult(false);
+        public Task<CertificationImageContent?> OpenCardImageAsync(Guid certificationId, CancellationToken cancellationToken = default) => Task.FromResult<CertificationImageContent?>(null);
+        public Task DeleteCertificationFilesAsync(Guid certificationId, CancellationToken cancellationToken = default) => Task.CompletedTask;
+        public Task CleanupCertificationDirectoryAsync(Guid certificationId, CancellationToken cancellationToken = default) => Task.CompletedTask;
+    }
+
     private sealed class TestExperienceAttachmentService : IExperienceAttachmentService
     {
         public static Guid AttachmentId { get; } = Guid.Parse("7a7e7cd2-c353-415d-968b-8e851341a5d9");
@@ -515,6 +575,9 @@ public sealed class AdminAuthenticationTests : IAsyncLifetime
 
         public Task<bool> DeleteAsync(Guid attachmentId, CancellationToken cancellationToken = default) =>
             Task.FromResult(false);
+
+        public Task CleanupExperienceDirectoryAsync(Guid experienceId, CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
 
         public Task<bool> SetPublicAsync(Guid attachmentId, bool isPublic, CancellationToken cancellationToken = default) =>
             Task.FromResult(true);

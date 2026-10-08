@@ -34,6 +34,7 @@ public static class CertificationTranslationSelector
             GetPublicImagePath(certification),
             certification.DisplayOrder,
             certification.Attachments
+                .Where(attachment => attachment.IsPublic)
                 .OrderBy(attachment => attachment.CreatedAt)
                 .ThenBy(attachment => attachment.Id)
                 .Select(attachment => new CertificationAttachmentReadModel(
@@ -43,7 +44,8 @@ public static class CertificationTranslationSelector
                     attachment.DisplayName,
                     attachment.ContentType,
                     attachment.SizeBytes,
-                    attachment.CreatedAt))
+                    attachment.CreatedAt,
+                    attachment.IsPublic))
                 .ToArray());
     }
 

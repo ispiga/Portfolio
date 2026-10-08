@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Portfolio.Application.Blog;
 using Portfolio.Domain.Entities;
@@ -47,7 +48,8 @@ public sealed class BlogPostImageStorageTests : IDisposable
             {
                 Directory = "blog-images",
                 MaximumFileSizeBytes = 4096
-            }));
+            }),
+            NullLogger<BlogPostImageStorageService>.Instance);
     }
 
     [Fact]
@@ -145,6 +147,25 @@ public sealed class BlogPostImageStorageTests : IDisposable
         await using var check = factory.CreateDbContext();
         Assert.Null(await check.BlogPostImages.FindAsync(image.Id));
         Assert.Null((await check.BlogPosts.SingleAsync(post => post.Id == blogPostId)).FeaturedImagePath);
+    }
+
+    [Fact]
+    public async Task Deleting_blog_post_removes_its_empty_image_directory_after_database_delete()
+    {
+        var png = new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
+        var uploaded = await service.UploadImageAsync(blogPostId, "image.png", "image/png", png.Length, new MemoryStream(png));
+        var image = uploaded.Image!;
+        Assert.Equal(BlogPostImageError.None, await service.DeleteImageAsync(image.Id));
+
+        var postDirectory = Path.Combine(root, "blog-images", "posts", blogPostId.ToString("N"));
+        Assert.True(Directory.Exists(postDirectory));
+
+        var result = await new Portfolio.Infrastructure.Services.BlogPostAdministrationService(factory, service)
+            .DeleteAsync(blogPostId);
+
+        Assert.Equal(BlogPostDeleteResult.Deleted, result);
+        Assert.False(Directory.Exists(postDirectory));
+        Assert.True(Directory.Exists(Path.Combine(root, "blog-images", "posts")));
     }
 
     public void Dispose()

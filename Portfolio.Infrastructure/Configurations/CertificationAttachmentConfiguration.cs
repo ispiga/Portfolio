@@ -16,6 +16,7 @@ public sealed class CertificationAttachmentConfiguration : IEntityTypeConfigurat
         builder.Property(attachment => attachment.ContentType).HasMaxLength(100).IsRequired();
         builder.Property(attachment => attachment.SizeBytes).IsRequired();
         builder.Property(attachment => attachment.CreatedAt).IsRequired();
+        builder.Property(attachment => attachment.IsPublic).IsRequired();
         builder.HasIndex(attachment => new { attachment.CertificationId, attachment.CreatedAt });
         builder.HasOne(attachment => attachment.Certification)
             .WithMany(certification => certification.Attachments)

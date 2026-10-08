@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Portfolio.Application.Certifications;
 using Portfolio.Domain.Entities;
@@ -9,7 +10,8 @@ namespace Portfolio.Infrastructure.Storage;
 public sealed class CertificationMediaStorageService(
     IDbContextFactory<PortfolioDbContext> dbContextFactory,
     IWebHostEnvironment environment,
-    IOptions<CertificationMediaStorageOptions> options) : ICertificationMediaService
+    IOptions<CertificationMediaStorageOptions> options,
+    ILogger<CertificationMediaStorageService> logger) : ICertificationMediaService
 {
     private const string StoragePrefix = "certifications";
     private readonly CertificationMediaStorageOptions settings = options.Value;
@@ -81,7 +83,8 @@ public sealed class CertificationMediaStorageService(
                 StorageKey = relativePath,
                 ContentType = validation.ContentType!,
                 SizeBytes = fileSize,
-                CreatedAt = DateTimeOffset.UtcNow
+                CreatedAt = DateTimeOffset.UtcNow,
+                IsPublic = false
             };
             context.CertificationAttachments.Add(attachment);
             try
@@ -135,6 +138,25 @@ public sealed class CertificationMediaStorageService(
         return true;
     }
 
+    public async Task<bool> SetAttachmentPublicAsync(
+        Guid attachmentId,
+        bool isPublic,
+        CancellationToken cancellationToken = default)
+    {
+        await using var context = await dbContextFactory.CreateDbContextAsync(cancellationToken);
+        var attachment = await context.CertificationAttachments.SingleOrDefaultAsync(
+            candidate => candidate.Id == attachmentId,
+            cancellationToken);
+        if (attachment is null)
+        {
+            return false;
+        }
+
+        attachment.IsPublic = isPublic;
+        await context.SaveChangesAsync(cancellationToken);
+        return true;
+    }
+
     public async Task<bool> DeleteAttachmentAsync(
         Guid attachmentId,
         CancellationToken cancellationToken = default)
@@ -163,6 +185,23 @@ public sealed class CertificationMediaStorageService(
         await using var context = await dbContextFactory.CreateDbContextAsync(cancellationToken);
         var attachment = await context.CertificationAttachments.AsNoTracking()
             .SingleOrDefaultAsync(candidate => candidate.Id == attachmentId, cancellationToken);
+        if (attachment is null
+            || !TryGetStoredPath(attachment.StorageKey, attachment.CertificationId, "attachments", out var path)
+            || !File.Exists(path))
+        {
+            return null;
+        }
+
+        return new(ToReadModel(attachment), new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read));
+    }
+
+    public async Task<CertificationAttachmentContent?> OpenPublicAttachmentAsync(
+        Guid attachmentId,
+        CancellationToken cancellationToken = default)
+    {
+        await using var context = await dbContextFactory.CreateDbContextAsync(cancellationToken);
+        var attachment = await context.CertificationAttachments.AsNoTracking()
+            .SingleOrDefaultAsync(candidate => candidate.Id == attachmentId && candidate.IsPublic, cancellationToken);
         if (attachment is null
             || !TryGetStoredPath(attachment.StorageKey, attachment.CertificationId, "attachments", out var path)
             || !File.Exists(path))
@@ -268,7 +307,8 @@ public sealed class CertificationMediaStorageService(
             return null;
         }
 
-        return new(GetContentType(Path.GetExtension(path))!, new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read));
+        var content = await File.ReadAllBytesAsync(path, cancellationToken);
+        return new(GetContentType(Path.GetExtension(path))!, new MemoryStream(content, writable: false));
     }
 
     public async Task DeleteCertificationFilesAsync(
@@ -295,6 +335,28 @@ public sealed class CertificationMediaStorageService(
         {
             DeleteFile(path);
         }
+    }
+
+    public Task CleanupCertificationDirectoryAsync(Guid certificationId, CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        CleanupCertificationDirectory(certificationId);
+        return Task.CompletedTask;
+    }
+
+    private void CleanupCertificationDirectory(Guid certificationId)
+    {
+        var storagePrefixDirectory = Path.GetFullPath(Path.Combine(storageRoot, StoragePrefix));
+        var certificationDirectory = Path.GetFullPath(Path.Combine(storagePrefixDirectory, certificationId.ToString("N")));
+        if (!certificationDirectory.StartsWith(storagePrefixDirectory + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+        {
+            logger.LogWarning("Skipped cleanup of an invalid media directory for certification {CertificationId}.", certificationId);
+            return;
+        }
+
+        TryDeleteEmptyDirectory(Path.Combine(certificationDirectory, "attachments"), certificationId);
+        TryDeleteEmptyDirectory(Path.Combine(certificationDirectory, "card"), certificationId);
+        TryDeleteEmptyDirectory(certificationDirectory, certificationId);
     }
 
     private async Task<CertificationAttachmentError?> CopyAndValidateAsync(
@@ -373,7 +435,8 @@ public sealed class CertificationMediaStorageService(
         attachment.DisplayName,
         attachment.ContentType,
         attachment.SizeBytes,
-        attachment.CreatedAt);
+        attachment.CreatedAt,
+        attachment.IsPublic);
 
     private static string ResolveStorageRoot(IWebHostEnvironment environment, string directory)
     {
@@ -428,11 +491,33 @@ public sealed class CertificationMediaStorageService(
         }
     }
 
-    private static void DeleteFile(string? path)
+    private void DeleteFile(string? path)
     {
-        if (path is not null && File.Exists(path))
+        try
         {
-            File.Delete(path);
+            if (path is not null && File.Exists(path))
+            {
+                File.Delete(path);
+            }
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            logger.LogWarning(exception, "Unable to delete certification media file {FilePath}.", path);
+        }
+    }
+
+    private void TryDeleteEmptyDirectory(string path, Guid certificationId)
+    {
+        try
+        {
+            if (Directory.Exists(path) && !Directory.EnumerateFileSystemEntries(path).Any())
+            {
+                Directory.Delete(path);
+            }
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            logger.LogWarning(exception, "Unable to delete empty media directory {DirectoryPath} for certification {CertificationId}.", path, certificationId);
         }
     }
 

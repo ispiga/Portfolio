@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Portfolio.Application.Projects;
 using Portfolio.Domain.Entities;
@@ -30,7 +31,8 @@ public sealed class ProjectPreviewImageStorageTests : IDisposable
         service = new ProjectPreviewImageStorageService(
             factory,
             environment,
-            Options.Create(new ProjectPreviewImageStorageOptions { Directory = "preview-images" }));
+            Options.Create(new ProjectPreviewImageStorageOptions { Directory = "preview-images" }),
+            NullLogger<ProjectPreviewImageStorageService>.Instance);
     }
 
     [Fact]
@@ -140,7 +142,8 @@ public sealed class ProjectPreviewImageStorageTests : IDisposable
             Options.Create(new ProjectPreviewImageStorageOptions
             {
                 Directory = Path.Combine(webRoot, "project-images")
-            })));
+            }),
+            NullLogger<ProjectPreviewImageStorageService>.Instance));
     }
 
     public void Dispose()

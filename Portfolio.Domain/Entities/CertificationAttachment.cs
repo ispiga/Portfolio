@@ -18,5 +18,7 @@ public sealed class CertificationAttachment
 
     public DateTimeOffset CreatedAt { get; set; }
 
+    public bool IsPublic { get; set; }
+
     public Certification Certification { get; set; } = null!;
 }

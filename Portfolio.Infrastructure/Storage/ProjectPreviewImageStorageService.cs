@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Portfolio.Application.Projects;
 using Portfolio.Domain.Entities;
@@ -9,7 +10,8 @@ namespace Portfolio.Infrastructure.Storage;
 public sealed class ProjectPreviewImageStorageService(
     IDbContextFactory<PortfolioDbContext> dbContextFactory,
     IWebHostEnvironment environment,
-    IOptions<ProjectPreviewImageStorageOptions> options) : IProjectPreviewImageService
+    IOptions<ProjectPreviewImageStorageOptions> options,
+    ILogger<ProjectPreviewImageStorageService> logger) : IProjectPreviewImageService
 {
     private const string PublicPathPrefix = "/project-preview-images/";
     private readonly ProjectPreviewImageStorageOptions settings = options.Value;
@@ -221,9 +223,16 @@ public sealed class ProjectPreviewImageStorageService(
 
     private void DeleteStoredPath(string? publicPath)
     {
-        if (publicPath is not null && TryGetStoredPath(publicPath, out var fullPath) && File.Exists(fullPath))
+        try
         {
-            File.Delete(fullPath);
+            if (publicPath is not null && TryGetStoredPath(publicPath, out var fullPath) && File.Exists(fullPath))
+            {
+                File.Delete(fullPath);
+            }
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            logger.LogWarning(exception, "Unable to delete project preview image {PublicPath}.", publicPath);
         }
     }
 }

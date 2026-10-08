@@ -2,6 +2,7 @@ using System.Xml;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Portfolio.Application.Blog;
 using Portfolio.Domain.Entities;
@@ -11,7 +12,8 @@ namespace Portfolio.Infrastructure.Storage;
 public sealed class BlogPostImageStorageService(
     IDbContextFactory<PortfolioDbContext> dbContextFactory,
     IWebHostEnvironment environment,
-    IOptions<BlogPostImageStorageOptions> options) : IBlogPostImageService
+    IOptions<BlogPostImageStorageOptions> options,
+    ILogger<BlogPostImageStorageService> logger) : IBlogPostImageService
 {
     private const string PublicPathPrefix = "/blog-post-images/";
     private const string StoragePrefix = "posts";
@@ -194,6 +196,21 @@ public sealed class BlogPostImageStorageService(
         await context.SaveChangesAsync(cancellationToken);
         DeleteFile(storedPath);
         return BlogPostImageError.None;
+    }
+
+    public Task CleanupBlogPostDirectoryAsync(Guid blogPostId, CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var postsRoot = Path.GetFullPath(Path.Combine(storageRoot, StoragePrefix));
+        var postDirectory = Path.GetFullPath(Path.Combine(postsRoot, blogPostId.ToString("N")));
+        if (!postDirectory.StartsWith(postsRoot + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+        {
+            logger.LogWarning("Skipped cleanup of an invalid image directory for blog post {BlogPostId}.", blogPostId);
+            return Task.CompletedTask;
+        }
+
+        TryDeleteEmptyDirectory(postDirectory, blogPostId);
+        return Task.CompletedTask;
     }
 
     public async Task<BlogPostImageContent?> OpenImageAsync(
@@ -393,11 +410,33 @@ public sealed class BlogPostImageStorageService(
         _ => null
     };
 
-    private static void DeleteFile(string? path)
+    private void DeleteFile(string? path)
     {
-        if (path is not null && File.Exists(path))
+        try
         {
-            File.Delete(path);
+            if (path is not null && File.Exists(path))
+            {
+                File.Delete(path);
+            }
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            logger.LogWarning(exception, "Unable to delete blog image file {FilePath}.", path);
+        }
+    }
+
+    private void TryDeleteEmptyDirectory(string path, Guid blogPostId)
+    {
+        try
+        {
+            if (Directory.Exists(path) && !Directory.EnumerateFileSystemEntries(path).Any())
+            {
+                Directory.Delete(path);
+            }
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            logger.LogWarning(exception, "Unable to delete empty image directory for blog post {BlogPostId}.", blogPostId);
         }
     }
 }

@@ -202,12 +202,19 @@ public sealed class ExperienceAttachmentStorageService(
                 File.Delete(path);
             }
         }
-        catch (IOException exception)
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
-            logger.LogWarning(exception, "Unable to remove a deleted experience attachment from persistent storage.");
+            logger.LogWarning(exception, "Unable to remove experience attachment {AttachmentId} from persistent storage.", attachmentId);
         }
 
         return true;
+    }
+
+    public Task CleanupExperienceDirectoryAsync(Guid experienceId, CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        TryDeleteEmptyExperienceDirectory(experienceId);
+        return Task.CompletedTask;
     }
 
     public async Task<bool> SetPublicAsync(Guid attachmentId, bool isPublic, CancellationToken cancellationToken = default)
@@ -279,6 +286,29 @@ public sealed class ExperienceAttachmentStorageService(
         }
 
         return path;
+    }
+
+    private void TryDeleteEmptyExperienceDirectory(Guid experienceId)
+    {
+        var experienceRoot = Path.GetFullPath(Path.Combine(storageRoot, "experience"));
+        var experienceDirectory = Path.GetFullPath(Path.Combine(experienceRoot, experienceId.ToString("N")));
+        if (!experienceDirectory.StartsWith(experienceRoot + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+        {
+            logger.LogWarning("Skipped cleanup of an invalid attachment directory for experience {ExperienceId}.", experienceId);
+            return;
+        }
+
+        try
+        {
+            if (Directory.Exists(experienceDirectory) && !Directory.EnumerateFileSystemEntries(experienceDirectory).Any())
+            {
+                Directory.Delete(experienceDirectory);
+            }
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            logger.LogWarning(exception, "Unable to delete empty attachment directory for experience {ExperienceId}.", experienceId);
+        }
     }
 
     private static string GetStorageRoot(IWebHostEnvironment environment, string configuredDirectory)

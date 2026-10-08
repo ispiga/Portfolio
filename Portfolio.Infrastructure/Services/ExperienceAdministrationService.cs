@@ -5,7 +5,8 @@ using Portfolio.Domain.Entities;
 namespace Portfolio.Infrastructure.Services;
 
 public sealed class ExperienceAdministrationService(
-    IDbContextFactory<PortfolioDbContext> dbContextFactory) : IExperienceAdministrationService
+    IDbContextFactory<PortfolioDbContext> dbContextFactory,
+    IExperienceAttachmentService? attachmentService = null) : IExperienceAdministrationService
 {
     public async Task<IReadOnlyList<ExperienceAdminListItem>> GetExperiencesAsync(
         CancellationToken cancellationToken = default)
@@ -109,6 +110,10 @@ public sealed class ExperienceAdministrationService(
 
         context.Experiences.Remove(experience);
         await context.SaveChangesAsync(cancellationToken);
+        if (attachmentService is not null)
+        {
+            await attachmentService.CleanupExperienceDirectoryAsync(id, cancellationToken);
+        }
         return ExperienceDeleteResult.Deleted;
     }
 

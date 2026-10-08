@@ -7,7 +7,8 @@ public sealed record CertificationAttachmentReadModel(
     string DisplayName,
     string ContentType,
     long SizeBytes,
-    DateTimeOffset CreatedAt);
+    DateTimeOffset CreatedAt,
+    bool IsPublic);
 
 public sealed record CertificationAttachmentContent(
     CertificationAttachmentReadModel Attachment,

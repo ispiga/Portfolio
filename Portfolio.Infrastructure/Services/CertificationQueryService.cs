@@ -16,7 +16,7 @@ public sealed class CertificationQueryService(
             .AsNoTracking()
             .AsSplitQuery()
             .Include(certification => certification.Translations)
-            .Include(certification => certification.Attachments)
+            .Include(certification => certification.Attachments.Where(attachment => attachment.IsPublic))
             .OrderBy(certification => certification.DisplayOrder)
             .ThenBy(certification => certification.Id)
             .ToListAsync(cancellationToken);

@@ -114,7 +114,9 @@
         }
         else
         {
-            operationMessage = Localizer["CertificationNotFound"];
+            operationMessage = Localizer[result == CertificationDeleteResult.HasAttachments
+                ? "CertificationDeleteHasAttachments"
+                : "CertificationNotFound"];
             operationSeverity = Severity.Error;
         }
     }

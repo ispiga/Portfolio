@@ -25,6 +25,8 @@ public interface IExperienceAttachmentService
 
     Task<bool> DeleteAsync(Guid attachmentId, CancellationToken cancellationToken = default);
 
+    Task CleanupExperienceDirectoryAsync(Guid experienceId, CancellationToken cancellationToken = default);
+
     Task<bool> SetPublicAsync(Guid attachmentId, bool isPublic, CancellationToken cancellationToken = default);
 
     Task<ExperienceAttachmentContent?> OpenReadAsync(Guid attachmentId, CancellationToken cancellationToken = default);

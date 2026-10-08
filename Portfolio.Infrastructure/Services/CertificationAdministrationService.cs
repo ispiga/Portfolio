@@ -102,9 +102,28 @@ public sealed class CertificationAdministrationService(
             return CertificationDeleteResult.NotFound;
         }
 
+        if (await context.CertificationAttachments.AnyAsync(
+                attachment => attachment.CertificationId == id,
+                cancellationToken))
+        {
+            return CertificationDeleteResult.HasAttachments;
+        }
+
         await mediaService.DeleteCertificationFilesAsync(id, cancellationToken);
-        context.Certifications.Remove(certification);
-        await context.SaveChangesAsync(cancellationToken);
+        await using (var deleteContext = await dbContextFactory.CreateDbContextAsync(cancellationToken))
+        {
+            var persistedCertification = await deleteContext.Certifications
+                .SingleOrDefaultAsync(candidate => candidate.Id == id, cancellationToken);
+            if (persistedCertification is null)
+            {
+                return CertificationDeleteResult.NotFound;
+            }
+
+            deleteContext.Certifications.Remove(persistedCertification);
+            await deleteContext.SaveChangesAsync(cancellationToken);
+        }
+
+        await mediaService.CleanupCertificationDirectoryAsync(id, cancellationToken);
         return CertificationDeleteResult.Deleted;
     }
 
