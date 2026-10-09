@@ -550,15 +550,9 @@ La implementación actual mantiene esta lógica en `wwwroot/js/theme.js`, sin du
 
 # 12. Identidad visual y logo
 
-El portfolio tendrá un logo propio.
+El portfolio tendrá un logo propio. La dirección conceptual preferida es un monograma construido a partir de **dos letras I de Ismael enlazadas**. Sus remates superiores e inferiores serán curvos y caligráficos, en lugar de barras rectas; el conjunto podrá evocar sutilmente los símbolos **π** o **#** sin depender de que se lean literalmente como esos caracteres.
 
-La idea conceptual es integrar tres elementos:
-
-- **I** → Ismael
-- **π** → referencia a la inicial del primer apellido
-- **Q** → referencia a la inicial del segundo apellido
-
-El diseño gráfico definitivo se realizará posteriormente.
+El boceto compartido por el usuario es una referencia de forma y gesto, no un arte final. El diseño definitivo se realizará posteriormente y deberá comprobarse en tamaños pequeños y en versiones monocromas, para que se reconozca principalmente como una marca propia y no pierda legibilidad.
 
 Inicialmente se reservará el espacio correspondiente:
 
@@ -687,6 +681,17 @@ La visibilidad del icono es únicamente una decisión de UX. La seguridad real s
 
 Inicialmente solo existirá un usuario administrador.
 
+## Gestión del contenido principal de la Home
+
+Se añadirán dos apartados de administración independientes, protegidos por `AdministratorOnly` e integrados en el Dashboard y la navegación administrativa:
+
+- **Hero:** editar el titular en español e inglés; añadir, editar, retirar y ordenar los logos tecnológicos, y asignar cada logo a una órbita.
+- **Sobre mí:** editar la descripción del perfil y gestionar las áreas/skills ordenables; añadir, editar, retirar y ordenar aficiones, con imagen y descripción localizada.
+
+El contenido textual y los metadatos se persistirán en SQL Server. Los textos presentados al público se localizarán para `es-ES` y `en-US`, con fallback a español cuando falte la traducción inglesa. Los binarios de logos e imágenes de aficiones se guardarán fuera de SQL Server y `wwwroot`, en almacenamiento persistente bajo `App_Data` (directorio configurable del módulo); SQL Server conservará una clave opaca, no una ruta física ni el contenido binario. Las imágenes se servirán mediante rutas controladas de la aplicación. Se aplicarán validación de formato, tamaño y contenido, y no se expondrán directorios de almacenamiento.
+
+El componente público del Hero calculará la distribución orbital a partir de los datos administrados; la animación y el diseño no se almacenarán como contenido. Las dos pantallas administrativas serán responsivas y reutilizarán los patrones existentes de formularios localizados, orden y gestión de imágenes.
+
 ### Responsive del área administrativa
 
 Las rutas administrativas deben seguir siendo utilizables en móvil sin desbordamiento horizontal. El layout compartido reorganiza cabecera, controles y navegación; por debajo de `48rem`, los enlaces de navegación se disponen en dos columnas. Los listados `MudTable` usan el breakpoint `Sm` para presentar sus filas de forma adaptada y las acciones pueden ajustarse al ancho disponible. Formularios, selectores, botones, alertas, tablas, vistas previas y cargas de archivos también deben reducir o envolver su contenido según el espacio. TinyMCE local se limita al ancho del contenedor y usa `toolbar_mode: "sliding"` para conservar las herramientas en pantallas estrechas.
@@ -740,25 +745,11 @@ La información más extensa estará en "Sobre mí".
 
 ## Tecnologías animadas
 
-Se quiere incluir un elemento visual que represente las tecnologías habituales.
+El elemento visual del Hero será una composición de **logos tecnológicos orbitando alrededor de un centro**, como evolución del recurso estático provisional actual. El conjunto de logos, su orden y la órbita asignada se gestionarán desde administración; el frontend distribuirá los elementos de manera equilibrada en cada órbita.
 
-Posibilidades:
+La animación se implementará con HTML/CSS y componentes Blazor, no mediante un GIF pesado. Será sutil, responsive y compatible con tema claro/oscuro; deberá respetar `prefers-reduced-motion` y mantener una presentación legible cuando el movimiento esté reducido o desactivado. El diseño no debe saturar el Hero.
 
-- banda horizontal animada de logos
-- composición visual alrededor de la presentación
-- animaciones CSS/HTML
-- componentes interactivos
-
-Se priorizará una implementación propia mediante HTML/CSS/Blazor frente a utilizar simplemente un GIF pesado.
-
-El efecto debe ser:
-
-- profesional
-- sutil
-- responsive
-- compatible con tema claro/oscuro
-
-No debe saturar visualmente el Hero.
+El titular del Hero será contenido localizado y editable desde administración. El texto del Hero se conservará breve —aproximadamente una frase/titular y 2-3 líneas como máximo— y no se convertirá en una biografía. Los elementos de interfaz, como el texto del CTA, seguirán los recursos compartidos de localización.
 
 ---
 
@@ -768,7 +759,7 @@ La sección "Sobre mí" incluirá varios bloques relacionados.
 
 ## Perfil
 
-Descripción profesional más completa que la del Hero.
+Descripción profesional más completa que la del Hero, editable desde administración y localizada para `es-ES` y `en-US`.
 
 Debe explicar:
 
@@ -779,7 +770,7 @@ Debe explicar:
 
 ## Áreas principales
 
-Se mostrarán visualmente las principales áreas tecnológicas.
+Se mostrarán visualmente las principales áreas tecnológicas. Los grupos y sus skills se gestionarán desde administración, con orden de presentación configurable. No se pretende mostrar aquí toda la lista de habilidades del CV.
 
 Por ejemplo:
 
@@ -797,7 +788,9 @@ DevOps
 Docker · Git · GitHub · Azure
 ```
 
-No es necesario mostrar aquí toda la lista de habilidades del CV.
+## Aficiones
+
+Se incluirá un bloque visual secundario con aficiones personales, administrable desde el panel. Cada elemento podrá incluir una imagen y una descripción localizada; su orden de presentación será configurable. El bloque complementará el perfil profesional sin desplazar ni competir visualmente con la descripción, las áreas tecnológicas o la experiencia.
 
 ## Experiencia profesional
 
@@ -1510,6 +1503,7 @@ La Fase 7 se implementará por entregas funcionales, con pruebas y revisión ant
 3. **Proyectos:** CRUD, edición localizada, aviso de traducciones ausentes, orden/destacado y gestión de las imágenes asociadas. Completada en la tercera entrega; la implementación y las pruebas se detallan más adelante. El ajuste posterior de slug, destacado y descripción se registra como una corrección de esta entrega, no como una nueva entrega de la Fase 7.
 4. **Certificaciones:** CRUD, edición localizada, aviso de traducciones ausentes, fechas, credenciales, orden e imágenes/documentos acordados. Completada en la cuarta entrega; la implementación, el almacenamiento y las pruebas se detallan más adelante.
 5. **Blog:** listado de artículos con acción para crear, editar o eliminar. La acción «Editar» seleccionará el artículo por su identificador y cargará ese contenido en el editor; no hace falta un desplegable separado para escogerlo. La edición localizada se realizará desde el mismo formulario mediante pestañas o controles de idioma. TinyMCE 8 se usará únicamente para `BlogPostTranslation.Content`, por ser el campo de texto enriquecido; experiencia, proyectos y certificaciones usarán campos estructurados y controles de texto normales. El formulario incluirá un estado editorial explícito y permitirá guardar cambios aunque el artículo tenga todos sus campos rellenos pero todavía se encuentre en redacción. **Completada en la quinta entrega;** implementación y validación descritas en «Entrega 5 implementada — Blog».
+6. **Contenido del Hero y «Sobre mí»:** entrega pendiente. Añadirá dos apartados administrativos: Hero (titular localizado y gestión de logos orbitales) y Sobre mí (descripción localizada del perfil, áreas/skills y aficiones con imagen). Incluirá persistencia en SQL Server para textos y metadatos, almacenamiento persistente externo para imágenes, consultas públicas localizadas y el efecto orbital accesible. El Hero y los bloques personales actuales siguen siendo provisionales hasta completar esta entrega; no se deben documentar como dinámicos o implementados antes de terminarla.
 
 El almacenamiento de archivos se implementa como infraestructura reutilizable mediante un directorio persistente configurable (local para desarrollo y montable desde QNAP), mantiene los binarios fuera de SQL Server y valida tipo, firma, tamaño y nombres seguros. Cada módulo define sus reglas de publicación y acceso: los adjuntos de experiencia son privados por defecto y se publican explícitamente; los previews de proyectos y los archivos de certificación son públicos según las reglas específicas de esos módulos.
 
