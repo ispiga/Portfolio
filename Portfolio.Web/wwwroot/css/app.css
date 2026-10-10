@@ -179,60 +179,121 @@ html[data-theme="dark"] {
 
 .technology-orbit {
     position: relative;
+    width: min(100%, 38rem);
+    aspect-ratio: 1.42;
+    margin-inline: auto;
+}
+
+.technology-orbit__plane,
+.technology-orbit__tracks,
+.technology-orbit__core {
+    position: absolute;
+    inset: 0;
     display: grid;
     place-items: center;
-    width: min(100%, 22rem);
-    aspect-ratio: 1;
-    margin-inline: auto;
-    border: 1px solid var(--color-border);
-    border-radius: 50%;
-    background: radial-gradient(circle, var(--color-surface) 0 23%, transparent 24%), var(--color-background);
-    box-shadow: var(--shadow-surface);
 }
 
-.technology-orbit::before,
-.technology-orbit::after {
+.technology-orbit__plane {
+    transform: none;
+}
+
+.technology-orbit__track {
     position: absolute;
-    inset: 12%;
-    border: 1px dashed var(--color-border);
+    border: 1px solid color-mix(in srgb, var(--color-primary) 34%, var(--color-border));
+    border-block-start-color: color-mix(in srgb, var(--color-primary) 52%, var(--color-border));
+    border-block-end-color: color-mix(in srgb, var(--color-primary) 16%, var(--color-border));
     border-radius: 50%;
-    content: "";
 }
 
-.technology-orbit::after {
-    inset: 27%;
+.technology-orbit__track--orbit-1 { width: 54%; height: 46%; }
+.technology-orbit__track--orbit-2 { width: 73%; height: 62%; }
+.technology-orbit__track--orbit-3 { width: 92%; height: 78%; }
+
+.technology-orbit__track--orbit-2 {
+    border-color: color-mix(in srgb, var(--color-primary) 48%, var(--color-border));
 }
+
+.technology-orbit__track--orbit-1::after,
+.technology-orbit__track--orbit-2::after,
+.technology-orbit__track--orbit-3::after {
+    position: absolute;
+    inset: -1px;
+    border: inherit;
+    border-radius: inherit;
+    content: "";
+    pointer-events: none;
+    clip-path: inset(50% 0 0);
+}
+
+.technology-orbit__track--orbit-1::after,
+.technology-orbit__track--orbit-3::after { opacity: .75; }
 
 .technology-orbit__core {
-    z-index: 1;
-    display: grid;
-    place-items: center;
-    width: 5rem;
-    height: 5rem;
-    border: 1px solid var(--color-primary);
+    inset: 50% auto auto 50%;
+    width: clamp(6rem, 28%, 10rem);
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+    overflow: hidden;
+    border: 0.35rem solid color-mix(in srgb, var(--color-primary) 75%, var(--color-background));
     border-radius: 50%;
+    background: var(--color-surface);
+    box-shadow: var(--shadow-surface);
     color: var(--color-primary);
     font-family: var(--font-mono);
     font-size: 1.25rem;
     font-weight: 700;
+    z-index: auto;
+}
+
+.technology-orbit__core img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .technology-orbit__item {
     position: absolute;
-    z-index: 1;
-    padding: 0.4rem 0.65rem;
-    border: 1px solid var(--color-border);
-    border-radius: 999px;
-    background-color: var(--color-surface);
-    color: var(--color-text-secondary);
-    font-family: var(--font-mono);
-    font-size: var(--text-small);
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    offset-anchor: center;
+    offset-rotate: 0deg;
+    offset-distance: 0%;
+    animation: technology-orbit-motion var(--orbit-duration) linear infinite;
+    animation-direction: var(--orbit-direction, normal);
+    animation-delay: var(--orbit-delay, 0s);
 }
 
-.technology-orbit__item--one { inset-block-start: 8%; inset-inline-start: 38%; }
-.technology-orbit__item--two { inset-block-start: 42%; inset-inline-end: 3%; }
-.technology-orbit__item--three { inset-block-end: 10%; inset-inline-start: 32%; }
-.technology-orbit__item--four { inset-block-start: 42%; inset-inline-start: 3%; }
+.technology-orbit__item--orbit-1 { offset-path: ellipse(27% 23% at 50% 50%); }
+.technology-orbit__item--orbit-2 { offset-path: ellipse(36.5% 31% at 50% 50%); }
+.technology-orbit__item--orbit-3 { offset-path: ellipse(46% 39% at 50% 50%); }
+
+.technology-orbit__item-counter {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    transform: translate(-50%, -50%);
+    border: 1px solid color-mix(in srgb, var(--color-primary) 25%, var(--color-border));
+    border-radius: 50%;
+    background: var(--color-surface);
+    box-shadow: 0 0.35rem 0.9rem color-mix(in srgb, var(--color-primary) 18%, transparent), var(--shadow-surface);
+}
+
+.technology-orbit__item-image {
+    display: block;
+    width: 1.75rem;
+    height: 1.75rem;
+    object-fit: contain;
+}
+
+@keyframes technology-orbit-motion {
+    from { offset-distance: 0%; }
+    to { offset-distance: 100%; }
+}
 
 .section-heading {
     max-width: 48rem;
@@ -260,6 +321,27 @@ html[data-theme="dark"] {
 .content-card { display: flex; align-items: center; min-height: 100%; }
 .area-card h3, .project-card h3, .certification-card h3 { margin-bottom: 0.5rem; font-size: 1.15rem; }
 .area-card p, .project-card p, .certification-card p { margin-bottom: 0; }
+.about-profile { white-space: pre-line; }
+.about-skill-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0; padding: 0; list-style: none; }
+.about-skill-list li { padding: 0.3rem 0.6rem; border: 1px solid var(--color-border); border-radius: 999px; color: var(--color-text-secondary); font-size: var(--text-small); }
+.about-content-empty { align-self: center; color: var(--color-text-secondary); }
+.about-hobbies { margin-top: 3rem; }
+.about-hobbies > h3 { margin-bottom: 1rem; font-size: clamp(1.4rem, 3vw, 2rem); }
+.about-hobbies-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: 1rem; }
+.about-hobby-card { display: grid; grid-template-columns: minmax(5rem, 0.35fr) minmax(0, 1fr); align-items: center; gap: 1rem; padding: 1rem; }
+.about-hobby-card img { width: 100%; aspect-ratio: 1; border-radius: var(--radius-small); object-fit: cover; }
+.about-hobby-card h4 { margin-bottom: 0.35rem; }
+.about-hobby-card p { margin-bottom: 0; white-space: pre-line; }
+.home-content-editor-card { margin-top: 1rem; padding: clamp(1rem, 2.5vw, 1.5rem); border: 1px solid var(--color-border); border-radius: var(--radius-small); }
+.home-content-editor-card__heading, .admin-module-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.home-content-editor-card__heading { margin-bottom: 1rem; }
+.home-content-editor-card__heading h3, .home-content-editor-card__subheading h4 { margin: 0; }
+.home-content-editor-card__preview { display: grid; place-items: center; min-height: 5rem; padding: 0.5rem; border: 1px solid var(--color-border); border-radius: var(--radius-small); }
+.home-content-editor-card__preview img { width: 4rem; height: 4rem; object-fit: contain; }
+.home-content-editor-card__subheading { margin-block: 1.5rem 0.75rem; }
+.home-content-editor-card__child { margin-block: 0.75rem; padding: 0.75rem; border: 1px solid var(--color-border); border-radius: var(--radius-small); }
+.home-content-editor-card__remove { align-self: end; }
+.admin-field__hint { color: var(--color-text-secondary); font-size: var(--text-small); }
 .timeline-empty { display: flex; align-items: center; gap: 1rem; min-height: 8rem; }
 .timeline-empty p { margin: 0; }
 .timeline-empty__marker { width: 1rem; height: 1rem; flex: 0 0 auto; border: 0.25rem solid var(--color-primary); border-radius: 50%; }
@@ -370,8 +452,12 @@ html[data-theme="dark"] {
 
 @media (max-width: 47.999rem) {
     .home-hero { grid-template-columns: 1fr; min-height: auto; }
-    .technology-orbit { width: min(100%, 18rem); }
+    .technology-orbit { width: min(100%, 30rem); aspect-ratio: 1.15; perspective: 42rem; }
+    .technology-orbit__item-counter { width: 2.4rem; height: 2.4rem; }
+    .technology-orbit__item-image { width: 1.5rem; height: 1.5rem; }
     .about-grid, .areas-grid, .card-grid, .form-grid { grid-template-columns: 1fr; }
+    .about-hobby-card { grid-template-columns: 5rem minmax(0, 1fr); }
+    .admin-module-heading, .home-content-editor-card__heading { align-items: flex-start; flex-wrap: wrap; }
     .section-heading--split { display: block; }
     .section-heading--split > p { margin-top: 1rem; }
     .experience-card { grid-template-columns: 1fr; gap: 0.75rem; }
@@ -1133,4 +1219,7 @@ p {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
     }
+
+    .technology-orbit__item,
+    .technology-orbit__item-counter { animation: none !important; }
 }

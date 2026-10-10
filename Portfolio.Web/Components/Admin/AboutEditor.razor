@@ -1,0 +1,398 @@
+@page "/admin/about"
+@attribute [Authorize(Policy = PortfolioAuthorization.AdministratorPolicy)]
+@layout AdminLayout
+@implements IAsyncDisposable
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.Extensions.Localization
+@using Portfolio.Application.HomeContent
+@using Portfolio.Infrastructure.Identity
+@inject IAboutAdministrationService AboutService
+@inject IHomeContentImageStorageService ImageStorage
+@inject IStringLocalizer<SharedResource> Localizer
+@inject ILogger<AboutEditor> Logger
+
+<PageTitle>@Localizer["AboutAdminTitle"]</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="admin-dashboard">
+    <header class="admin-dashboard__heading">
+        <MudText Typo="Typo.h1" Tag="@("h1")">@Localizer["AboutAdminTitle"]</MudText>
+        <MudText Typo="Typo.body1">@Localizer["AboutAdminDescription"]</MudText>
+    </header>
+
+    @if (!loaded)
+    {
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary" aria-label="@Localizer["Loading"]" />
+    }
+    else
+    {
+        <EditForm Model="model" OnSubmit="SaveAsync">
+            <MudPaper Elevation="1" Class="pa-5 mb-4">
+                <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["AboutProfileSection"]</MudText>
+                <div class="experience-admin-grid">
+                    <div class="admin-field">
+                        <label for="about-profile-es">@Localizer["AboutSpanishProfile"]</label>
+                        <InputTextArea id="about-profile-es" @bind-Value="model.SpanishProfile" maxlength="4000" rows="8" />
+                    </div>
+                    <div class="admin-field">
+                        <label for="about-profile-en">@Localizer["AboutEnglishProfile"]</label>
+                        <InputTextArea id="about-profile-en" @bind-Value="model.EnglishProfile" maxlength="4000" rows="8" />
+                        <span class="admin-field__hint">@Localizer["HomeEnglishFallbackHint"]</span>
+                    </div>
+                </div>
+            </MudPaper>
+
+            <MudPaper Elevation="1" Class="pa-5 mb-4">
+                <div class="admin-module-heading">
+                    <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["AboutSkillGroups"]</MudText>
+                    <MudButton ButtonType="ButtonType.Button" OnClick="AddGroup" Variant="Variant.Outlined" Color="Color.Primary">@Localizer["AboutAddGroup"]</MudButton>
+                </div>
+                @if (model.Groups.Count == 0)
+                {
+                    <MudText Typo="Typo.body2">@Localizer["AboutGroupsEmpty"]</MudText>
+                }
+                @foreach (var group in model.Groups.OrderBy(item => item.DisplayOrder).ThenBy(item => item.Id))
+                {
+                    <section @key="group.Id" class="home-content-editor-card" aria-label="@Localizer["AboutGroupEditorLabel", group.SpanishName]">
+                        <div class="home-content-editor-card__heading">
+                            <MudText Typo="Typo.h3" Tag="@("h3")">@Localizer["AboutSkillGroup"]</MudText>
+                            <MudButton ButtonType="ButtonType.Button" OnClick="@(() => RemoveGroup(group))" Color="Color.Error" Variant="Variant.Outlined">@Localizer["Delete"]</MudButton>
+                        </div>
+                        <div class="experience-admin-grid">
+                            <div class="admin-field">
+                                <label for="@($"group-name-es-{group.Id:N}")">@Localizer["AboutGroupNameSpanish"]</label>
+                                <InputText id="@($"group-name-es-{group.Id:N}")" @bind-Value="group.SpanishName" maxlength="100" />
+                            </div>
+                            <div class="admin-field">
+                                <label for="@($"group-name-en-{group.Id:N}")">@Localizer["AboutGroupNameEnglish"]</label>
+                                <InputText id="@($"group-name-en-{group.Id:N}")" @bind-Value="group.EnglishName" maxlength="100" />
+                            </div>
+                            <div class="admin-field">
+                                <label for="@($"group-order-{group.Id:N}")">@Localizer["HomeDisplayOrder"]</label>
+                                <InputNumber id="@($"group-order-{group.Id:N}")" @bind-Value="group.DisplayOrder" TValue="int" min="0" />
+                            </div>
+                        </div>
+                        <div class="admin-module-heading home-content-editor-card__subheading">
+                            <MudText Typo="Typo.h4" Tag="@("h4")">@Localizer["AboutSkills"]</MudText>
+                            <MudButton ButtonType="ButtonType.Button" OnClick="@(() => AddSkill(group))" Variant="Variant.Outlined" Color="Color.Primary">@Localizer["AboutAddSkill"]</MudButton>
+                        </div>
+                        @foreach (var skill in group.Skills.OrderBy(item => item.DisplayOrder).ThenBy(item => item.Id))
+                        {
+                            <div @key="skill.Id" class="home-content-editor-card__child">
+                                <div class="experience-admin-grid">
+                                    <div class="admin-field">
+                                        <label for="@($"skill-name-es-{skill.Id:N}")">@Localizer["AboutSkillNameSpanish"]</label>
+                                        <InputText id="@($"skill-name-es-{skill.Id:N}")" @bind-Value="skill.SpanishName" maxlength="100" />
+                                    </div>
+                                    <div class="admin-field">
+                                        <label for="@($"skill-name-en-{skill.Id:N}")">@Localizer["AboutSkillNameEnglish"]</label>
+                                        <InputText id="@($"skill-name-en-{skill.Id:N}")" @bind-Value="skill.EnglishName" maxlength="100" />
+                                    </div>
+                                    <div class="admin-field">
+                                        <label for="@($"skill-order-{skill.Id:N}")">@Localizer["HomeDisplayOrder"]</label>
+                                        <InputNumber id="@($"skill-order-{skill.Id:N}")" @bind-Value="skill.DisplayOrder" TValue="int" min="0" />
+                                    </div>
+                                    <div class="admin-field home-content-editor-card__remove">
+                                        <MudButton ButtonType="ButtonType.Button" OnClick="@(() => RemoveSkill(group, skill))" Color="Color.Error" Variant="Variant.Outlined">@Localizer["Delete"]</MudButton>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </section>
+                }
+            </MudPaper>
+
+            <MudPaper Elevation="1" Class="pa-5 mb-4">
+                <div class="admin-module-heading">
+                    <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["AboutHobbies"]</MudText>
+                    <MudButton OnClick="AddHobby" Variant="Variant.Outlined" Color="Color.Primary">@Localizer["AboutAddHobby"]</MudButton>
+                </div>
+                @if (model.Hobbies.Count == 0)
+                {
+                    <MudText Typo="Typo.body2">@Localizer["AboutHobbiesEmpty"]</MudText>
+                }
+                @foreach (var hobby in model.Hobbies.OrderBy(item => item.DisplayOrder).ThenBy(item => item.Id))
+                {
+                    <section @key="hobby.Id" class="home-content-editor-card" aria-label="@Localizer["AboutHobbyEditorLabel", hobby.SpanishName]">
+                        <div class="home-content-editor-card__heading">
+                            <MudText Typo="Typo.h3" Tag="@("h3")">@Localizer["AboutHobby"]</MudText>
+                            <MudButton OnClick="@(() => RemoveHobbyAsync(hobby))" Color="Color.Error" Variant="Variant.Outlined">@Localizer["Delete"]</MudButton>
+                        </div>
+                        <div class="experience-admin-grid">
+                            <div class="admin-field">
+                                <label for="@($"hobby-name-es-{hobby.Id:N}")">@Localizer["AboutHobbyNameSpanish"]</label>
+                                <InputText id="@($"hobby-name-es-{hobby.Id:N}")" @bind-Value="hobby.SpanishName" maxlength="150" />
+                            </div>
+                            <div class="admin-field">
+                                <label for="@($"hobby-description-es-{hobby.Id:N}")">@Localizer["AboutHobbyDescriptionSpanish"]</label>
+                                <InputTextArea id="@($"hobby-description-es-{hobby.Id:N}")" @bind-Value="hobby.SpanishDescription" maxlength="1200" rows="4" />
+                            </div>
+                            <div class="admin-field">
+                                <label for="@($"hobby-name-en-{hobby.Id:N}")">@Localizer["AboutHobbyNameEnglish"]</label>
+                                <InputText id="@($"hobby-name-en-{hobby.Id:N}")" @bind-Value="hobby.EnglishName" maxlength="150" />
+                            </div>
+                            <div class="admin-field">
+                                <label for="@($"hobby-description-en-{hobby.Id:N}")">@Localizer["AboutHobbyDescriptionEnglish"]</label>
+                                <InputTextArea id="@($"hobby-description-en-{hobby.Id:N}")" @bind-Value="hobby.EnglishDescription" maxlength="1200" rows="4" />
+                                <span class="admin-field__hint">@Localizer["HomeEnglishFallbackHint"]</span>
+                            </div>
+                            <div class="admin-field">
+                                <label for="@($"hobby-order-{hobby.Id:N}")">@Localizer["HomeDisplayOrder"]</label>
+                                <InputNumber id="@($"hobby-order-{hobby.Id:N}")" @bind-Value="hobby.DisplayOrder" TValue="int" min="0" />
+                            </div>
+                            <div class="admin-field">
+                                <label for="@($"hobby-image-{hobby.Id:N}")">@Localizer["AboutHobbyImage"]</label>
+                                <InputFile id="@($"hobby-image-{hobby.Id:N}")" OnChange="@(args => UploadHobbyAsync(hobby, args))" accept=".svg,.jpg,.jpeg,.png" />
+                                <span class="admin-field__hint">@Localizer["HomeImageRules", ImageStorage.MaximumFileSizeBytes / 1024 / 1024]</span>
+                            </div>
+                            @if (hobby.IsPersisted)
+                            {
+                                <div class="home-content-editor-card__preview">
+                                    <img src="@($"/home-content-images/hobby/{hobby.Id:N}")" alt="@hobby.SpanishName" />
+                                </div>
+                            }
+                        </div>
+                    </section>
+                }
+            </MudPaper>
+
+            @if (operationMessage is not null)
+            {
+                <MudAlert Severity="@operationSeverity" Role="@(operationSeverity == Severity.Error ? "alert" : "status")" Class="mb-4">
+                    @operationMessage
+                </MudAlert>
+            }
+            <div class="experience-admin-actions">
+                <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Disabled="saving || uploading">
+                    @Localizer[saving ? "Saving" : "Save"]
+                </MudButton>
+                <NavLink class="button button--secondary" href="/admin">@Localizer["Cancel"]</NavLink>
+            </div>
+        </EditForm>
+    }
+</MudContainer>
+
+@code {
+    private readonly List<(Guid Id, string Key)> pendingImages = [];
+    private AboutFormModel model = new();
+    private bool loaded;
+    private bool saving;
+    private bool uploading;
+    private string? operationMessage;
+    private Severity operationSeverity = Severity.Info;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var stored = await AboutService.GetAsync();
+        model = new AboutFormModel
+        {
+            SpanishProfile = stored.SpanishProfile,
+            EnglishProfile = stored.EnglishProfile ?? string.Empty,
+            Groups = stored.Groups.Select(group => new SkillGroupFormModel
+            {
+                Id = group.Id,
+                SpanishName = group.SpanishName,
+                EnglishName = group.EnglishName ?? string.Empty,
+                DisplayOrder = group.DisplayOrder,
+                Skills = group.Skills.Select(skill => new SkillFormModel
+                {
+                    Id = skill.Id,
+                    SpanishName = skill.SpanishName,
+                    EnglishName = skill.EnglishName ?? string.Empty,
+                    DisplayOrder = skill.DisplayOrder
+                }).ToList()
+            }).ToList(),
+            Hobbies = stored.Hobbies.Select(hobby => new HobbyFormModel
+            {
+                Id = hobby.Id,
+                StorageKey = hobby.StorageKey,
+                ContentType = hobby.ContentType,
+                SizeBytes = hobby.SizeBytes,
+                DisplayOrder = hobby.DisplayOrder,
+                SpanishName = hobby.SpanishName,
+                SpanishDescription = hobby.SpanishDescription,
+                EnglishName = hobby.EnglishName ?? string.Empty,
+                EnglishDescription = hobby.EnglishDescription ?? string.Empty,
+                IsPersisted = true
+            }).ToList()
+        };
+        loaded = true;
+    }
+
+    private void AddGroup() => model.Groups.Add(new SkillGroupFormModel
+    {
+        Id = Guid.NewGuid(),
+        DisplayOrder = model.Groups.Count
+    });
+
+    private void RemoveGroup(SkillGroupFormModel group) => model.Groups.Remove(group);
+
+    private void AddSkill(SkillGroupFormModel group) => group.Skills.Add(new SkillFormModel
+    {
+        Id = Guid.NewGuid(),
+        DisplayOrder = group.Skills.Count
+    });
+
+    private void RemoveSkill(SkillGroupFormModel group, SkillFormModel skill) => group.Skills.Remove(skill);
+
+    private void AddHobby() => model.Hobbies.Add(new HobbyFormModel
+    {
+        Id = Guid.NewGuid(),
+        DisplayOrder = model.Hobbies.Count
+    });
+
+    private async Task RemoveHobbyAsync(HobbyFormModel hobby)
+    {
+        model.Hobbies.Remove(hobby);
+        var pending = pendingImages.FirstOrDefault(image => image.Id == hobby.Id);
+        if (pending.Key is not null)
+        {
+            pendingImages.Remove(pending);
+            await ImageStorage.DeleteAsync(HomeContentImageKind.Hobby, hobby.Id, pending.Key);
+        }
+    }
+
+    private async Task UploadHobbyAsync(HobbyFormModel hobby, InputFileChangeEventArgs args)
+    {
+        operationMessage = null;
+        var file = args.File;
+        try
+        {
+            await using var stream = file.OpenReadStream(ImageStorage.MaximumFileSizeBytes);
+            var result = await ImageStorage.UploadAsync(
+                HomeContentImageKind.Hobby,
+                hobby.Id,
+                file.Name,
+                file.ContentType,
+                file.Size,
+                stream);
+            if (result.Error != HomeContentImageError.None || result.StorageKey is null)
+            {
+                ShowImageError(result.Error);
+                return;
+            }
+
+            if (pendingImages.FirstOrDefault(image => image.Id == hobby.Id) is var previous && previous.Key is not null)
+            {
+                pendingImages.Remove(previous);
+                await ImageStorage.DeleteAsync(HomeContentImageKind.Hobby, hobby.Id, previous.Key);
+            }
+
+            pendingImages.Add((hobby.Id, result.StorageKey));
+            hobby.StorageKey = result.StorageKey;
+            hobby.ContentType = result.ContentType!;
+            hobby.SizeBytes = result.SizeBytes;
+        }
+        catch (IOException)
+        {
+            ShowImageError(HomeContentImageError.TooLarge);
+        }
+    }
+
+    private async Task SaveAsync(EditContext _)
+    {
+        saving = true;
+        operationMessage = null;
+        try
+        {
+            var request = new AboutContentEditRequest(
+                model.SpanishProfile,
+                model.EnglishProfile,
+                model.Groups.Select(group => new SkillGroupEditModel(
+                    group.Id,
+                    group.SpanishName,
+                    group.EnglishName,
+                    group.DisplayOrder,
+                    group.Skills.Select(skill => new SkillEditModel(
+                        skill.Id, skill.SpanishName, skill.EnglishName, skill.DisplayOrder)).ToArray())).ToArray(),
+                model.Hobbies.Select(hobby => new HobbyEditModel(
+                    hobby.Id, hobby.StorageKey, hobby.ContentType, hobby.SizeBytes, hobby.DisplayOrder,
+                    hobby.SpanishName, hobby.SpanishDescription, hobby.EnglishName, hobby.EnglishDescription)).ToArray());
+            var result = await AboutService.SaveAsync(request);
+            if (!result.Succeeded)
+            {
+                operationMessage = Localizer[result.Errors[0].ResourceKey];
+                operationSeverity = Severity.Error;
+                return;
+            }
+
+            foreach (var hobby in model.Hobbies)
+            {
+                hobby.IsPersisted = true;
+            }
+
+            pendingImages.Clear();
+            operationMessage = Localizer["AboutSaved"];
+            operationSeverity = Severity.Success;
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "Unable to save About content.");
+            operationMessage = Localizer["AboutSaveFailed"];
+            operationSeverity = Severity.Error;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    private void ShowImageError(HomeContentImageError error)
+    {
+        operationMessage = Localizer[error switch
+        {
+            HomeContentImageError.UnsupportedType => "HomeImageUnsupportedType",
+            HomeContentImageError.TooLarge => "HomeImageTooLarge",
+            HomeContentImageError.InvalidContent => "HomeImageInvalid",
+            _ => "HomeImageUploadFailed"
+        }];
+        operationSeverity = Severity.Error;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        foreach (var pending in pendingImages)
+        {
+            await ImageStorage.DeleteAsync(HomeContentImageKind.Hobby, pending.Id, pending.Key);
+        }
+    }
+
+    private sealed class AboutFormModel
+    {
+        public string SpanishProfile { get; set; } = string.Empty;
+        public string EnglishProfile { get; set; } = string.Empty;
+        public List<SkillGroupFormModel> Groups { get; set; } = [];
+        public List<HobbyFormModel> Hobbies { get; set; } = [];
+    }
+
+    private sealed class SkillGroupFormModel
+    {
+        public Guid Id { get; set; }
+        public string SpanishName { get; set; } = string.Empty;
+        public string EnglishName { get; set; } = string.Empty;
+        public int DisplayOrder { get; set; }
+        public List<SkillFormModel> Skills { get; set; } = [];
+    }
+
+    private sealed class SkillFormModel
+    {
+        public Guid Id { get; set; }
+        public string SpanishName { get; set; } = string.Empty;
+        public string EnglishName { get; set; } = string.Empty;
+        public int DisplayOrder { get; set; }
+    }
+
+    private sealed class HobbyFormModel
+    {
+        public Guid Id { get; set; }
+        public string StorageKey { get; set; } = string.Empty;
+        public string ContentType { get; set; } = string.Empty;
+        public long SizeBytes { get; set; }
+        public int DisplayOrder { get; set; }
+        public string SpanishName { get; set; } = string.Empty;
+        public string SpanishDescription { get; set; } = string.Empty;
+        public string EnglishName { get; set; } = string.Empty;
+        public string EnglishDescription { get; set; } = string.Empty;
+        public bool IsPersisted { get; set; }
+    }
+}

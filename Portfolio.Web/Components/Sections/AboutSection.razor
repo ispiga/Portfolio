@@ -1,5 +1,7 @@
 @using Microsoft.Extensions.Localization
+@using Portfolio.Application.HomeContent
 @inject IStringLocalizer<SharedResource> Localizer
+@inject IAboutQueryService AboutQueryService
 
 <section id="about" class="home-section" aria-labelledby="about-title">
     <div class="section-heading">
@@ -7,14 +9,54 @@
         <h2 id="about-title">@Localizer["AboutTitle"]</h2>
     </div>
     <div class="about-grid">
-        <div class="surface content-card">
-            <p>@Localizer["AboutPlaceholder"]</p>
+        <div class="surface content-card about-profile">
+            <p>@(content?.Profile ?? Localizer["AboutProfileEmpty"].Value)</p>
         </div>
-        <div class="areas-grid" aria-label="@Localizer["AboutAreasLabel"]">
-            <div class="surface area-card"><h3>@Localizer["AreaBackend"]</h3><p>@Localizer["AreaBackendDescription"]</p></div>
-            <div class="surface area-card"><h3>@Localizer["AreaFrontend"]</h3><p>@Localizer["AreaFrontendDescription"]</p></div>
-            <div class="surface area-card"><h3>@Localizer["AreaData"]</h3><p>@Localizer["AreaDataDescription"]</p></div>
-            <div class="surface area-card"><h3>@Localizer["AreaDevOps"]</h3><p>@Localizer["AreaDevOpsDescription"]</p></div>
-        </div>
+        @if (content is { Groups.Count: > 0 })
+        {
+            <div class="areas-grid" aria-label="@Localizer["AboutAreasLabel"]">
+                @foreach (var group in content.Groups)
+                {
+                    <article class="surface area-card">
+                        <h3>@group.Name</h3>
+                        <ul class="about-skill-list">
+                            @foreach (var skill in group.Skills)
+                            {
+                                <li>@skill.Name</li>
+                            }
+                        </ul>
+                    </article>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="about-content-empty">@Localizer["AboutAreasEmpty"]</p>
+        }
     </div>
+    @if (content is { Hobbies.Count: > 0 })
+    {
+        <section class="about-hobbies" aria-labelledby="about-hobbies-title">
+            <h3 id="about-hobbies-title">@Localizer["AboutHobbies"]</h3>
+            <div class="about-hobbies-grid">
+                @foreach (var hobby in content.Hobbies)
+                {
+                    <article class="surface about-hobby-card">
+                        <img src="@hobby.ImageUrl" alt="@hobby.Name" loading="lazy" />
+                        <div>
+                            <h4>@hobby.Name</h4>
+                            <p>@hobby.Description</p>
+                        </div>
+                    </article>
+                }
+            </div>
+        </section>
+    }
+    <ExperienceTimeline />
 </section>
+
+@code {
+    private AboutContentReadModel? content;
+
+    protected override async Task OnInitializedAsync() => content = await AboutQueryService.GetAsync();
+}

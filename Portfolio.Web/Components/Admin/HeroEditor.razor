@@ -1,0 +1,491 @@
+@page "/admin/hero"
+@attribute [Authorize(Policy = PortfolioAuthorization.AdministratorPolicy)]
+@layout AdminLayout
+@implements IAsyncDisposable
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.Extensions.Localization
+@using Microsoft.JSInterop
+@using Portfolio.Application.HomeContent
+@using Portfolio.Infrastructure.Identity
+@inject IHeroAdministrationService HeroService
+@inject IHomeContentImageStorageService ImageStorage
+@inject IStringLocalizer<SharedResource> Localizer
+@inject IJSRuntime JS
+
+<PageTitle>@Localizer["HeroAdminTitle"]</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="admin-dashboard">
+    <header class="admin-dashboard__heading">
+        <MudText Typo="Typo.h1" Tag="@("h1")">@Localizer["HeroAdminTitle"]</MudText>
+        <MudText Typo="Typo.body1">@Localizer["HeroAdminDescription"]</MudText>
+    </header>
+
+    @if (!loaded)
+    {
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary" aria-label="@Localizer["Loading"]" />
+    }
+    else
+    {
+        <EditForm Model="model" OnSubmit="SaveAsync">
+            <MudPaper Elevation="1" Class="pa-5 mb-4">
+                <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["HeroHeadlineSection"]</MudText>
+                <div class="experience-admin-grid">
+                    <div class="admin-field">
+                        <label for="hero-headline-es">@Localizer["HeroSpanishHeadline"]</label>
+                        <InputText id="hero-headline-es" @bind-Value="model.SpanishHeadline" maxlength="250" />
+                    </div>
+                    <div class="admin-field">
+                        <label for="hero-headline-en">@Localizer["HeroEnglishHeadline"]</label>
+                        <InputText id="hero-headline-en" @bind-Value="model.EnglishHeadline" maxlength="250" />
+                        <span class="admin-field__hint">@Localizer["HomeEnglishFallbackHint"]</span>
+                    </div>
+                    <div class="admin-field">
+                        <label for="hero-orbit-count">@Localizer["HeroOrbitCount"]</label>
+                        <InputNumber id="hero-orbit-count" @bind-Value="model.OrbitCount" TValue="int" min="1" max="3" />
+                    </div>
+                </div>
+            </MudPaper>
+
+            <MudPaper Elevation="1" Class="pa-5 mb-4">
+                <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["HeroProfileImageSection"]</MudText>
+                <div class="admin-field">
+                    <label for="hero-profile-image">@Localizer["HeroProfileImage"]</label>
+                    <InputFile id="hero-profile-image" OnChange="UploadProfileImageAsync" accept=".svg,.jpg,.jpeg,.png" />
+                    <span class="admin-field__hint">@Localizer["HomeImageRules", ImageStorage.MaximumFileSizeBytes / 1024 / 1024]</span>
+                    <label for="hero-profile-image-alt">@Localizer["HeroProfileImageAlt"]</label>
+                    <InputText id="hero-profile-image-alt" @bind-Value="model.ProfileImageAlternativeText" maxlength="200" />
+                    @if (!string.IsNullOrWhiteSpace(model.ProfileImagePreviewUrl))
+                    {
+                        <div class="home-content-editor-card__preview">
+                            <img src="@model.ProfileImagePreviewUrl" alt="@model.ProfileImageAlternativeText" />
+                        </div>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(model.ProfileImageStorageKey))
+                    {
+                        <MudButton ButtonType="ButtonType.Button" OnClick="RemoveProfileImageAsync" Color="Color.Error" Variant="Variant.Outlined">@Localizer["HeroProfileImageRemove"]</MudButton>
+                    }
+                </div>
+            </MudPaper>
+
+            <MudPaper Elevation="1" Class="pa-5 mb-4">
+                <div class="admin-module-heading">
+                    <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["HeroTechnologyLogos"]</MudText>
+                    <MudButton OnClick="AddLogo" Variant="Variant.Outlined" Color="Color.Primary">@Localizer["HeroAddLogo"]</MudButton>
+                </div>
+                @if (model.Logos.Count == 0)
+                {
+                    <MudText Typo="Typo.body2">@Localizer["HeroLogosEmpty"]</MudText>
+                }
+                @foreach (var logo in model.Logos.OrderBy(item => item.DisplayOrder).ThenBy(item => item.Id))
+                {
+                    <section @key="logo.Id" class="home-content-editor-card" aria-label="@Localizer["HeroLogoEditorLabel", logo.Name]">
+                        <div class="home-content-editor-card__heading">
+                            <MudText Typo="Typo.h3" Tag="@("h3")">@Localizer["HeroLogoItem"]</MudText>
+                            <MudButton OnClick="@(() => RemoveLogoAsync(logo))" Color="Color.Error" Variant="Variant.Outlined">@Localizer["Delete"]</MudButton>
+                        </div>
+                        <div class="experience-admin-grid">
+                            <div class="admin-field">
+                                <label for="@($"logo-name-{logo.Id:N}")">@Localizer["HeroLogoName"]</label>
+                                <InputText id="@($"logo-name-{logo.Id:N}")" @bind-Value="logo.Name" maxlength="100" />
+                            </div>
+                            <div class="admin-field">
+                                <label for="@($"logo-alt-{logo.Id:N}")">@Localizer["HeroLogoAlternativeText"]</label>
+                                <InputText id="@($"logo-alt-{logo.Id:N}")" @bind-Value="logo.AlternativeText" maxlength="200" />
+                            </div>
+                            <div class="admin-field">
+                                <label for="@($"logo-order-{logo.Id:N}")">@Localizer["HomeDisplayOrder"]</label>
+                                <InputNumber id="@($"logo-order-{logo.Id:N}")" @bind-Value="logo.DisplayOrder" TValue="int" min="0" />
+                            </div>
+                            <div class="admin-field">
+                                <label for="@($"logo-orbit-{logo.Id:N}")">@Localizer["HeroLogoOrbit"]</label>
+                                <InputNumber id="@($"logo-orbit-{logo.Id:N}")" @bind-Value="logo.Orbit" TValue="int" min="1" max="@Math.Clamp(model.OrbitCount, 1, 3)" />
+                            </div>
+                            <div class="admin-field">
+                                <label for="@($"logo-file-{logo.Id:N}")">@Localizer["HeroLogoImage"]</label>
+                                <InputFile @key="logo.Id" id="@($"logo-file-{logo.Id:N}")" OnChange="@(args => UploadLogoAsync(logo, args))" accept=".svg,.jpg,.jpeg,.png" />
+                                <span class="admin-field__hint">@Localizer["HomeImageRules", ImageStorage.MaximumFileSizeBytes / 1024 / 1024]</span>
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(logo.PreviewUrl))
+                            {
+                                <div class="home-content-editor-card__preview">
+                                    <img src="@logo.PreviewUrl" alt="@logo.AlternativeText" />
+                                </div>
+                            }
+                        </div>
+                    </section>
+                }
+            </MudPaper>
+
+            @if (operationMessage is not null)
+            {
+                <MudAlert Severity="@operationSeverity" Role="@(operationSeverity == Severity.Error ? "alert" : "status")" Class="mb-4">
+                    @operationMessage
+                </MudAlert>
+            }
+            <div class="experience-admin-actions">
+                <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Disabled="saving || uploading">
+                    @Localizer[saving ? "Saving" : "Save"]
+                </MudButton>
+                <NavLink class="button button--secondary" href="/admin">@Localizer["Cancel"]</NavLink>
+            </div>
+        </EditForm>
+    }
+</MudContainer>
+
+@code {
+    private readonly List<(Guid Id, string Key)> pendingImages = [];
+    private (Guid Id, string Key)? pendingProfileImage;
+    private IJSObjectReference? imagePreviewModule;
+    private HeroFormModel model = new();
+    private bool loaded;
+    private bool saving;
+    private bool uploading;
+    private string? operationMessage;
+    private Severity operationSeverity = Severity.Info;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var stored = await HeroService.GetAsync();
+        model = new HeroFormModel
+        {
+            OrbitCount = Math.Clamp(stored.OrbitCount, 1, 3),
+            SpanishHeadline = stored.SpanishHeadline,
+            EnglishHeadline = stored.EnglishHeadline ?? string.Empty,
+            ProfileImageId = stored.ProfileImageId,
+            ProfileImageStorageKey = stored.ProfileImageStorageKey ?? string.Empty,
+            ProfileImageContentType = stored.ProfileImageContentType ?? string.Empty,
+            ProfileImageSizeBytes = stored.ProfileImageSizeBytes ?? 0,
+            ProfileImageAlternativeText = stored.ProfileImageAlternativeText ?? string.Empty,
+            ProfileImagePreviewUrl = stored.ProfileImageId is { } profileImageId
+                ? $"/home-content-images/hero-profile/{profileImageId:N}"
+                : null,
+            Logos = stored.Logos.Select(logo => new LogoFormModel
+            {
+                Id = logo.Id,
+                Name = logo.Name,
+                AlternativeText = logo.AlternativeText,
+                StorageKey = logo.StorageKey,
+                ContentType = logo.ContentType,
+                SizeBytes = logo.SizeBytes,
+                DisplayOrder = logo.DisplayOrder,
+                Orbit = logo.Orbit,
+                IsPersisted = true,
+                PreviewUrl = $"/home-content-images/technology-logo/{logo.Id:N}"
+            }).ToList()
+        };
+        loaded = true;
+    }
+
+    private async Task UploadProfileImageAsync(InputFileChangeEventArgs args)
+    {
+        operationMessage = null;
+        var file = args.File;
+        string? preview = null;
+        var previousPreview = model.ProfileImagePreviewUrl;
+        var profileImageId = Guid.NewGuid();
+        try
+        {
+            preview = await CreatePreviewAsync("hero-profile-image");
+            model.ProfileImagePreviewUrl = preview;
+            await InvokeAsync(StateHasChanged);
+            await using var stream = file.OpenReadStream(ImageStorage.MaximumFileSizeBytes);
+            var result = await ImageStorage.UploadAsync(HomeContentImageKind.HeroProfile, profileImageId,
+                file.Name, file.ContentType, file.Size, stream);
+            if (result.Error != HomeContentImageError.None || result.StorageKey is null)
+            {
+                await RevokePreviewUrlAsync(preview);
+                model.ProfileImagePreviewUrl = previousPreview;
+                ShowImageError(result.Error);
+                return;
+            }
+
+            if (pendingProfileImage is { } previousPending)
+            {
+                await ImageStorage.DeleteAsync(HomeContentImageKind.HeroProfile, previousPending.Id, previousPending.Key);
+            }
+            pendingProfileImage = (profileImageId, result.StorageKey);
+
+            if (previousPreview?.StartsWith("blob:", StringComparison.Ordinal) == true)
+            {
+                await RevokePreviewUrlAsync(previousPreview);
+            }
+
+            model.ProfileImageId = profileImageId;
+            model.ProfileImageStorageKey = result.StorageKey;
+            model.ProfileImageContentType = result.ContentType!;
+            model.ProfileImageSizeBytes = result.SizeBytes;
+            model.ProfileImagePreviewUrl = preview;
+            preview = null;
+        }
+        catch (IOException)
+        {
+            if (preview is not null)
+            {
+                await RevokePreviewUrlAsync(preview);
+            }
+
+            model.ProfileImagePreviewUrl = previousPreview;
+            ShowImageError(HomeContentImageError.TooLarge);
+        }
+    }
+
+    private async Task RemoveProfileImageAsync()
+    {
+        if (pendingProfileImage is { } pending)
+        {
+            await ImageStorage.DeleteAsync(HomeContentImageKind.HeroProfile, pending.Id, pending.Key);
+            pendingProfileImage = null;
+        }
+
+        if (model.ProfileImagePreviewUrl?.StartsWith("blob:", StringComparison.Ordinal) == true)
+        {
+            await RevokePreviewUrlAsync(model.ProfileImagePreviewUrl);
+        }
+        else if (model.ProfileImageId is { } profileImageId)
+        {
+            await RevokePreviewUrlAsync($"/home-content-images/hero-profile/{profileImageId:N}");
+        }
+
+        model.ProfileImageId = null;
+        model.ProfileImageStorageKey = string.Empty;
+        model.ProfileImageContentType = string.Empty;
+        model.ProfileImageSizeBytes = 0;
+        model.ProfileImageAlternativeText = string.Empty;
+        model.ProfileImagePreviewUrl = null;
+    }
+
+    private void AddLogo()
+    {
+        model.Logos.Add(new LogoFormModel { Id = Guid.NewGuid(), DisplayOrder = model.Logos.Count, Orbit = 1 });
+        operationMessage = null;
+    }
+
+    private async Task RemoveLogoAsync(LogoFormModel logo)
+    {
+        model.Logos.Remove(logo);
+        var pending = pendingImages.FirstOrDefault(image => image.Id == logo.Id);
+        if (pending.Key is not null)
+        {
+            pendingImages.Remove(pending);
+            await ImageStorage.DeleteAsync(HomeContentImageKind.TechnologyLogo, logo.Id, pending.Key);
+        }
+
+        await RevokePreviewAsync(logo);
+    }
+
+    private async Task UploadLogoAsync(LogoFormModel logo, InputFileChangeEventArgs args)
+    {
+        operationMessage = null;
+        var file = args.File;
+        string? preview = null;
+        var previousPreview = logo.PreviewUrl;
+        try
+        {
+            preview = await CreatePreviewAsync($"logo-file-{logo.Id:N}");
+            logo.PreviewUrl = preview;
+            await InvokeAsync(StateHasChanged);
+            await using var stream = file.OpenReadStream(ImageStorage.MaximumFileSizeBytes);
+            var result = await ImageStorage.UploadAsync(
+                HomeContentImageKind.TechnologyLogo,
+                logo.Id,
+                file.Name,
+                file.ContentType,
+                file.Size,
+                stream);
+            if (result.Error != HomeContentImageError.None || result.StorageKey is null)
+            {
+                await RevokePreviewUrlAsync(preview);
+                preview = null;
+                logo.PreviewUrl = previousPreview;
+                ShowImageError(result.Error);
+                return;
+            }
+
+            if (pendingImages.FirstOrDefault(image => image.Id == logo.Id) is var previous && previous.Key is not null)
+            {
+                pendingImages.Remove(previous);
+                await ImageStorage.DeleteAsync(HomeContentImageKind.TechnologyLogo, logo.Id, previous.Key);
+            }
+
+            if (previousPreview is not null && previousPreview.StartsWith("blob:", StringComparison.Ordinal))
+            {
+                await RevokePreviewUrlAsync(previousPreview);
+            }
+
+            pendingImages.Add((logo.Id, result.StorageKey));
+            logo.StorageKey = result.StorageKey;
+            logo.ContentType = result.ContentType!;
+            logo.SizeBytes = result.SizeBytes;
+            logo.PreviewUrl = preview;
+            preview = null;
+        }
+        catch (IOException)
+        {
+            if (preview is not null)
+            {
+                await RevokePreviewUrlAsync(preview);
+            }
+
+            logo.PreviewUrl = previousPreview;
+            ShowImageError(HomeContentImageError.TooLarge);
+        }
+    }
+
+    private async Task SaveAsync(EditContext _)
+    {
+        saving = true;
+        operationMessage = null;
+        try
+        {
+            var result = await HeroService.SaveAsync(new HeroEditRequest(
+                model.OrbitCount,
+                model.SpanishHeadline,
+                model.EnglishHeadline,
+                model.Logos.Select(logo => new TechnologyLogoEditModel(
+                    logo.Id, logo.Name, logo.AlternativeText, logo.StorageKey, logo.ContentType,
+                    logo.SizeBytes, logo.DisplayOrder, logo.Orbit)).ToArray(),
+                model.ProfileImageId,
+                string.IsNullOrWhiteSpace(model.ProfileImageStorageKey) ? null : model.ProfileImageStorageKey,
+                string.IsNullOrWhiteSpace(model.ProfileImageContentType) ? null : model.ProfileImageContentType,
+                model.ProfileImageId is null ? null : model.ProfileImageSizeBytes,
+                string.IsNullOrWhiteSpace(model.ProfileImageAlternativeText) ? null : model.ProfileImageAlternativeText));
+            if (!result.Succeeded)
+            {
+                operationMessage = Localizer[result.Errors[0].ResourceKey];
+                operationSeverity = Severity.Error;
+                return;
+            }
+
+            foreach (var logo in model.Logos)
+            {
+                logo.IsPersisted = true;
+            }
+
+            pendingImages.Clear();
+            pendingProfileImage = null;
+            if (model.ProfileImageId is { } profileImageId
+                && model.ProfileImagePreviewUrl?.StartsWith("blob:", StringComparison.Ordinal) == true)
+            {
+                await RevokePreviewUrlAsync(model.ProfileImagePreviewUrl);
+                model.ProfileImagePreviewUrl = $"/home-content-images/hero-profile/{profileImageId:N}";
+            }
+            pendingProfileImage = null;
+            operationMessage = Localizer["HeroSaved"];
+            operationSeverity = Severity.Success;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    private void ShowImageError(HomeContentImageError error)
+    {
+        operationMessage = Localizer[error switch
+        {
+            HomeContentImageError.UnsupportedType => "HomeImageUnsupportedType",
+            HomeContentImageError.TooLarge => "HomeImageTooLarge",
+            HomeContentImageError.InvalidContent => "HomeImageInvalid",
+            _ => "HomeImageUploadFailed"
+        }];
+        operationSeverity = Severity.Error;
+    }
+
+    private async Task<string> CreatePreviewAsync(string inputId)
+    {
+        imagePreviewModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./js/home-content-image-preview.js");
+        return await imagePreviewModule.InvokeAsync<string>("createPreview", inputId);
+    }
+
+    private async Task RevokePreviewAsync(LogoFormModel logo)
+    {
+        var previewUrl = logo.PreviewUrl;
+        if (previewUrl is null)
+        {
+            return;
+        }
+
+        logo.PreviewUrl = null;
+        if (previewUrl.StartsWith("blob:", StringComparison.Ordinal))
+        {
+            await RevokePreviewUrlAsync(previewUrl);
+        }
+    }
+
+    private async Task RevokePreviewUrlAsync(string previewUrl)
+    {
+        if (imagePreviewModule is not null && previewUrl.StartsWith("blob:", StringComparison.Ordinal))
+        {
+            try
+            {
+                await imagePreviewModule.InvokeVoidAsync("revokePreview", previewUrl);
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        foreach (var pending in pendingImages)
+        {
+            await ImageStorage.DeleteAsync(HomeContentImageKind.TechnologyLogo, pending.Id, pending.Key);
+        }
+
+        if (pendingProfileImage is { } profileImage)
+        {
+            await ImageStorage.DeleteAsync(HomeContentImageKind.HeroProfile, profileImage.Id, profileImage.Key);
+        }
+
+        foreach (var logo in model.Logos)
+        {
+            await RevokePreviewAsync(logo);
+        }
+
+        if (model.ProfileImagePreviewUrl?.StartsWith("blob:", StringComparison.Ordinal) == true)
+        {
+            await RevokePreviewUrlAsync(model.ProfileImagePreviewUrl);
+        }
+
+        if (imagePreviewModule is not null)
+        {
+            try
+            {
+                await imagePreviewModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+        }
+    }
+
+    private sealed class HeroFormModel
+    {
+        public int OrbitCount { get; set; } = 1;
+        public string SpanishHeadline { get; set; } = string.Empty;
+        public string EnglishHeadline { get; set; } = string.Empty;
+        public Guid? ProfileImageId { get; set; }
+        public string ProfileImageStorageKey { get; set; } = string.Empty;
+        public string ProfileImageContentType { get; set; } = string.Empty;
+        public long ProfileImageSizeBytes { get; set; }
+        public string ProfileImageAlternativeText { get; set; } = string.Empty;
+        public string? ProfileImagePreviewUrl { get; set; }
+        public List<LogoFormModel> Logos { get; set; } = [];
+    }
+
+    private sealed class LogoFormModel
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string AlternativeText { get; set; } = string.Empty;
+        public string StorageKey { get; set; } = string.Empty;
+        public string ContentType { get; set; } = string.Empty;
+        public long SizeBytes { get; set; }
+        public int DisplayOrder { get; set; }
+        public int Orbit { get; set; } = 1;
+        public bool IsPersisted { get; set; }
+        public string? PreviewUrl { get; set; }
+    }
+}

@@ -27,6 +27,28 @@ public sealed class PortfolioDbContext(DbContextOptions<PortfolioDbContext> opti
 
     public DbSet<BlogPostTranslation> BlogPostTranslations => Set<BlogPostTranslation>();
 
+    public DbSet<HeroContent> HeroContents => Set<HeroContent>();
+
+    public DbSet<HeroTranslation> HeroTranslations => Set<HeroTranslation>();
+
+    public DbSet<TechnologyLogo> TechnologyLogos => Set<TechnologyLogo>();
+
+    public DbSet<AboutProfile> AboutProfiles => Set<AboutProfile>();
+
+    public DbSet<AboutProfileTranslation> AboutProfileTranslations => Set<AboutProfileTranslation>();
+
+    public DbSet<SkillGroup> SkillGroups => Set<SkillGroup>();
+
+    public DbSet<SkillGroupTranslation> SkillGroupTranslations => Set<SkillGroupTranslation>();
+
+    public DbSet<Skill> Skills => Set<Skill>();
+
+    public DbSet<SkillTranslation> SkillTranslations => Set<SkillTranslation>();
+
+    public DbSet<Hobby> Hobbies => Set<Hobby>();
+
+    public DbSet<HobbyTranslation> HobbyTranslations => Set<HobbyTranslation>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

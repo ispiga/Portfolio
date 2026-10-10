@@ -1296,4 +1296,82 @@
   <data name="CertificationDetailsCollapse" xml:space="preserve">
     <value>Hide details</value>
   </data>
+  <data name="AdminHero" xml:space="preserve"><value>Hero</value></data>
+  <data name="AdminHeroDescription" xml:space="preserve"><value>Manage the home page headline and orbital technology logos.</value></data>
+  <data name="HeroManageAction" xml:space="preserve"><value>Manage Hero</value></data>
+  <data name="AdminAbout" xml:space="preserve"><value>About me</value></data>
+  <data name="AdminAboutDescription" xml:space="preserve"><value>Manage the profile, skill areas and hobbies.</value></data>
+  <data name="AboutManageAction" xml:space="preserve"><value>Manage About me</value></data>
+  <data name="HeroAdminTitle" xml:space="preserve"><value>Manage Hero</value></data>
+  <data name="HeroAdminDescription" xml:space="preserve"><value>Edit the localized headline and manage the logos orbiting in the home page.</value></data>
+  <data name="HeroHeadlineSection" xml:space="preserve"><value>Headline and orbits</value></data>
+  <data name="HeroProfileImageSection" xml:space="preserve"><value>Central portrait</value></data>
+  <data name="HeroProfileImage" xml:space="preserve"><value>Personal photo or image</value></data>
+  <data name="HeroProfileImageAlt" xml:space="preserve"><value>Profile photo</value></data>
+  <data name="HeroProfileImageRemove" xml:space="preserve"><value>Remove photo</value></data>
+  <data name="HeroSpanishHeadline" xml:space="preserve"><value>Spanish headline</value></data>
+  <data name="HeroEnglishHeadline" xml:space="preserve"><value>English headline</value></data>
+  <data name="HomeEnglishFallbackHint" xml:space="preserve"><value>If the English text is missing, the Spanish version will be shown.</value></data>
+  <data name="HeroOrbitCount" xml:space="preserve"><value>Number of orbits</value></data>
+  <data name="HeroTechnologyLogos" xml:space="preserve"><value>Technology logos</value></data>
+  <data name="HeroAddLogo" xml:space="preserve"><value>Add logo</value></data>
+  <data name="HeroLogosEmpty" xml:space="preserve"><value>There are no technology logos yet.</value></data>
+  <data name="HeroLogoItem" xml:space="preserve"><value>Technology logo</value></data>
+  <data name="HeroLogoEditorLabel" xml:space="preserve"><value>Edit logo {0}</value></data>
+  <data name="HeroLogoName" xml:space="preserve"><value>Administrative name</value></data>
+  <data name="HeroLogoAlternativeText" xml:space="preserve"><value>Alternative text</value></data>
+  <data name="HomeDisplayOrder" xml:space="preserve"><value>Display order</value></data>
+  <data name="HeroLogoOrbit" xml:space="preserve"><value>Assigned orbit</value></data>
+  <data name="HeroLogoImage" xml:space="preserve"><value>Logo image</value></data>
+  <data name="HeroSaved" xml:space="preserve"><value>Hero changes have been saved.</value></data>
+  <data name="HomeImageRules" xml:space="preserve"><value>SVG, JPG/JPEG or PNG; maximum {0} MiB.</value></data>
+  <data name="HomeImageUnsupportedType" xml:space="preserve"><value>This image format is not allowed.</value></data>
+  <data name="HomeImageUploadFailed" xml:space="preserve"><value>The image could not be uploaded.</value></data>
+  <data name="HomeImageRequired" xml:space="preserve"><value>An image is required.</value></data>
+  <data name="HomeImageTooLarge" xml:space="preserve"><value>The image exceeds the maximum allowed size.</value></data>
+  <data name="HomeImageInvalid" xml:space="preserve"><value>The image content is invalid.</value></data>
+  <data name="HomeOrbitCountInvalid" xml:space="preserve"><value>The number of orbits must be greater than zero.</value></data>
+  <data name="HomeSpanishHeadlineRequired" xml:space="preserve"><value>The Spanish headline is required.</value></data>
+  <data name="HomeHeadlineTooLong" xml:space="preserve"><value>The headline cannot exceed 250 characters.</value></data>
+  <data name="HomeLogoIdInvalid" xml:space="preserve"><value>Duplicate logos or an invalid identifier were found.</value></data>
+  <data name="HomeLogoNameInvalid" xml:space="preserve"><value>The logo name is required and cannot exceed 100 characters.</value></data>
+  <data name="HomeLogoAltInvalid" xml:space="preserve"><value>Alternative text is required and cannot exceed 200 characters.</value></data>
+  <data name="HomeLogoOrbitInvalid" xml:space="preserve"><value>The orbit must be between 1 and the configured number of orbits.</value></data>
+  <data name="HomeOrderInvalid" xml:space="preserve"><value>Display order cannot be negative.</value></data>
+  <data name="AboutAdminTitle" xml:space="preserve"><value>Manage About me</value></data>
+  <data name="AboutAdminDescription" xml:space="preserve"><value>Edit the localized profile and order the skill areas and hobbies.</value></data>
+  <data name="AboutProfileSection" xml:space="preserve"><value>Profile description</value></data>
+  <data name="AboutSpanishProfile" xml:space="preserve"><value>Spanish profile</value></data>
+  <data name="AboutEnglishProfile" xml:space="preserve"><value>English profile</value></data>
+  <data name="AboutProfileEmpty" xml:space="preserve"><value>The professional profile description will be available soon.</value></data>
+  <data name="AboutAreasEmpty" xml:space="preserve"><value>No skill areas have been configured yet.</value></data>
+  <data name="AboutSkillGroups" xml:space="preserve"><value>Skill areas and groups</value></data>
+  <data name="AboutAddGroup" xml:space="preserve"><value>Add group</value></data>
+  <data name="AboutGroupsEmpty" xml:space="preserve"><value>There are no skill groups yet.</value></data>
+  <data name="AboutSkillGroup" xml:space="preserve"><value>Skill group</value></data>
+  <data name="AboutGroupEditorLabel" xml:space="preserve"><value>Edit group {0}</value></data>
+  <data name="AboutGroupNameSpanish" xml:space="preserve"><value>Group name in Spanish</value></data>
+  <data name="AboutGroupNameEnglish" xml:space="preserve"><value>Group name in English</value></data>
+  <data name="AboutSkills" xml:space="preserve"><value>Skills</value></data>
+  <data name="AboutAddSkill" xml:space="preserve"><value>Add skill</value></data>
+  <data name="AboutSkillNameSpanish" xml:space="preserve"><value>Skill in Spanish</value></data>
+  <data name="AboutSkillNameEnglish" xml:space="preserve"><value>Skill in English</value></data>
+  <data name="AboutHobbies" xml:space="preserve"><value>Hobbies</value></data>
+  <data name="AboutAddHobby" xml:space="preserve"><value>Add hobby</value></data>
+  <data name="AboutHobbiesEmpty" xml:space="preserve"><value>No hobbies have been configured yet.</value></data>
+  <data name="AboutHobby" xml:space="preserve"><value>Hobby</value></data>
+  <data name="AboutHobbyEditorLabel" xml:space="preserve"><value>Edit hobby {0}</value></data>
+  <data name="AboutHobbyNameSpanish" xml:space="preserve"><value>Name in Spanish</value></data>
+  <data name="AboutHobbyDescriptionSpanish" xml:space="preserve"><value>Description in Spanish</value></data>
+  <data name="AboutHobbyNameEnglish" xml:space="preserve"><value>Name in English</value></data>
+  <data name="AboutHobbyDescriptionEnglish" xml:space="preserve"><value>Description in English</value></data>
+  <data name="AboutHobbyImage" xml:space="preserve"><value>Hobby image</value></data>
+  <data name="AboutSpanishProfileRequired" xml:space="preserve"><value>The Spanish profile description is required.</value></data>
+  <data name="AboutIdInvalid" xml:space="preserve"><value>Duplicate items or an invalid identifier were found.</value></data>
+  <data name="AboutSpanishNameRequired" xml:space="preserve"><value>The Spanish name is required.</value></data>
+  <data name="AboutTextTooLong" xml:space="preserve"><value>One of the texts exceeds the maximum allowed length.</value></data>
+  <data name="AboutSpanishHobbyRequired" xml:space="preserve"><value>Each hobby requires a Spanish name and description.</value></data>
+  <data name="AboutEnglishHobbyIncomplete" xml:space="preserve"><value>An English hobby translation must include both name and description, or leave both fields empty.</value></data>
+  <data name="AboutSaved" xml:space="preserve"><value>About me changes have been saved.</value></data>
+  <data name="AboutSaveFailed" xml:space="preserve"><value>Changes could not be saved. Please try again.</value></data>
 </root>

@@ -9,6 +9,7 @@ using Portfolio.Application.Certifications;
 using Portfolio.Application.Blog;
 using Portfolio.Application.Experiences;
 using Portfolio.Application.Projects;
+using Portfolio.Application.HomeContent;
 using Portfolio.Infrastructure.Email;
 using Portfolio.Infrastructure.Identity;
 using Portfolio.Infrastructure.Services;
@@ -75,6 +76,18 @@ public static class DependencyInjection
             .ValidateDataAnnotations()
             .ValidateOnStart();
         services.AddScoped<IProjectPreviewImageService, ProjectPreviewImageStorageService>();
+        services.AddScoped<IHeroAdministrationService, HeroContentAdministrationService>();
+        services.AddScoped<IHeroQueryService, HeroQueryService>();
+        services.AddScoped<IAboutAdministrationService, AboutAdministrationService>();
+        services.AddScoped<IAboutQueryService, AboutQueryService>();
+        services.AddOptions<HomeContentImageStorageOptions>()
+            .Bind(configuration.GetSection(HomeContentImageStorageOptions.SectionName))
+            .ValidateDataAnnotations()
+            .Validate(options => options.AllowedExtensions.Length > 0
+                && options.AllowedExtensions.All(extension => extension is ".svg" or ".jpg" or ".jpeg" or ".png"),
+                "Only SVG, JPEG and PNG home content images are supported.")
+            .ValidateOnStart();
+        services.AddScoped<IHomeContentImageStorageService, HomeContentImageStorageService>();
 
         return services;
     }

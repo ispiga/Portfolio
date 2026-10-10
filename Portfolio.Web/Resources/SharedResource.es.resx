@@ -1296,4 +1296,82 @@
   <data name="CertificationDetailsCollapse" xml:space="preserve">
     <value>Ocultar detalles</value>
   </data>
+  <data name="AdminHero" xml:space="preserve"><value>Hero</value></data>
+  <data name="AdminHeroDescription" xml:space="preserve"><value>Administra el titular y los logos tecnológicos orbitales de la portada.</value></data>
+  <data name="HeroManageAction" xml:space="preserve"><value>Gestionar Hero</value></data>
+  <data name="AdminAbout" xml:space="preserve"><value>Sobre mí</value></data>
+  <data name="AdminAboutDescription" xml:space="preserve"><value>Administra el perfil, las áreas de skills y las aficiones.</value></data>
+  <data name="AboutManageAction" xml:space="preserve"><value>Gestionar Sobre mí</value></data>
+  <data name="HeroAdminTitle" xml:space="preserve"><value>Administrar Hero</value></data>
+  <data name="HeroAdminDescription" xml:space="preserve"><value>Edita el titular localizado y gestiona los logos que orbitan en la portada.</value></data>
+  <data name="HeroHeadlineSection" xml:space="preserve"><value>Titular y órbitas</value></data>
+  <data name="HeroProfileImageSection" xml:space="preserve"><value>Fotografía central</value></data>
+  <data name="HeroProfileImage" xml:space="preserve"><value>Fotografía o imagen personal</value></data>
+  <data name="HeroProfileImageAlt" xml:space="preserve"><value>Fotografía de perfil</value></data>
+  <data name="HeroProfileImageRemove" xml:space="preserve"><value>Quitar fotografía</value></data>
+  <data name="HeroSpanishHeadline" xml:space="preserve"><value>Titular en español</value></data>
+  <data name="HeroEnglishHeadline" xml:space="preserve"><value>Titular en inglés</value></data>
+  <data name="HomeEnglishFallbackHint" xml:space="preserve"><value>Si falta el texto en inglés, se mostrará la versión en español.</value></data>
+  <data name="HeroOrbitCount" xml:space="preserve"><value>Número de órbitas</value></data>
+  <data name="HeroTechnologyLogos" xml:space="preserve"><value>Logos tecnológicos</value></data>
+  <data name="HeroAddLogo" xml:space="preserve"><value>Añadir logo</value></data>
+  <data name="HeroLogosEmpty" xml:space="preserve"><value>Aún no hay logos tecnológicos.</value></data>
+  <data name="HeroLogoItem" xml:space="preserve"><value>Logo tecnológico</value></data>
+  <data name="HeroLogoEditorLabel" xml:space="preserve"><value>Editar logo {0}</value></data>
+  <data name="HeroLogoName" xml:space="preserve"><value>Nombre para administración</value></data>
+  <data name="HeroLogoAlternativeText" xml:space="preserve"><value>Texto alternativo</value></data>
+  <data name="HomeDisplayOrder" xml:space="preserve"><value>Orden de presentación</value></data>
+  <data name="HeroLogoOrbit" xml:space="preserve"><value>Órbita asignada</value></data>
+  <data name="HeroLogoImage" xml:space="preserve"><value>Imagen del logo</value></data>
+  <data name="HeroSaved" xml:space="preserve"><value>Los cambios del Hero se han guardado.</value></data>
+  <data name="HomeImageRules" xml:space="preserve"><value>SVG, JPG/JPEG o PNG; máximo {0} MiB.</value></data>
+  <data name="HomeImageUnsupportedType" xml:space="preserve"><value>El formato de imagen no está permitido.</value></data>
+  <data name="HomeImageUploadFailed" xml:space="preserve"><value>No se ha podido cargar la imagen.</value></data>
+  <data name="HomeImageRequired" xml:space="preserve"><value>Debes cargar una imagen.</value></data>
+  <data name="HomeImageTooLarge" xml:space="preserve"><value>La imagen supera el tamaño máximo permitido.</value></data>
+  <data name="HomeImageInvalid" xml:space="preserve"><value>El contenido de la imagen no es válido.</value></data>
+  <data name="HomeOrbitCountInvalid" xml:space="preserve"><value>El número de órbitas debe ser mayor que cero.</value></data>
+  <data name="HomeSpanishHeadlineRequired" xml:space="preserve"><value>El titular en español es obligatorio.</value></data>
+  <data name="HomeHeadlineTooLong" xml:space="preserve"><value>El titular no puede superar los 250 caracteres.</value></data>
+  <data name="HomeLogoIdInvalid" xml:space="preserve"><value>Hay logos duplicados o con un identificador no válido.</value></data>
+  <data name="HomeLogoNameInvalid" xml:space="preserve"><value>El nombre del logo es obligatorio y no puede superar los 100 caracteres.</value></data>
+  <data name="HomeLogoAltInvalid" xml:space="preserve"><value>El texto alternativo es obligatorio y no puede superar los 200 caracteres.</value></data>
+  <data name="HomeLogoOrbitInvalid" xml:space="preserve"><value>La órbita debe estar entre 1 y el número configurado.</value></data>
+  <data name="HomeOrderInvalid" xml:space="preserve"><value>El orden no puede ser negativo.</value></data>
+  <data name="AboutAdminTitle" xml:space="preserve"><value>Administrar «Sobre mí»</value></data>
+  <data name="AboutAdminDescription" xml:space="preserve"><value>Edita el perfil localizado y ordena las áreas, skills y aficiones.</value></data>
+  <data name="AboutProfileSection" xml:space="preserve"><value>Descripción del perfil</value></data>
+  <data name="AboutSpanishProfile" xml:space="preserve"><value>Perfil en español</value></data>
+  <data name="AboutEnglishProfile" xml:space="preserve"><value>Perfil en inglés</value></data>
+  <data name="AboutProfileEmpty" xml:space="preserve"><value>La descripción profesional estará disponible próximamente.</value></data>
+  <data name="AboutAreasEmpty" xml:space="preserve"><value>Aún no se han configurado áreas de skills.</value></data>
+  <data name="AboutSkillGroups" xml:space="preserve"><value>Áreas y grupos de skills</value></data>
+  <data name="AboutAddGroup" xml:space="preserve"><value>Añadir grupo</value></data>
+  <data name="AboutGroupsEmpty" xml:space="preserve"><value>Aún no hay grupos de skills.</value></data>
+  <data name="AboutSkillGroup" xml:space="preserve"><value>Grupo de skills</value></data>
+  <data name="AboutGroupEditorLabel" xml:space="preserve"><value>Editar grupo {0}</value></data>
+  <data name="AboutGroupNameSpanish" xml:space="preserve"><value>Nombre del grupo en español</value></data>
+  <data name="AboutGroupNameEnglish" xml:space="preserve"><value>Nombre del grupo en inglés</value></data>
+  <data name="AboutSkills" xml:space="preserve"><value>Skills</value></data>
+  <data name="AboutAddSkill" xml:space="preserve"><value>Añadir skill</value></data>
+  <data name="AboutSkillNameSpanish" xml:space="preserve"><value>Skill en español</value></data>
+  <data name="AboutSkillNameEnglish" xml:space="preserve"><value>Skill en inglés</value></data>
+  <data name="AboutHobbies" xml:space="preserve"><value>Aficiones</value></data>
+  <data name="AboutAddHobby" xml:space="preserve"><value>Añadir afición</value></data>
+  <data name="AboutHobbiesEmpty" xml:space="preserve"><value>Aún no hay aficiones configuradas.</value></data>
+  <data name="AboutHobby" xml:space="preserve"><value>Afición</value></data>
+  <data name="AboutHobbyEditorLabel" xml:space="preserve"><value>Editar afición {0}</value></data>
+  <data name="AboutHobbyNameSpanish" xml:space="preserve"><value>Nombre en español</value></data>
+  <data name="AboutHobbyDescriptionSpanish" xml:space="preserve"><value>Descripción en español</value></data>
+  <data name="AboutHobbyNameEnglish" xml:space="preserve"><value>Nombre en inglés</value></data>
+  <data name="AboutHobbyDescriptionEnglish" xml:space="preserve"><value>Descripción en inglés</value></data>
+  <data name="AboutHobbyImage" xml:space="preserve"><value>Imagen de la afición</value></data>
+  <data name="AboutSpanishProfileRequired" xml:space="preserve"><value>La descripción del perfil en español es obligatoria.</value></data>
+  <data name="AboutIdInvalid" xml:space="preserve"><value>Hay elementos duplicados o con un identificador no válido.</value></data>
+  <data name="AboutSpanishNameRequired" xml:space="preserve"><value>El nombre en español es obligatorio.</value></data>
+  <data name="AboutTextTooLong" xml:space="preserve"><value>Uno de los textos supera la longitud máxima permitida.</value></data>
+  <data name="AboutSpanishHobbyRequired" xml:space="preserve"><value>El nombre y la descripción en español de cada afición son obligatorios.</value></data>
+  <data name="AboutEnglishHobbyIncomplete" xml:space="preserve"><value>La traducción inglesa de una afición debe incluir nombre y descripción, o dejar ambos campos vacíos.</value></data>
+  <data name="AboutSaved" xml:space="preserve"><value>Los cambios de «Sobre mí» se han guardado.</value></data>
+  <data name="AboutSaveFailed" xml:space="preserve"><value>No se han podido guardar los cambios. Inténtalo de nuevo.</value></data>
 </root>

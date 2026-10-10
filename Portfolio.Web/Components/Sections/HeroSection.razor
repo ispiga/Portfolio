@@ -1,18 +1,58 @@
 @using Microsoft.Extensions.Localization
+@using global::System.Globalization
+@using Portfolio.Application.HomeContent
 @inject IStringLocalizer<SharedResource> Localizer
+@inject IHeroQueryService HeroQueryService
 
 <section class="home-hero" aria-labelledby="hero-title">
     <div class="home-hero__content">
         <p class="eyebrow">@Localizer["HeroEyebrow"]</p>
-        <h1 id="hero-title">@Localizer["HeroTitle"]</h1>
+        <h1 id="hero-title">@(hero?.Headline ?? Localizer["HeroTitle"].Value)</h1>
         <p class="home-hero__description">@Localizer["HeroDescription"]</p>
         <a class="button button--primary" href="#contact">@Localizer["HeroCta"]</a>
     </div>
-    <div class="technology-orbit" aria-label="@Localizer["TechnologyVisualLabel"]">
-        <span class="technology-orbit__core" aria-hidden="true">@Localizer["TechnologyCore"]</span>
-        <span class="technology-orbit__item technology-orbit__item--one">@Localizer["TechnologyDotNet"]</span>
-        <span class="technology-orbit__item technology-orbit__item--two">@Localizer["TechnologyCSharp"]</span>
-        <span class="technology-orbit__item technology-orbit__item--three">@Localizer["TechnologySql"]</span>
-        <span class="technology-orbit__item technology-orbit__item--four">@Localizer["TechnologyWeb"]</span>
-    </div>
+    @if (hero is { Logos.Count: > 0 } || !string.IsNullOrWhiteSpace(hero?.ProfileImageUrl))
+    {
+        <div class="technology-orbit" aria-label="@Localizer["TechnologyVisualLabel"]">
+            <div class="technology-orbit__plane">
+                <div class="technology-orbit__tracks" aria-hidden="true">
+                    <span class="technology-orbit__track technology-orbit__track--orbit-1"></span>
+                    <span class="technology-orbit__track technology-orbit__track--orbit-2"></span>
+                    <span class="technology-orbit__track technology-orbit__track--orbit-3"></span>
+                </div>
+                @foreach (var orbit in hero.Logos.GroupBy(logo => ((logo.Orbit - 1) % 3) + 1).OrderBy(group => group.Key))
+                {
+                    var logos = orbit.OrderBy(logo => logo.DisplayOrder).ThenBy(logo => logo.Id).ToArray();
+                    var orbitNumber = orbit.Key;
+                    var duration = 46 + orbitNumber * 7;
+                    var orbitDirection = orbitNumber == 2 ? "reverse" : "normal";
+                    @for (var index = 0; index < logos.Length; index++)
+                    {
+                        var delay = -(double)duration * index / logos.Length;
+                        <span class="technology-orbit__item technology-orbit__item--orbit-@orbitNumber" style="--orbit-duration: @($"{duration}s"); --orbit-direction: @orbitDirection; animation-delay: @($"{delay.ToString("0.##", CultureInfo.InvariantCulture)}s");">
+                            <span class="technology-orbit__item-counter">
+                                <img class="technology-orbit__item-image" src="@logos[index].ImageUrl" alt="@logos[index].AlternativeText" width="36" height="36" />
+                            </span>
+                        </span>
+                    }
+                }
+            </div>
+            <div class="technology-orbit__core">
+                @if (!string.IsNullOrWhiteSpace(hero.ProfileImageUrl))
+                {
+                    <img src="@hero.ProfileImageUrl" alt="@hero.ProfileImageAlternativeText" />
+                }
+                else
+                {
+                    <span aria-hidden="true">@Localizer["TechnologyCore"]</span>
+                }
+            </div>
+        </div>
+    }
 </section>
+
+@code {
+    private HeroReadModel? hero;
+
+    protected override async Task OnInitializedAsync() => hero = await HeroQueryService.GetAsync();
+}

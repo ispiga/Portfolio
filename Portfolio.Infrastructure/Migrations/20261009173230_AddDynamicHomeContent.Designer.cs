@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Portfolio.Infrastructure;
 
@@ -11,9 +12,11 @@ using Portfolio.Infrastructure;
 namespace Portfolio.Infrastructure.Migrations
 {
     [DbContext(typeof(PortfolioDbContext))]
-    partial class PortfolioDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261009173230_AddDynamicHomeContent")]
+    partial class AddDynamicHomeContent
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -158,6 +161,7 @@ namespace Portfolio.Infrastructure.Migrations
             modelBuilder.Entity("Portfolio.Domain.Entities.AboutProfile", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedNever()
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -504,28 +508,29 @@ namespace Portfolio.Infrastructure.Migrations
             modelBuilder.Entity("Portfolio.Domain.Entities.HeroContent", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedNever()
                         .HasColumnType("int");
 
                     b.Property<int>("OrbitCount")
                         .HasColumnType("int");
 
-                    b.Property<string>("ProfileImageAlternativeText")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                    b.Property<Guid?>("ProfileImageId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ProfileImageStorageKey")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("ProfileImageContentType")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<Guid?>("ProfileImageId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<long?>("ProfileImageSizeBytes")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("ProfileImageStorageKey")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                    b.Property<string>("ProfileImageAlternativeText")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.HasKey("Id");
 
