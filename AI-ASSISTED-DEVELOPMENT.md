@@ -3237,3 +3237,105 @@ Alcance documentado de la entrega:
 No inventes campos, relaciones, estados, rutas ni comportamiento que no estén especificados o no puedan deducirse de los patrones existentes. Si queda una decisión funcional necesaria sin resolver en PORTFOLIO_PROJECT.md ni en el código —especialmente cómo representar el estado editorial y qué significa la gestión de imágenes para el contenido de TinyMCE— pregúntame antes de decidir.
 
 Implementa solo el alcance de esta entrega y conserva arquitectura, seguridad, localización, accesibilidad y protección de cambios no guardados coherentes con las instrucciones del repositorio. Añade o actualiza pruebas, ejecuta la compilación y las pruebas pertinentes, sincroniza la documentación y genera cualquier migración necesaria sin aplicarla a ninguna base de datos. Informa claramente del impacto de la migración y de si queda pendiente de aplicación.
+
+
+# *************************************************************************************
+# PROMPT PARA REALIZAR LA FASE 7 - IMPLEMENTACIÓN CONTENIDO DINÁMICO DE HERO Y SOBRE MÍ
+# *************************************************************************************
+
+Implementa en este workspace las decisiones documentadas para gestionar dinámicamente el Hero y la sección «Sobre mí» del portfolio.
+
+Antes de modificar nada:
+1. Lee `.github/copilot-instructions.md` y `PORTFOLIO_PROJECT.md`; son las fuentes de verdad del proyecto.
+2. Inspecciona la solución y los componentes, servicios, entidades, almacenamiento, administración y pruebas que ya existen. Reutiliza sus patrones y evita duplicar responsabilidades.
+3. Como el trabajo abarca varias capas, presenta un plan breve y ejecútalo paso a paso. Si una decisión funcional necesaria no está definida, pregúntame antes de asumirla.
+
+Alcance funcional:
+
+**Hero**
+- El titular será editable y localizado para `es-ES` y `en-US`.
+- Habrá una sección de administración propia del Hero para añadir, editar, retirar y ordenar los logos tecnológicos, además de asignar cada logo a una órbita.
+- Cada logo tendrá los metadatos necesarios para identificarlo y mostrarlo accesiblemente, incluido su texto alternativo.
+- La Home distribuirá los logos de forma equilibrada en sus órbitas a partir de los datos persistidos. La animación será sutil, responsive, compatible con tema claro/oscuro y respetará `prefers-reduced-motion`.
+- No conviertas otros textos del Hero en contenido editable salvo que la especificación actual lo establezca.
+
+**Sobre mí**
+- Habrá otro apartado administrativo, independiente, para editar la descripción localizada del perfil.
+- Se podrán gestionar y ordenar las áreas o grupos de skills y sus skills.
+- Se podrán añadir, editar, retirar y ordenar aficiones. Cada afición tendrá una imagen y una descripción localizada.
+- La experiencia profesional existente dentro de «Sobre mí» debe conservar su comportamiento y presentación.
+
+**Persistencia y archivos**
+- Persiste en SQL Server los textos y metadatos mediante las capas y dependencias arquitectónicas ya establecidas.
+- No almacenes imágenes como BLOB ni las expongas mediante una ruta física. Guárdalas fuera de SQL Server y `wwwroot`, en almacenamiento persistente bajo `App_Data`, con directorio configurable, claves opacas y rutas controladas por la aplicación.
+- Sigue las reglas existentes del proyecto para crear directorios, validar cargas y eliminar archivos de forma segura. No introduzcas dependencias nuevas si no son imprescindibles.
+
+**Administración y experiencia**
+- Integra ambos apartados en el Dashboard y en la navegación administrativa, protegidos por la política de administrador existente.
+- Mantén las páginas y formularios responsivos, accesibles y coherentes con MudBlazor.
+- Usa recursos compartidos para todos los textos de interfaz, con `es-ES` como cultura predeterminada y preparación para `en-US`.
+- Aplica el fallback a español para el contenido cuando falte la traducción inglesa. No inventes contenido personal ni logos de relleno.
+- Conserva el diseño público existente y sus decisiones de navegación; implementa la órbita con Blazor/CSS, no con una SPA ni con un GIF.
+
+**Validación y documentación**
+- Añade o actualiza las pruebas adecuadas para persistencia, localización/fallback, orden, validación, autorización y almacenamiento.
+- Genera las migraciones necesarias, pero no las apliques automáticamente ni ejecutes `database update`.
+- Ejecuta las pruebas relevantes y la compilación completa. Corrige los errores atribuibles a los cambios y resume los resultados.
+- Actualiza `PORTFOLIO_PROJECT.md` para describir con precisión lo implementado y las migraciones pendientes.
+- No modifiques el logo de marca `docs/brand/logo_principal.svg`: es independiente de los logos tecnológicos orbitales.
+
+
+# *********************************************************************
+# PROMPT PARA REALIZAR LA FASE 7 - MEJORAS DE ANIMACIÓN ORBITAL EN HERO
+# *********************************************************************
+
+Quiero mejorar la animación orbital de mi portfolio. Revisa los archivos existentes `HeroSection.razor` y `app.css` antes de realizar cambios. La animación ya funciona y los logos siguen sus respectivas trayectorias, por lo que debes preservar esa funcionalidad.
+
+### 1. Eliminar el efecto de saltos o parpadeos
+
+Investiga por qué los círculos que rodean los logos parecen dar pequeños saltos durante el movimiento.
+
+- Revisa la estructura y las dimensiones de `.technology-orbit__item`, que actualmente ocupa el 100 % del contenedor.
+- Comprueba si el uso de `offset-path`, `offset-anchor`, `offset-distance`, los retrasos negativos y las animaciones CSS está provocando trabajo de renderizado innecesario o discontinuidades.
+- Comprueba si los bordes, las sombras, el antialiasing o el movimiento subpíxel contribuyen al efecto visual.
+- No atribuyas el problema a una causa sin verificarla.
+- Conserva `offset-path` si sigue siendo una solución adecuada. Si cambias la técnica, explica la razón y mantén la coincidencia exacta entre las trayectorias dibujadas y las recorridas.
+- Evita aplicar `will-change` indiscriminadamente o añadir filtros y sombras costosos para intentar ocultar el problema.
+- Comprueba que la animación sea continua durante todo el ciclo, incluido el paso del 100 % al 0 %, sin saltos perceptibles.
+
+### 2. Incorporar perspectiva y profundidad
+
+Quiero que las tres órbitas dejen de parecer elipses horizontales planas.
+
+- Introduce una inclinación visual tridimensional mediante CSS 3D, SVG o una técnica equivalente.
+- Prioriza una simulación elegante y ligera, sin necesidad de incorporar una librería 3D.
+- La fotografía central debe permanecer frontal, nítida y sin deformaciones.
+- Mantén las líneas y los logos perfectamente alineados durante toda la animación.
+- Crea una sensación de profundidad en la que algunas partes de las órbitas se perciban detrás de la fotografía y otras delante, utilizando capas y superposición cuando corresponda.
+- No uses movimientos verticales independientes para simular profundidad.
+- Respeta la geometría de las trayectorias y comprueba el resultado en distintos momentos del ciclo.
+
+### 3. Aumentar el tamaño de los elementos
+
+Ajusta progresivamente los tamaños:
+
+- Fotografía central: objetivo inicial de 176–192 px de diámetro en escritorio.
+- Círculos de los logos: objetivo inicial de 52–56 px.
+- Iconos interiores: objetivo inicial de 32–36 px.
+- Zona orbital: amplíala si el espacio disponible lo permite, sin desbordar la cabecera.
+
+Adapta los tamaños a móviles mediante reglas responsive. Evita solapamientos entre los logos, la fotografía y las líneas.
+
+### 4. Mantener las convenciones del proyecto
+
+- Conserva la compatibilidad con los temas claro, oscuro y sistema.
+- Respeta `prefers-reduced-motion`.
+- No introduzcas dependencias nuevas innecesarias.
+- Mantén la carga de la información desde `IHeroQueryService` y la estructura actual de Blazor.
+- No modifiques otras secciones de `app.css` que no estén relacionadas con la cabecera.
+
+### 5. Verificación final
+
+Tras implementar los cambios, comprueba los tamaños, la continuidad de las animaciones y la coincidencia geométrica entre las líneas y los logos. Si no puedes ejecutar visualmente la aplicación, indícalo expresamente y no afirmes que has verificado el resultado en el navegador.
+
+Al finalizar, resume qué causaba los saltos, qué has cambiado y qué comprobaciones has podido realizar.
