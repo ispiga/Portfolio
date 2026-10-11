@@ -16,9 +16,12 @@
         <div class="technology-orbit" aria-label="@Localizer["TechnologyVisualLabel"]">
             <div class="technology-orbit__plane">
                 <div class="technology-orbit__tracks" aria-hidden="true">
-                    <span class="technology-orbit__track technology-orbit__track--orbit-1"></span>
-                    <span class="technology-orbit__track technology-orbit__track--orbit-2"></span>
-                    <span class="technology-orbit__track technology-orbit__track--orbit-3"></span>
+                    <span class="technology-orbit__track technology-orbit__track--orbit-1 technology-orbit__track--back"></span>
+                    <span class="technology-orbit__track technology-orbit__track--orbit-1 technology-orbit__track--front"></span>
+                    <span class="technology-orbit__track technology-orbit__track--orbit-2 technology-orbit__track--back"></span>
+                    <span class="technology-orbit__track technology-orbit__track--orbit-2 technology-orbit__track--front"></span>
+                    <span class="technology-orbit__track technology-orbit__track--orbit-3 technology-orbit__track--back"></span>
+                    <span class="technology-orbit__track technology-orbit__track--orbit-3 technology-orbit__track--front"></span>
                 </div>
                 @foreach (var orbit in hero.Logos.GroupBy(logo => ((logo.Orbit - 1) % 3) + 1).OrderBy(group => group.Key))
                 {
@@ -26,15 +29,18 @@
                     var orbitNumber = orbit.Key;
                     var duration = 46 + orbitNumber * 7;
                     var orbitDirection = orbitNumber == 2 ? "reverse" : "normal";
-                    @for (var index = 0; index < logos.Length; index++)
-                    {
-                        var delay = -(double)duration * index / logos.Length;
-                        <span class="technology-orbit__item technology-orbit__item--orbit-@orbitNumber" style="--orbit-duration: @($"{duration}s"); --orbit-direction: @orbitDirection; animation-delay: @($"{delay.ToString("0.##", CultureInfo.InvariantCulture)}s");">
-                            <span class="technology-orbit__item-counter">
-                                <img class="technology-orbit__item-image" src="@logos[index].ImageUrl" alt="@logos[index].AlternativeText" width="36" height="36" />
+                    <div class="technology-orbit__orbit-layer technology-orbit__orbit-layer--orbit-@orbitNumber">
+                        @for (var index = 0; index < logos.Length; index++)
+                        {
+                            var delay = -(double)duration * index / logos.Length;
+                            var startDistance = 100d * (orbitNumber == 2 ? 1d - (double)index / logos.Length : (double)index / logos.Length);
+                            <span class="technology-orbit__item technology-orbit__item--orbit-@orbitNumber" style="--orbit-duration: @($"{duration}s"); --orbit-direction: @orbitDirection; --orbit-distance: @($"{startDistance.ToString("0.##", CultureInfo.InvariantCulture)}%"); animation-delay: @($"{delay.ToString("0.##", CultureInfo.InvariantCulture)}s");">
+                                <span class="technology-orbit__item-counter">
+                                    <img class="technology-orbit__item-image" src="@logos[index].ImageUrl" alt="@logos[index].AlternativeText" width="36" height="36" />
+                                </span>
                             </span>
-                        </span>
-                    }
+                        }
+                    </div>
                 }
             </div>
             <div class="technology-orbit__core">
