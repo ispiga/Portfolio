@@ -8,13 +8,17 @@
         <p class="eyebrow">@Localizer["AboutEyebrow"]</p>
         <h2 id="about-title">@Localizer["AboutTitle"]</h2>
     </div>
-    <div class="about-grid">
+    <section class="about-composition" aria-label="@Localizer["AboutAreasLabel"]">
         <div class="surface content-card about-profile">
+            <span class="about-pin" aria-hidden="true">
+                <span class="about-pin__head"></span>
+                <span class="about-pin__needle"></span>
+            </span>
             <p>@(content?.Profile ?? Localizer["AboutProfileEmpty"].Value)</p>
         </div>
-        @if (content is { Groups.Count: > 0 })
-        {
-            <div class="areas-grid" aria-label="@Localizer["AboutAreasLabel"]">
+        <div class="about-skills">
+            @if (content is { Groups.Count: > 0 })
+            {
                 @foreach (var group in content.Groups)
                 {
                     <article class="surface area-card">
@@ -27,13 +31,13 @@
                         </ul>
                     </article>
                 }
-            </div>
-        }
-        else
-        {
-            <p class="about-content-empty">@Localizer["AboutAreasEmpty"]</p>
-        }
-    </div>
+            }
+            else
+            {
+                <p class="about-content-empty">@Localizer["AboutAreasEmpty"]</p>
+            }
+        </div>
+    </section>
     @if (content is { Hobbies.Count: > 0 })
     {
         <section class="about-hobbies" aria-labelledby="about-hobbies-title">

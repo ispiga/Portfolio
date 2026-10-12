@@ -328,17 +328,112 @@ html[data-theme="dark"] {
 }
 
 .section-heading--split > p { max-width: 28rem; }
-.about-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; }
-.areas-grid, .card-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.about-composition { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); align-items: start; gap: 1.5rem; }
+.about-skills {
+    width: min(100%, 25.625rem);
+    margin-inline: auto;
+    min-width: 0;
+    column-count: 2;
+    column-gap: 0.625rem;
+}
+.card-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
 .surface { color: var(--color-text); }
 .content-card, .area-card, .project-card, .certification-card, .timeline-empty, .contact-form { padding: clamp(1.25rem, 3vw, 2rem); }
 .content-card { display: flex; align-items: center; min-height: 100%; }
 .area-card h3, .project-card h3, .certification-card h3 { margin-bottom: 0.5rem; font-size: 1.15rem; }
 .area-card p, .project-card p, .certification-card p { margin-bottom: 0; }
-.about-profile { white-space: pre-line; }
+.about-profile {
+    --about-paper: color-mix(in srgb, var(--color-surface) 94%, var(--color-primary));
+    --about-paper-highlight: color-mix(in srgb, var(--color-surface) 98%, var(--color-accent));
+    position: relative;
+    display: block;
+    width: 100%;
+    min-height: 0;
+    margin: 0;
+    padding: 3.25rem 1.5rem 1.5rem;
+    border: 1px solid color-mix(in srgb, var(--color-border) 78%, var(--color-primary));
+    border-radius: 0.2rem 0.35rem 0.75rem 0.25rem;
+    background: linear-gradient(155deg, var(--about-paper-highlight), var(--about-paper) 72%, color-mix(in srgb, var(--about-paper) 94%, var(--color-accent)));
+    filter: drop-shadow(0 0.4rem 0.9rem color-mix(in srgb, var(--color-text) 11%, transparent)) drop-shadow(0 0.08rem 0.18rem color-mix(in srgb, var(--color-text) 8%, transparent));
+    white-space: pre-line;
+}
+.about-profile p { margin: 0; }
+.about-pin {
+    position: absolute;
+    top: 0.45rem;
+    left: 50%;
+    width: 2.25rem;
+    height: 2.35rem;
+    transform: translateX(-50%) rotate(26deg);
+    pointer-events: none;
+}
+.about-pin__head {
+    position: relative;
+    display: block;
+    width: 0.9rem;
+    height: 0.85rem;
+    margin-inline: auto;
+    border: 1px solid color-mix(in srgb, var(--color-accent) 72%, var(--color-border));
+    border-radius: 50% 50% 45% 45%;
+    background: radial-gradient(ellipse at 32% 25%, color-mix(in srgb, var(--color-surface) 70%, var(--color-accent)), var(--color-accent) 68%);
+    box-shadow: 0 0.12rem 0.22rem color-mix(in srgb, var(--color-text) 22%, transparent);
+}
+.about-pin__needle {
+    position: absolute;
+    top: 0.68rem;
+    left: 1.05rem;
+    display: block;
+    width: 0.13rem;
+    height: 1.15rem;
+    border-radius: 0 0 50% 50%;
+    background: linear-gradient(to bottom, var(--color-secondary), color-mix(in srgb, var(--color-secondary) 45%, var(--color-background)));
+    clip-path: polygon(15% 0, 85% 0, 50% 100%);
+}
+.about-skills .area-card {
+    --about-paper: color-mix(in srgb, var(--color-surface) 94%, var(--color-primary));
+    --about-paper-highlight: color-mix(in srgb, var(--color-surface) 98%, var(--color-accent));
+    position: relative;
+    width: 100%;
+    max-width: 12.5rem;
+    min-width: 0;
+    margin: 0 0 0.625rem;
+    padding: 0.75rem 1rem 1rem 0.75rem;
+    border: 1px solid color-mix(in srgb, var(--color-border) 82%, var(--color-primary));
+    border-radius: 0.2rem 0.3rem 0.05rem 0.25rem;
+    background: linear-gradient(148deg, var(--about-paper-highlight), var(--about-paper) 76%, color-mix(in srgb, var(--about-paper) 93%, var(--color-accent)));
+    box-shadow: 0 0.3rem 0.65rem color-mix(in srgb, var(--color-text) 10%, transparent), 0 0.06rem 0.14rem color-mix(in srgb, var(--color-text) 7%, transparent);
+    transition: box-shadow 160ms ease;
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+.about-skills .area-card::before,
+.about-skills .area-card::after {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 0.9rem;
+    height: 0.9rem;
+    pointer-events: none;
+    content: "";
+}
+.about-skills .area-card::before {
+    z-index: 1;
+    background: linear-gradient(145deg, color-mix(in srgb, var(--about-paper-highlight) 80%, var(--color-surface)), color-mix(in srgb, var(--about-paper) 76%, var(--color-border)));
+    box-shadow: -0.06rem -0.05rem 0.1rem color-mix(in srgb, var(--color-text) 12%, transparent);
+    clip-path: polygon(0 100%, 100% 0, 100% 100%);
+}
+.about-skills .area-card::after {
+    z-index: 2;
+    background: color-mix(in srgb, var(--color-border) 82%, var(--color-text));
+    clip-path: polygon(0 100%, 100% 0, 100% 7%, 7% 100%);
+}
+.about-skills .area-card h3 { margin-bottom: 0.5rem; font-size: 0.95rem; line-height: 1.3; overflow-wrap: anywhere; }
+.about-skills .about-skill-list { gap: 0.35rem; min-width: 0; }
+.about-skills .about-skill-list li { max-width: 100%; padding: 0.16rem 0.4rem; overflow-wrap: anywhere; }
+.about-skills .area-card:hover { box-shadow: 0 0.38rem 0.72rem color-mix(in srgb, var(--color-text) 12%, transparent), 0 0.08rem 0.16rem color-mix(in srgb, var(--color-text) 8%, transparent); }
 .about-skill-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0; padding: 0; list-style: none; }
-.about-skill-list li { padding: 0.3rem 0.6rem; border: 1px solid var(--color-border); border-radius: 999px; color: var(--color-text-secondary); font-size: var(--text-small); }
-.about-content-empty { align-self: center; color: var(--color-text-secondary); }
+.about-skill-list li { padding: 0.2rem 0.5rem; border: 1px solid var(--color-border); border-radius: 999px; color: var(--color-text-secondary); font-size: 0.8rem; line-height: 1.4; }
+.about-content-empty { column-span: all; color: var(--color-text-secondary); }
 .about-hobbies { margin-top: 3rem; }
 .about-hobbies > h3 { margin-bottom: 1rem; font-size: clamp(1.4rem, 3vw, 2rem); }
 .about-hobbies-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: 1rem; }
@@ -468,12 +563,33 @@ html[data-theme="dark"] {
     .home-hero { grid-template-columns: 1fr; min-height: auto; }
 }
 
+@media (max-width: 56rem) {
+    .about-composition { grid-template-columns: minmax(0, 1fr); }
+    .about-skills { width: min(100%, 51.875rem); column-count: 4; }
+}
+
+@media (max-width: 50rem) {
+    .about-skills { width: min(100%, 38.75rem); column-count: 3; }
+}
+
+@media (min-width: 72rem) {
+    .about-skills { width: min(100%, 38.75rem); column-count: 3; }
+}
+
+@media (min-width: 96rem) {
+    .about-skills { width: min(100%, 51.875rem); column-count: 4; }
+}
+
+@media (min-width: 120rem) {
+    .about-skills { width: min(100%, 65rem); column-count: 5; }
+}
+
 @media (max-width: 47.999rem) {
+    .about-skills { width: 100%; column-count: 1; }
     .technology-orbit { width: min(100%, 30rem); aspect-ratio: 1.15; }
     .technology-orbit__core { width: clamp(7rem, 36%, 8.5rem); }
     .technology-orbit__item-counter { width: 2.75rem; height: 2.75rem; }
     .technology-orbit__item-image { width: 1.75rem; height: 1.75rem; }
-    .about-grid, .areas-grid, .card-grid, .form-grid { grid-template-columns: 1fr; }
     .about-hobby-card { grid-template-columns: 5rem minmax(0, 1fr); }
     .admin-module-heading, .home-content-editor-card__heading { align-items: flex-start; flex-wrap: wrap; }
     .section-heading--split { display: block; }
@@ -591,7 +707,8 @@ p {
 }
 
 .site-main:has(.home-hero) {
-    width: min(100% - (var(--space-page) * 2), 100rem);
+    --home-page-inset: clamp(1rem, 4vw, 4rem);
+    width: min(calc(100% - var(--home-page-inset) - var(--home-page-inset)), 120rem);
 }
 
 .portfolio-shell {
