@@ -399,38 +399,48 @@ html[data-theme="dark"] {
     margin: 0 0 0.625rem;
     padding: 0.75rem 1rem 1rem 0.75rem;
     border: 1px solid color-mix(in srgb, var(--color-border) 82%, var(--color-primary));
-    border-radius: 0.2rem 0.3rem 0.05rem 0.25rem;
+    border-radius: 0.2rem 0.3rem 0 0.25rem;
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%);
     background: linear-gradient(148deg, var(--about-paper-highlight), var(--about-paper) 76%, color-mix(in srgb, var(--about-paper) 93%, var(--color-accent)));
-    box-shadow: 0 0.3rem 0.65rem color-mix(in srgb, var(--color-text) 10%, transparent), 0 0.06rem 0.14rem color-mix(in srgb, var(--color-text) 7%, transparent);
-    transition: box-shadow 160ms ease;
+    filter: drop-shadow(0 0.3rem 0.65rem color-mix(in srgb, var(--color-text) 10%, transparent)) drop-shadow(0 0.06rem 0.14rem color-mix(in srgb, var(--color-text) 7%, transparent));
+    transition: filter 160ms ease;
     break-inside: avoid;
     page-break-inside: avoid;
 }
-.about-skills .area-card::before,
-.about-skills .area-card::after {
+.about-skills .area-card::before {
     position: absolute;
-    right: 0;
-    bottom: 0;
-    width: 0.9rem;
-    height: 0.9rem;
+    inset-inline-end: -1px;
+    inset-block-end: -1px;
+    width: 18px;
+    height: 18px;
     pointer-events: none;
     content: "";
 }
 .about-skills .area-card::before {
     z-index: 1;
-    background: linear-gradient(145deg, color-mix(in srgb, var(--about-paper-highlight) 80%, var(--color-surface)), color-mix(in srgb, var(--about-paper) 76%, var(--color-border)));
-    box-shadow: -0.06rem -0.05rem 0.1rem color-mix(in srgb, var(--color-text) 12%, transparent);
-    clip-path: polygon(0 100%, 100% 0, 100% 100%);
+    background: linear-gradient(145deg, color-mix(in srgb, var(--about-paper-highlight) 94%, var(--color-surface)), color-mix(in srgb, var(--about-paper) 82%, var(--color-border)));
+    clip-path: polygon(0 0, 0 100%, 100% 0);
 }
-.about-skills .area-card::after {
+.about-skills__fold-line {
+    position: absolute;
     z-index: 2;
-    background: color-mix(in srgb, var(--color-border) 82%, var(--color-text));
-    clip-path: polygon(0 100%, 100% 0, 100% 7%, 7% 100%);
+    inset-inline-end: -1px;
+    inset-block-end: -1px;
+    width: 18px;
+    height: 18px;
+    overflow: visible;
+    pointer-events: none;
+}
+.about-skills__fold-line path {
+    fill: none;
+    stroke: color-mix(in srgb, var(--color-border) 72%, var(--about-paper));
+    stroke-width: 1px;
+    stroke-linecap: butt;
 }
 .about-skills .area-card h3 { margin-bottom: 0.5rem; font-size: 0.95rem; line-height: 1.3; overflow-wrap: anywhere; }
 .about-skills .about-skill-list { gap: 0.35rem; min-width: 0; }
 .about-skills .about-skill-list li { max-width: 100%; padding: 0.16rem 0.4rem; overflow-wrap: anywhere; }
-.about-skills .area-card:hover { box-shadow: 0 0.38rem 0.72rem color-mix(in srgb, var(--color-text) 12%, transparent), 0 0.08rem 0.16rem color-mix(in srgb, var(--color-text) 8%, transparent); }
+.about-skills .area-card:hover { filter: drop-shadow(0 0.38rem 0.72rem color-mix(in srgb, var(--color-text) 12%, transparent)) drop-shadow(0 0.08rem 0.16rem color-mix(in srgb, var(--color-text) 8%, transparent)); }
 .about-skill-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0; padding: 0; list-style: none; }
 .about-skill-list li { padding: 0.2rem 0.5rem; border: 1px solid var(--color-border); border-radius: 999px; color: var(--color-text-secondary); font-size: 0.8rem; line-height: 1.4; }
 .about-content-empty { column-span: all; color: var(--color-text-secondary); }
