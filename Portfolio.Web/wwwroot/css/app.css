@@ -421,22 +421,6 @@ html[data-theme="dark"] {
     background: linear-gradient(145deg, color-mix(in srgb, var(--about-paper-highlight) 94%, var(--color-surface)), color-mix(in srgb, var(--about-paper) 82%, var(--color-border)));
     clip-path: polygon(0 0, 0 100%, 100% 0);
 }
-.about-skills__fold-line {
-    position: absolute;
-    z-index: 2;
-    inset-inline-end: -1px;
-    inset-block-end: -1px;
-    width: 18px;
-    height: 18px;
-    overflow: visible;
-    pointer-events: none;
-}
-.about-skills__fold-line path {
-    fill: none;
-    stroke: color-mix(in srgb, var(--color-border) 72%, var(--about-paper));
-    stroke-width: 1px;
-    stroke-linecap: butt;
-}
 .about-skills .area-card h3 { margin-bottom: 0.5rem; font-size: 0.95rem; line-height: 1.3; overflow-wrap: anywhere; }
 .about-skills .about-skill-list { gap: 0.35rem; min-width: 0; }
 .about-skills .about-skill-list li { max-width: 100%; padding: 0.16rem 0.4rem; overflow-wrap: anywhere; }
