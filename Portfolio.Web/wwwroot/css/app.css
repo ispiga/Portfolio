@@ -1209,6 +1209,19 @@ p {
     gap: 1rem;
 }
 
+.hero-profile-image-editor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    align-items: start;
+    gap: 1rem;
+}
+
+.hero-profile-image-editor-grid > * { min-width: 0; }
+
+.hero-profile-image-preview { display: flex; min-width: 0; align-items: center; gap: 0.75rem; }
+
+.hero-profile-image-preview .home-content-editor-card__preview { flex: 1; min-width: 0; }
+
 .experience-admin-actions,
 .experience-attachment-list__item,
 .experience-attachment-list__controls {

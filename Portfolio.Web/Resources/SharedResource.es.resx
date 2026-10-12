@@ -1303,6 +1303,8 @@
   <data name="AdminAboutDescription" xml:space="preserve"><value>Administra el perfil, las áreas de skills y las aficiones.</value></data>
   <data name="AboutManageAction" xml:space="preserve"><value>Gestionar Sobre mí</value></data>
   <data name="HeroAdminTitle" xml:space="preserve"><value>Administrar Hero</value></data>
+  <data name="HeroUnsavedChangesTitle" xml:space="preserve"><value>Cambios sin guardar</value></data>
+  <data name="HeroUnsavedChangesConfirmation" xml:space="preserve"><value>Los cambios del Hero se perderán si sales sin guardar. ¿Quieres salir sin guardar?</value></data>
   <data name="HeroAdminDescription" xml:space="preserve"><value>Edita el titular localizado y gestiona los logos que orbitan en la portada.</value></data>
   <data name="HeroHeadlineSection" xml:space="preserve"><value>Titular y órbitas</value></data>
   <data name="HeroProfileImageSection" xml:space="preserve"><value>Fotografía central</value></data>

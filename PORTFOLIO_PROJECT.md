@@ -702,6 +702,8 @@ Las rutas administrativas deben seguir siendo utilizables en móvil sin desborda
 
 El Home será la principal carta de presentación del portfolio.
 
+La Home usa el `site-main` común de `MainLayout.razor`; su anchura máxima de `120rem` y su margen interior lateral responsive se limitan a la portada. No se debe ensanchar el resto de páginas públicas para ajustar la alineación del Home.
+
 Estructura prevista:
 
 ```text
@@ -771,6 +773,13 @@ Debe explicar:
 ## Áreas principales
 
 Se mostrarán visualmente las principales áreas tecnológicas. Los grupos y sus skills se gestionarán desde administración, con orden de presentación configurable. No se pretende mostrar aquí toda la lista de habilidades del CV.
+
+### Presentación responsive actual
+
+- El perfil y las skills se presentan en zonas independientes: en escritorio el perfil ocupa la columna izquierda y los grupos la derecha; en anchos reducidos se apilan, manteniendo primero el perfil.
+- Los grupos se muestran con CSS Columns para conservar tarjetas de altura natural y compactar visualmente contenidos variables. Cada tarjeta evita fragmentarse entre columnas, mantiene el orden de origen administrado en el DOM y conserva una anchura máxima aproximada de `12.5rem`; los detalles responsive y las separaciones se definen en `Portfolio.Web/wwwroot/css/app.css`.
+- No se debe sustituir esta distribución por Grid de filas uniformes, añadir posiciones basadas en categorías ni recuperar un algoritmo masonry en JavaScript sin un cambio explícito de requisitos.
+- Las tarjetas usan tokens semánticos de tema. La esquina inferior derecha conserva un recorte diagonal de `18px` en la silueta y un pseudoelemento `::before` para la cara interior. No se mantiene una línea diagonal SVG ni un segundo pseudoelemento para dibujarla. No se añadirán controles de administración para colores o gradientes hasta que se defina la paleta corporativa.
 
 Por ejemplo:
 
@@ -1569,7 +1578,9 @@ El almacenamiento de archivos se implementa como infraestructura reutilizable me
 ### Entrega 6 implementada — Hero y «Sobre mí»
 
 - Las rutas `/admin/hero` y `/admin/about` están protegidas por `AdministratorOnly` e integradas en el Dashboard y la navegación administrativa. Los formularios usan recursos compartidos en español e inglés y se adaptan a pantallas estrechas.
-- Hero administra el titular español/inglés, la cantidad de órbitas, el nombre administrativo y texto alternativo obligatorio de cada logo, su orden, órbita e imagen. No expone para edición los demás textos del Hero; el CTA y los textos de interfaz siguen en recursos. Si todavía no existe contenido persistido, se conserva el titular localizado provisional actual hasta que se guarde uno desde administración.
+- Hero administra el titular español/inglés, la cantidad de órbitas, el nombre administrativo y texto alternativo obligatorio de cada logo, su orden, órbita e imagen. No expone para edición los demás textos del Hero; el CTA y los textos de interfaz siguen en recursos. Si todavía no existe contenido persistido, se conserva el titular localizado provisional actual hasta que se guarde uno desde administración. El formulario de fotografía central distribuye sus campos en varias columnas cuando hay espacio y se apila en móvil; el selector de imagen queda junto a la vista previa y la acción de eliminar mantiene un tamaño compacto.
+- La lista administrativa ordena los logos por órbita y después por orden de presentación. Un logo nuevo empieza con orden `0` y permanece arriba mientras se asignan ambos valores; al editar órbita y orden se recoloca en su posición. Estos valores siguen sujetos al guardado normal del formulario.
+- El editor detecta cambios mediante una comparación con el estado inicial que incluye titulares, cantidad de órbitas, metadatos e imagen de perfil y todos los campos de los logos. Protege la navegación interna y el logout con el diálogo localizado compartido y las salidas del documento con la confirmación nativa del navegador (`beforeunload`/`NavigationLock`). Las imágenes temporales en curso también quedan protegidas y se limpian si se abandona sin guardar. Solo un guardado correcto desactiva el aviso; errores o validación fallida mantienen la protección.
 - «Sobre mí» administra las descripciones del perfil, los grupos y nombres de skills localizados y ordenables, y las aficiones ordenables con imagen, nombre alternativo y descripciones localizadas. La imagen y la traducción española de cada afición son obligatorias; la traducción inglesa completa es opcional. La timeline de experiencia conserva su consulta y presentación, integrada como bloque independiente dentro de «Sobre mí».
 - La distribución de logos se calcula a partir de los registros persistidos y reparte cada órbita por orden de presentación. La animación se implementa con CSS/Blazor, alterna la dirección entre órbitas, utiliza tokens semánticos y se desactiva para `prefers-reduced-motion`; no se crean logos, skills ni datos personales de relleno.
 - Logos e imágenes de aficiones admiten SVG/JPG/JPEG/PNG hasta 10 MiB. `Portfolio:HomeContentImages:Directory` configura el directorio (predeterminado `App_Data/HomeContentImages`); los ficheros usan claves opacas en directorios GUID fuera de SQL Server y `wwwroot`. Se valida extensión, MIME, tamaño real, firma y SVG XML seguro; la ruta pública `GET /home-content-images/{kind}/{entityId}` resuelve los metadatos desde la base de datos y nunca acepta una ruta física. La eliminación intenta borrar solo el archivo asociado y su directorio GUID cuando queda vacío; los errores del sistema de archivos se registran.

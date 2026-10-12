@@ -1303,6 +1303,8 @@
   <data name="AdminAboutDescription" xml:space="preserve"><value>Manage the profile, skill areas and hobbies.</value></data>
   <data name="AboutManageAction" xml:space="preserve"><value>Manage About me</value></data>
   <data name="HeroAdminTitle" xml:space="preserve"><value>Manage Hero</value></data>
+  <data name="HeroUnsavedChangesTitle" xml:space="preserve"><value>Unsaved changes</value></data>
+  <data name="HeroUnsavedChangesConfirmation" xml:space="preserve"><value>Your Hero changes will be lost if you leave without saving. Do you want to leave without saving?</value></data>
   <data name="HeroAdminDescription" xml:space="preserve"><value>Edit the localized headline and manage the logos orbiting in the home page.</value></data>
   <data name="HeroHeadlineSection" xml:space="preserve"><value>Headline and orbits</value></data>
   <data name="HeroProfileImageSection" xml:space="preserve"><value>Central portrait</value></data>
