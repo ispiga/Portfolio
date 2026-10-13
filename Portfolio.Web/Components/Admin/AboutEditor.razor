@@ -5,12 +5,14 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.Extensions.Localization
+@using Microsoft.JSInterop
 @using Portfolio.Application.HomeContent
 @using Portfolio.Infrastructure.Identity
 @inject IAboutAdministrationService AboutService
 @inject IHomeContentImageStorageService ImageStorage
 @inject IStringLocalizer<SharedResource> Localizer
 @inject ILogger<AboutEditor> Logger
+@inject IJSRuntime JS
 
 <PageTitle>@Localizer["AboutAdminTitle"]</PageTitle>
 
@@ -26,7 +28,8 @@
     }
     else
     {
-        <EditForm Model="model" OnSubmit="SaveAsync">
+        <NavigationLock ConfirmExternalNavigation="@HasUnsavedChanges" />
+        <EditForm id="about-edit-form" Model="model" OnSubmit="SaveAsync">
             <MudPaper Elevation="1" Class="pa-5 mb-4">
                 <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["AboutProfileSection"]</MudText>
                 <div class="experience-admin-grid">
@@ -51,7 +54,10 @@
                 {
                     <MudText Typo="Typo.body2">@Localizer["AboutGroupsEmpty"]</MudText>
                 }
-                @foreach (var group in model.Groups.OrderBy(item => item.DisplayOrder).ThenBy(item => item.Id))
+                @foreach (var group in model.Groups
+                    .OrderBy(item => item.HasAssignedDisplayOrder ? 1 : 0)
+                    .ThenBy(item => item.HasAssignedDisplayOrder ? item.DisplayOrder : -item.CreationOrder)
+                    .ThenBy(item => item.Id))
                 {
                     <section @key="group.Id" class="home-content-editor-card" aria-label="@Localizer["AboutGroupEditorLabel", group.SpanishName]">
                         <div class="home-content-editor-card__heading">
@@ -69,14 +75,17 @@
                             </div>
                             <div class="admin-field">
                                 <label for="@($"group-order-{group.Id:N}")">@Localizer["HomeDisplayOrder"]</label>
-                                <InputNumber id="@($"group-order-{group.Id:N}")" @bind-Value="group.DisplayOrder" TValue="int" min="0" />
+                                <InputNumber id="@($"group-order-{group.Id:N}")" @bind-Value="group.DisplayOrder" @bind-Value:after="() => MarkGroupOrderAssigned(group)" TValue="int" min="0" />
                             </div>
                         </div>
                         <div class="admin-module-heading home-content-editor-card__subheading">
                             <MudText Typo="Typo.h4" Tag="@("h4")">@Localizer["AboutSkills"]</MudText>
                             <MudButton ButtonType="ButtonType.Button" OnClick="@(() => AddSkill(group))" Variant="Variant.Outlined" Color="Color.Primary">@Localizer["AboutAddSkill"]</MudButton>
                         </div>
-                        @foreach (var skill in group.Skills.OrderBy(item => item.DisplayOrder).ThenBy(item => item.Id))
+                        @foreach (var skill in group.Skills
+                            .OrderBy(item => item.HasAssignedDisplayOrder ? 1 : 0)
+                            .ThenBy(item => item.HasAssignedDisplayOrder ? item.DisplayOrder : -item.CreationOrder)
+                            .ThenBy(item => item.Id))
                         {
                             <div @key="skill.Id" class="home-content-editor-card__child">
                                 <div class="experience-admin-grid">
@@ -90,9 +99,9 @@
                                     </div>
                                     <div class="admin-field">
                                         <label for="@($"skill-order-{skill.Id:N}")">@Localizer["HomeDisplayOrder"]</label>
-                                        <InputNumber id="@($"skill-order-{skill.Id:N}")" @bind-Value="skill.DisplayOrder" TValue="int" min="0" />
+                                        <InputNumber id="@($"skill-order-{skill.Id:N}")" @bind-Value="skill.DisplayOrder" @bind-Value:after="() => MarkSkillOrderAssigned(skill)" TValue="int" min="0" />
                                     </div>
-                                    <div class="admin-field home-content-editor-card__remove">
+                                    <div class="home-content-editor-card__remove">
                                         <MudButton ButtonType="ButtonType.Button" OnClick="@(() => RemoveSkill(group, skill))" Color="Color.Error" Variant="Variant.Outlined">@Localizer["Delete"]</MudButton>
                                     </div>
                                 </div>
@@ -111,7 +120,10 @@
                 {
                     <MudText Typo="Typo.body2">@Localizer["AboutHobbiesEmpty"]</MudText>
                 }
-                @foreach (var hobby in model.Hobbies.OrderBy(item => item.DisplayOrder).ThenBy(item => item.Id))
+                @foreach (var hobby in model.Hobbies
+                    .OrderBy(item => item.HasAssignedDisplayOrder ? 1 : 0)
+                    .ThenBy(item => item.HasAssignedDisplayOrder ? item.DisplayOrder : -item.CreationOrder)
+                    .ThenBy(item => item.Id))
                 {
                     <section @key="hobby.Id" class="home-content-editor-card" aria-label="@Localizer["AboutHobbyEditorLabel", hobby.SpanishName]">
                         <div class="home-content-editor-card__heading">
@@ -138,7 +150,7 @@
                             </div>
                             <div class="admin-field">
                                 <label for="@($"hobby-order-{hobby.Id:N}")">@Localizer["HomeDisplayOrder"]</label>
-                                <InputNumber id="@($"hobby-order-{hobby.Id:N}")" @bind-Value="hobby.DisplayOrder" TValue="int" min="0" />
+                                <InputNumber id="@($"hobby-order-{hobby.Id:N}")" @bind-Value="hobby.DisplayOrder" @bind-Value:after="() => MarkHobbyOrderAssigned(hobby)" TValue="int" min="0" />
                             </div>
                             <div class="admin-field">
                                 <label for="@($"hobby-image-{hobby.Id:N}")">@Localizer["AboutHobbyImage"]</label>
@@ -166,7 +178,7 @@
                 <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Disabled="saving || uploading">
                     @Localizer[saving ? "Saving" : "Save"]
                 </MudButton>
-                <NavLink class="button button--secondary" href="/admin">@Localizer["Cancel"]</NavLink>
+                <NavLink class="button button--secondary" href="/admin" data-unsaved-navigation>@Localizer["Cancel"]</NavLink>
             </div>
         </EditForm>
     }
@@ -175,11 +187,21 @@
 @code {
     private readonly List<(Guid Id, string Key)> pendingImages = [];
     private AboutFormModel model = new();
+    private AboutSnapshot? initialSnapshot;
+    private IJSObjectReference? unsavedChangesModule;
+    private int nextCreationOrder;
+    private int activeUploads;
     private bool loaded;
     private bool saving;
-    private bool uploading;
+    private bool unsavedChangesModuleInitialized;
+    private bool beforeUnloadEnabled;
     private string? operationMessage;
     private Severity operationSeverity = Severity.Info;
+    private bool uploading => activeUploads > 0;
+
+    private bool HasUnsavedChanges => loaded
+        && initialSnapshot is not null
+        && (uploading || !SnapshotsEqual(CaptureSnapshot(), initialSnapshot));
 
     protected override async Task OnInitializedAsync()
     {
@@ -194,12 +216,14 @@
                 SpanishName = group.SpanishName,
                 EnglishName = group.EnglishName ?? string.Empty,
                 DisplayOrder = group.DisplayOrder,
+                HasAssignedDisplayOrder = true,
                 Skills = group.Skills.Select(skill => new SkillFormModel
                 {
                     Id = skill.Id,
                     SpanishName = skill.SpanishName,
                     EnglishName = skill.EnglishName ?? string.Empty,
-                    DisplayOrder = skill.DisplayOrder
+                    DisplayOrder = skill.DisplayOrder,
+                    HasAssignedDisplayOrder = true
                 }).ToList()
             }).ToList(),
             Hobbies = stored.Hobbies.Select(hobby => new HobbyFormModel
@@ -209,6 +233,7 @@
                 ContentType = hobby.ContentType,
                 SizeBytes = hobby.SizeBytes,
                 DisplayOrder = hobby.DisplayOrder,
+                HasAssignedDisplayOrder = true,
                 SpanishName = hobby.SpanishName,
                 SpanishDescription = hobby.SpanishDescription,
                 EnglishName = hobby.EnglishName ?? string.Empty,
@@ -216,30 +241,67 @@
                 IsPersisted = true
             }).ToList()
         };
+        initialSnapshot = CaptureSnapshot();
         loaded = true;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!loaded)
+        {
+            return;
+        }
+
+        unsavedChangesModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./js/experience-unsaved-changes.js?v=14");
+        if (!unsavedChangesModuleInitialized)
+        {
+            await unsavedChangesModule.InvokeVoidAsync(
+                "initialize",
+                "about-edit-form",
+                Localizer["AboutUnsavedChangesTitle"].Value,
+                Localizer["AboutUnsavedChangesConfirmation"].Value,
+                Localizer["StayOnPage"].Value,
+                Localizer["DiscardChanges"].Value);
+            unsavedChangesModuleInitialized = true;
+        }
+
+        if (beforeUnloadEnabled != HasUnsavedChanges)
+        {
+            beforeUnloadEnabled = HasUnsavedChanges;
+            await unsavedChangesModule.InvokeVoidAsync("setEnabled", beforeUnloadEnabled);
+        }
     }
 
     private void AddGroup() => model.Groups.Add(new SkillGroupFormModel
     {
         Id = Guid.NewGuid(),
-        DisplayOrder = model.Groups.Count
+        DisplayOrder = 0,
+        CreationOrder = ++nextCreationOrder
     });
+
+    private static void MarkGroupOrderAssigned(SkillGroupFormModel group) => group.HasAssignedDisplayOrder = true;
 
     private void RemoveGroup(SkillGroupFormModel group) => model.Groups.Remove(group);
 
     private void AddSkill(SkillGroupFormModel group) => group.Skills.Add(new SkillFormModel
     {
         Id = Guid.NewGuid(),
-        DisplayOrder = group.Skills.Count
+        DisplayOrder = 0,
+        CreationOrder = ++nextCreationOrder
     });
+
+    private static void MarkSkillOrderAssigned(SkillFormModel skill) => skill.HasAssignedDisplayOrder = true;
 
     private void RemoveSkill(SkillGroupFormModel group, SkillFormModel skill) => group.Skills.Remove(skill);
 
     private void AddHobby() => model.Hobbies.Add(new HobbyFormModel
     {
         Id = Guid.NewGuid(),
-        DisplayOrder = model.Hobbies.Count
+        DisplayOrder = 0,
+        CreationOrder = ++nextCreationOrder
     });
+
+    private static void MarkHobbyOrderAssigned(HobbyFormModel hobby) => hobby.HasAssignedDisplayOrder = true;
 
     private async Task RemoveHobbyAsync(HobbyFormModel hobby)
     {
@@ -254,6 +316,7 @@
 
     private async Task UploadHobbyAsync(HobbyFormModel hobby, InputFileChangeEventArgs args)
     {
+        activeUploads++;
         operationMessage = null;
         var file = args.File;
         try
@@ -287,6 +350,10 @@
         {
             ShowImageError(HomeContentImageError.TooLarge);
         }
+        finally
+        {
+            activeUploads--;
+        }
     }
 
     private async Task SaveAsync(EditContext _)
@@ -316,14 +383,26 @@
                 return;
             }
 
+            foreach (var group in model.Groups)
+            {
+                group.HasAssignedDisplayOrder = true;
+                foreach (var skill in group.Skills)
+                {
+                    skill.HasAssignedDisplayOrder = true;
+                }
+            }
+
             foreach (var hobby in model.Hobbies)
             {
                 hobby.IsPersisted = true;
+                hobby.HasAssignedDisplayOrder = true;
             }
 
             pendingImages.Clear();
             operationMessage = Localizer["AboutSaved"];
             operationSeverity = Severity.Success;
+            initialSnapshot = CaptureSnapshot();
+            await DisableUnsavedChangesProtectionAsync();
         }
         catch (Exception exception)
         {
@@ -334,6 +413,53 @@
         finally
         {
             saving = false;
+        }
+    }
+
+    private AboutSnapshot CaptureSnapshot() => new(
+        model.SpanishProfile,
+        model.EnglishProfile,
+        model.Groups.Select(group => new SkillGroupSnapshot(
+            group.Id,
+            group.SpanishName,
+            group.EnglishName,
+            group.DisplayOrder,
+            group.Skills.Select(skill => new SkillSnapshot(
+                skill.Id,
+                skill.SpanishName,
+                skill.EnglishName,
+                skill.DisplayOrder)).ToArray())).ToArray(),
+        model.Hobbies.Select(hobby => new HobbySnapshot(
+            hobby.Id,
+            hobby.StorageKey,
+            hobby.ContentType,
+            hobby.SizeBytes,
+            hobby.DisplayOrder,
+            hobby.SpanishName,
+            hobby.SpanishDescription,
+            hobby.EnglishName,
+            hobby.EnglishDescription)).ToArray());
+
+    private static bool SnapshotsEqual(AboutSnapshot left, AboutSnapshot right) =>
+        left.SpanishProfile == right.SpanishProfile
+        && left.EnglishProfile == right.EnglishProfile
+        && left.Groups.Length == right.Groups.Length
+        && left.Groups.Zip(right.Groups).All(group => GroupSnapshotsEqual(group.First, group.Second))
+        && left.Hobbies.SequenceEqual(right.Hobbies);
+
+    private static bool GroupSnapshotsEqual(SkillGroupSnapshot left, SkillGroupSnapshot right) =>
+        left.Id == right.Id
+        && left.SpanishName == right.SpanishName
+        && left.EnglishName == right.EnglishName
+        && left.DisplayOrder == right.DisplayOrder
+        && left.Skills.SequenceEqual(right.Skills);
+
+    private async Task DisableUnsavedChangesProtectionAsync()
+    {
+        beforeUnloadEnabled = false;
+        if (unsavedChangesModule is not null)
+        {
+            await unsavedChangesModule.InvokeVoidAsync("setEnabled", false);
         }
     }
 
@@ -355,6 +481,19 @@
         {
             await ImageStorage.DeleteAsync(HomeContentImageKind.Hobby, pending.Id, pending.Key);
         }
+
+        if (unsavedChangesModule is not null)
+        {
+            try
+            {
+                await unsavedChangesModule.InvokeVoidAsync("setEnabled", false);
+                await unsavedChangesModule.InvokeVoidAsync("dispose");
+                await unsavedChangesModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+        }
     }
 
     private sealed class AboutFormModel
@@ -371,6 +510,8 @@
         public string SpanishName { get; set; } = string.Empty;
         public string EnglishName { get; set; } = string.Empty;
         public int DisplayOrder { get; set; }
+        public bool HasAssignedDisplayOrder { get; set; }
+        public int CreationOrder { get; set; }
         public List<SkillFormModel> Skills { get; set; } = [];
     }
 
@@ -380,6 +521,8 @@
         public string SpanishName { get; set; } = string.Empty;
         public string EnglishName { get; set; } = string.Empty;
         public int DisplayOrder { get; set; }
+        public bool HasAssignedDisplayOrder { get; set; }
+        public int CreationOrder { get; set; }
     }
 
     private sealed class HobbyFormModel
@@ -389,10 +532,42 @@
         public string ContentType { get; set; } = string.Empty;
         public long SizeBytes { get; set; }
         public int DisplayOrder { get; set; }
+        public bool HasAssignedDisplayOrder { get; set; }
+        public int CreationOrder { get; set; }
         public string SpanishName { get; set; } = string.Empty;
         public string SpanishDescription { get; set; } = string.Empty;
         public string EnglishName { get; set; } = string.Empty;
         public string EnglishDescription { get; set; } = string.Empty;
         public bool IsPersisted { get; set; }
     }
+
+    private sealed record AboutSnapshot(
+        string SpanishProfile,
+        string EnglishProfile,
+        SkillGroupSnapshot[] Groups,
+        HobbySnapshot[] Hobbies);
+
+    private sealed record SkillGroupSnapshot(
+        Guid Id,
+        string SpanishName,
+        string EnglishName,
+        int DisplayOrder,
+        SkillSnapshot[] Skills);
+
+    private sealed record SkillSnapshot(
+        Guid Id,
+        string SpanishName,
+        string EnglishName,
+        int DisplayOrder);
+
+    private sealed record HobbySnapshot(
+        Guid Id,
+        string StorageKey,
+        string ContentType,
+        long SizeBytes,
+        int DisplayOrder,
+        string SpanishName,
+        string SpanishDescription,
+        string EnglishName,
+        string EnglishDescription);
 }

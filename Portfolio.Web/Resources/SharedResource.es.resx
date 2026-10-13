@@ -1341,6 +1341,8 @@
   <data name="HomeLogoOrbitInvalid" xml:space="preserve"><value>La órbita debe estar entre 1 y el número configurado.</value></data>
   <data name="HomeOrderInvalid" xml:space="preserve"><value>El orden no puede ser negativo.</value></data>
   <data name="AboutAdminTitle" xml:space="preserve"><value>Administrar «Sobre mí»</value></data>
+  <data name="AboutUnsavedChangesTitle" xml:space="preserve"><value>Cambios sin guardar</value></data>
+  <data name="AboutUnsavedChangesConfirmation" xml:space="preserve"><value>Los cambios de «Sobre mí» se perderán si sales sin guardar. ¿Quieres salir sin guardar?</value></data>
   <data name="AboutAdminDescription" xml:space="preserve"><value>Edita el perfil localizado y ordena las áreas, skills y aficiones.</value></data>
   <data name="AboutProfileSection" xml:space="preserve"><value>Descripción del perfil</value></data>
   <data name="AboutSpanishProfile" xml:space="preserve"><value>Perfil en español</value></data>
