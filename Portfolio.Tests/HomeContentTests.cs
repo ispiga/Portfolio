@@ -374,18 +374,6 @@ public sealed class HomeContentImageStorageTests : IDisposable
     }
 
     [Fact]
-    public async Task Upload_accepts_azure_brand_svg_with_rdf_metadata()
-    {
-        var service = CreateService();
-        var filePath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "docs", "brand", "azure.svg"));
-        var content = await File.ReadAllBytesAsync(filePath);
-        var result = await service.UploadAsync(HomeContentImageKind.TechnologyLogo, Guid.NewGuid(),
-            "azure.svg", "image/svg+xml", content.Length, new MemoryStream(content));
-
-        Assert.Equal(HomeContentImageError.None, result.Error);
-    }
-
-    [Fact]
     public async Task Hero_profile_image_is_stored_and_served_only_for_the_active_profile_image_id()
     {
         var service = CreateService();

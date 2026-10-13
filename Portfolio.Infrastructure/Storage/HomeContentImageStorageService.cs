@@ -1,5 +1,3 @@
-using System.Xml;
-using System.Xml.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -252,7 +250,7 @@ public sealed class HomeContentImageStorageService(
     {
         if (extension == ".svg")
         {
-            return await IsSafeSvgAsync(path, cancellationToken);
+            return await SafeSvgDocument.IsSafeFileAsync(path, cancellationToken);
         }
 
         var header = new byte[8];
@@ -266,102 +264,4 @@ public sealed class HomeContentImageStorageService(
         };
     }
 
-    private static async Task<bool> IsSafeSvgAsync(string path, CancellationToken cancellationToken)
-    {
-        try
-        {
-            var settings = new XmlReaderSettings
-            {
-                DtdProcessing = DtdProcessing.Prohibit,
-                XmlResolver = null,
-                MaxCharactersInDocument = 10 * 1024 * 1024,
-                Async = true
-            };
-            await using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
-            using var reader = XmlReader.Create(stream, settings);
-            var document = await XDocument.LoadAsync(reader, LoadOptions.None, cancellationToken);
-            var root = document.Root;
-            if (root?.Name.LocalName != "svg" || root.Name.NamespaceName != "http://www.w3.org/2000/svg")
-            {
-                return false;
-            }
-
-            var blockedElements = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-            {
-                "script", "foreignObject", "iframe", "object", "embed", "audio", "video",
-                "animate", "animateMotion", "animateTransform", "set", "discard"
-            };
-            foreach (var element in document.Descendants())
-            {
-                if (blockedElements.Contains(element.Name.LocalName)
-                    || element.Name.LocalName.Equals("style", StringComparison.OrdinalIgnoreCase)
-                        && !IsSafeSvgStyle(element.Value))
-                {
-                    return false;
-                }
-
-                foreach (var attribute in element.Attributes())
-                {
-                    if (attribute.IsNamespaceDeclaration)
-                    {
-                        continue;
-                    }
-
-                    var name = attribute.Name.LocalName;
-                    var value = attribute.Value.Trim();
-                    var isRdfMetadataResource = name.Equals("resource", StringComparison.OrdinalIgnoreCase)
-                        && attribute.Name.NamespaceName == "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-                        && element.AncestorsAndSelf().Any(ancestor => ancestor.Name.LocalName == "metadata");
-                    if (name.StartsWith("on", StringComparison.OrdinalIgnoreCase)
-                        || name.Equals("base", StringComparison.OrdinalIgnoreCase)
-                        || name.Equals("href", StringComparison.OrdinalIgnoreCase) && !value.StartsWith('#')
-                        || value.Contains("javascript:", StringComparison.OrdinalIgnoreCase)
-                        || value.Contains("data:", StringComparison.OrdinalIgnoreCase)
-                        || value.Contains("file:", StringComparison.OrdinalIgnoreCase)
-                        || !isRdfMetadataResource && value.Contains("http:", StringComparison.OrdinalIgnoreCase)
-                        || !isRdfMetadataResource && value.Contains("https:", StringComparison.OrdinalIgnoreCase)
-                        || value.Contains("@import", StringComparison.OrdinalIgnoreCase)
-                        || value.Contains("expression(", StringComparison.OrdinalIgnoreCase)
-                        || value.Contains("url(", StringComparison.OrdinalIgnoreCase)
-                            && !System.Text.RegularExpressions.Regex.IsMatch(
-                                value,
-                                "url\\(\\s*['\"]?#[-A-Za-z0-9_.]+['\"]?\\s*\\)",
-                                System.Text.RegularExpressions.RegexOptions.IgnoreCase))
-                    {
-                        return false;
-                    }
-                }
-            }
-
-            return true;
-        }
-        catch (Exception exception) when (exception is XmlException or InvalidOperationException)
-        {
-            return false;
-        }
-    }
-
-    private static bool IsSafeSvgStyle(string style)
-    {
-        if (style.Contains('\\')
-            || style.Contains("javascript:", StringComparison.OrdinalIgnoreCase)
-            || style.Contains("data:", StringComparison.OrdinalIgnoreCase)
-            || style.Contains("file:", StringComparison.OrdinalIgnoreCase)
-            || style.Contains("http:", StringComparison.OrdinalIgnoreCase)
-            || style.Contains("https:", StringComparison.OrdinalIgnoreCase)
-            || style.Contains("@import", StringComparison.OrdinalIgnoreCase)
-            || style.Contains("expression(", StringComparison.OrdinalIgnoreCase)
-            || style.Contains("-moz-binding", StringComparison.OrdinalIgnoreCase)
-            || style.Contains("behavior:", StringComparison.OrdinalIgnoreCase))
-        {
-            return false;
-        }
-
-        var localReferencesRemoved = System.Text.RegularExpressions.Regex.Replace(
-            style,
-            @"url\(\s*(['""]?)#[-A-Za-z0-9_.:]+\1\s*\)",
-            string.Empty,
-            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-        return !localReferencesRemoved.Contains("url", StringComparison.OrdinalIgnoreCase);
-    }
 }

@@ -29,6 +29,8 @@ public sealed class PortfolioDbContext(DbContextOptions<PortfolioDbContext> opti
 
     public DbSet<HeroContent> HeroContents => Set<HeroContent>();
 
+    public DbSet<VisualIdentitySettings> VisualIdentitySettings => Set<VisualIdentitySettings>();
+
     public DbSet<HeroTranslation> HeroTranslations => Set<HeroTranslation>();
 
     public DbSet<TechnologyLogo> TechnologyLogos => Set<TechnologyLogo>();

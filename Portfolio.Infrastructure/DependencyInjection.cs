@@ -10,6 +10,7 @@ using Portfolio.Application.Blog;
 using Portfolio.Application.Experiences;
 using Portfolio.Application.Projects;
 using Portfolio.Application.HomeContent;
+using Portfolio.Application.VisualIdentity;
 using Portfolio.Infrastructure.Email;
 using Portfolio.Infrastructure.Identity;
 using Portfolio.Infrastructure.Services;
@@ -88,6 +89,16 @@ public static class DependencyInjection
                 "Only SVG, JPEG and PNG home content images are supported.")
             .ValidateOnStart();
         services.AddScoped<IHomeContentImageStorageService, HomeContentImageStorageService>();
+        services.AddOptions<VisualIdentityStorageOptions>()
+            .Bind(configuration.GetSection(VisualIdentityStorageOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+        services.AddScoped<IVisualIdentityAssetStorageService, VisualIdentityAssetStorageService>();
+        services.AddScoped<VisualIdentitySettingsService>();
+        services.AddScoped<IVisualIdentityAdministrationService>(provider =>
+            provider.GetRequiredService<VisualIdentitySettingsService>());
+        services.AddScoped<IVisualIdentityQueryService>(provider =>
+            provider.GetRequiredService<VisualIdentitySettingsService>());
 
         return services;
     }

@@ -128,6 +128,7 @@ app.MapProjectPreviewImageEndpoints();
 app.MapCertificationMediaEndpoints();
 app.MapBlogPostImageEndpoints();
 app.MapHomeContentImageEndpoints();
+app.MapVisualIdentityEndpoints();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 

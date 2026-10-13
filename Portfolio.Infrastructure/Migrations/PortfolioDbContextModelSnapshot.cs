@@ -824,6 +824,100 @@ namespace Portfolio.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Portfolio.Domain.Entities.VisualIdentitySettings", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("AccentColor")
+                        .IsRequired()
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
+
+                    b.Property<Guid>("AssetVersion")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("FaviconNeedsReview")
+                        .HasColumnType("bit");
+
+                    b.Property<long?>("FaviconSizeBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("FaviconStorageKey")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<bool>("FooterLogoNeedsReview")
+                        .HasColumnType("bit");
+
+                    b.Property<long?>("FooterLogoSizeBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("FooterLogoStorageKey")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("LogoColorEndOverride")
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
+
+                    b.Property<string>("LogoColorStartOverride")
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
+
+                    b.Property<bool>("LogoColorsLinkedToPalette")
+                        .HasColumnType("bit");
+
+                    b.Property<long?>("MainLogoSizeBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("MainLogoStorageKey")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<bool>("MainLogoSupportsRecoloring")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("PrimaryColor")
+                        .IsRequired()
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
+
+                    b.Property<string>("SecondaryColor")
+                        .IsRequired()
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("VisualIdentitySettings", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_VisualIdentitySettings_AssetVersion", "[AssetVersion] <> '00000000-0000-0000-0000-000000000000'");
+
+                            t.HasCheckConstraint("CK_VisualIdentitySettings_Colors", "[PrimaryColor] LIKE '#[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]' AND [SecondaryColor] LIKE '#[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]' AND [AccentColor] LIKE '#[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]'");
+
+                            t.HasCheckConstraint("CK_VisualIdentitySettings_LogoOverrides", "([LogoColorStartOverride] IS NULL AND [LogoColorEndOverride] IS NULL) OR ([LogoColorsLinkedToPalette] = 0 AND [LogoColorStartOverride] LIKE '#[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]' AND [LogoColorEndOverride] LIKE '#[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]')");
+
+                            t.HasCheckConstraint("CK_VisualIdentitySettings_MainLogo", "([MainLogoStorageKey] IS NULL AND [MainLogoSizeBytes] IS NULL) OR ([MainLogoStorageKey] IS NOT NULL AND [MainLogoSizeBytes] > 0)");
+
+                            t.HasCheckConstraint("CK_VisualIdentitySettings_Singleton", "[Id] = 1");
+                        });
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AccentColor = "#C98F42",
+                            AssetVersion = new Guid("00000000-0000-0000-0000-000000000001"),
+                            FaviconNeedsReview = false,
+                            FooterLogoNeedsReview = false,
+                            LogoColorsLinkedToPalette = true,
+                            MainLogoSupportsRecoloring = true,
+                            PrimaryColor = "#00A3FF",
+                            SecondaryColor = "#3E00D1"
+                        });
+                });
+
             modelBuilder.Entity("Portfolio.Infrastructure.Identity.PortfolioUser", b =>
                 {
                     b.Property<string>("Id")

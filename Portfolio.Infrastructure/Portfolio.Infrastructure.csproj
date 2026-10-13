@@ -6,6 +6,8 @@
   </PropertyGroup>
   <ItemGroup>
 	<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	<EmbeddedResource Include="..\docs\brand\logo_portfolio.svg" Link="Assets\logo_portfolio.svg" LogicalName="Portfolio.Infrastructure.Assets.logo_portfolio.svg" />
+	<EmbeddedResource Include="Assets\default-favicon.svg" LogicalName="Portfolio.Infrastructure.Assets.default-favicon.svg" />
 	<ProjectReference Include="..\Portfolio.Application\Portfolio.Application.csproj" />
 	<ProjectReference Include="..\Portfolio.Domain\Portfolio.Domain.csproj" />
 	<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.2">

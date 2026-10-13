@@ -1,0 +1,499 @@
+@page "/admin/visual-identity"
+@attribute [Authorize(Policy = PortfolioAuthorization.AdministratorPolicy)]
+@layout AdminLayout
+@implements IAsyncDisposable
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.Extensions.Localization
+@using Microsoft.JSInterop
+@using Portfolio.Application.VisualIdentity
+@using Portfolio.Infrastructure.Identity
+@inject IVisualIdentityAdministrationService VisualIdentityService
+@inject IStringLocalizer<SharedResource> Localizer
+@inject IDialogService DialogService
+@inject IJSRuntime JS
+
+<PageTitle>@Localizer["VisualIdentityTitle"]</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="visual-identity-editor">
+    <header class="admin-page-heading">
+        <MudText Typo="Typo.h1" Tag="@("h1")">@Localizer["VisualIdentityTitle"]</MudText>
+        <MudText Typo="Typo.body1">@Localizer["VisualIdentityDescription"]</MudText>
+    </header>
+
+    @if (isLoading)
+    {
+        <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+    }
+    else
+    {
+        <NavigationLock ConfirmExternalNavigation="@HasUnsavedChanges" />
+        <form id="visual-identity-edit-form" @onsubmit:preventDefault>
+        @if (!string.IsNullOrWhiteSpace(statusMessage))
+        {
+            <MudAlert Severity="@statusSeverity" Class="mb-4">@statusMessage</MudAlert>
+        }
+
+        <MudPaper Elevation="1" Class="pa-5 visual-identity-section">
+            <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["VisualIdentityColorsHeading"]</MudText>
+            <MudText Typo="Typo.body2">@Localizer["VisualIdentityColorsDescription"]</MudText>
+            <div class="visual-identity-colors">
+                @ColorEditor("visual-primary", "VisualIdentityPrimary", primaryColor, SetPrimaryColor)
+                @ColorEditor("visual-secondary", "VisualIdentitySecondary", secondaryColor, SetSecondaryColor)
+                @ColorEditor("visual-accent", "VisualIdentityAccent", accentColor, SetAccentColor)
+            </div>
+
+            <label class="visual-identity-check" for="link-logo-colors">
+                <input id="link-logo-colors" type="checkbox" checked="@logoColorsLinkedToPalette" @onchange="SetLogoColorsLinked" />
+                <span>@Localizer["VisualIdentityLinkLogoColors"]</span>
+            </label>
+            @if (!logoColorsLinkedToPalette)
+            {
+                <div class="visual-identity-colors visual-identity-colors--logo">
+                    @ColorEditor("visual-logo-start", "VisualIdentityLogoStartColor", logoColorStartOverride, SetLogoStartColor)
+                    @ColorEditor("visual-logo-end", "VisualIdentityLogoEndColor", logoColorEndOverride, SetLogoEndColor)
+                </div>
+            }
+            @if (settings is { MainLogoSupportsRecoloring: false })
+            {
+                <MudAlert Severity="Severity.Warning" Class="mt-3">@Localizer["VisualIdentityLogoNotRecolorable"]</MudAlert>
+            }
+            <div class="visual-identity-swatches" aria-label="@Localizer["VisualIdentityPreviewHeading"]">
+                @Swatch("VisualIdentityPrimary", primaryColor)
+                @Swatch("VisualIdentitySecondary", secondaryColor)
+                @Swatch("VisualIdentityAccent", accentColor)
+            </div>
+            <MudButton ButtonType="ButtonType.Button" Size="Size.Small" Class="visual-identity-action" Color="Color.Primary" Variant="Variant.Filled" OnClick="SaveAsync" Disabled="@(isSaving || !HasUnsavedChanges)">
+                @Localizer["VisualIdentitySaveColors"]
+            </MudButton>
+        </MudPaper>
+
+        <MudPaper Elevation="1" Class="pa-5 visual-identity-section visual-identity-assets" data-ignore-unsaved-changes>
+            <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["VisualIdentityLogoHeading"]</MudText>
+            <MudText Typo="Typo.body2">@Localizer["VisualIdentityLogoDescription"]</MudText>
+            <InputFile id="main-logo-upload" accept=".svg,image/svg+xml" OnChange="UploadMainLogoAsync" />
+            <div class="visual-identity-previews">
+                <div class="visual-identity-preview">
+                    <MudText Typo="Typo.subtitle2">@Localizer["VisualIdentityMainLogo"]</MudText>
+                    <div class="visual-identity-preview__surface">
+                        <img src="@PreviewUrl("mainlogo")" alt="@Localizer["VisualIdentityMainLogo"]" />
+                    </div>
+                </div>
+                <div class="visual-identity-preview">
+                    <MudText Typo="Typo.subtitle2">@Localizer["VisualIdentityFooterLogo"]</MudText>
+                    <div class="visual-identity-preview__footer">
+                        @if (settings?.FooterLogoUrl is not null)
+                        {
+                            <img src="@PreviewUrl("footerlogo")" alt="@Localizer["VisualIdentityFooterLogo"]" />
+                        }
+                        else
+                        {
+                            <span>@Localizer["VisualIdentityFooterVariantUnavailable"]</span>
+                        }
+                    </div>
+                    <MudText Typo="Typo.caption">@Localizer[StatusResourceKey(settings?.FooterLogoStatus)]</MudText>
+                    @if (settings?.FooterLogoNeedsReview == true)
+                    {
+                        <MudAlert Severity="Severity.Warning">@Localizer["VisualIdentityVariantNeedsReview"]</MudAlert>
+                    }
+                    <InputFile id="footer-logo-upload" accept=".svg,image/svg+xml" OnChange="UploadFooterLogoAsync" />
+                    @if (settings?.FooterLogoStatus == VisualIdentityVariantStatus.Manual)
+                    {
+                        <MudButton ButtonType="ButtonType.Button" Size="Size.Small" Class="visual-identity-action" Variant="Variant.Outlined" OnClick="() => RemoveVariantAsync(VisualIdentityAssetKind.FooterLogo)">@Localizer["VisualIdentityUseGeneratedVariant"]</MudButton>
+                    }
+                </div>
+                <div class="visual-identity-preview">
+                    <MudText Typo="Typo.subtitle2">@Localizer["VisualIdentityFavicon"]</MudText>
+                    <div class="visual-identity-preview__favicon">
+                        <img src="@PreviewUrl("favicon")" alt="@Localizer["VisualIdentityFavicon"]" />
+                    </div>
+                    <MudText Typo="Typo.caption">@Localizer[StatusResourceKey(settings?.FaviconStatus)]</MudText>
+                    @if (settings?.FaviconNeedsReview == true)
+                    {
+                        <MudAlert Severity="Severity.Warning">@Localizer["VisualIdentityVariantNeedsReview"]</MudAlert>
+                    }
+                    <InputFile id="favicon-upload" accept=".svg,.png,image/svg+xml,image/png" OnChange="UploadFaviconAsync" />
+                    @if (settings?.FaviconStatus == VisualIdentityVariantStatus.Manual)
+                    {
+                        <MudButton ButtonType="ButtonType.Button" Size="Size.Small" Class="visual-identity-action" Variant="Variant.Outlined" OnClick="() => RemoveVariantAsync(VisualIdentityAssetKind.Favicon)">@Localizer["VisualIdentityUseGeneratedVariant"]</MudButton>
+                    }
+                </div>
+            </div>
+            <MudText Typo="Typo.caption">@Localizer["VisualIdentityUploadImmediate"]</MudText>
+            <MudButton ButtonType="ButtonType.Button" Size="Size.Small" Class="visual-identity-action" Color="Color.Secondary" Variant="Variant.Outlined" OnClick="RestoreLogoAsync" Disabled="@isSaving">
+                @Localizer["VisualIdentityRestoreLogo"]
+            </MudButton>
+        </MudPaper>
+
+        <MudPaper Elevation="1" Class="pa-5 visual-identity-section">
+            <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["VisualIdentityPreviewHeading"]</MudText>
+            <div class="visual-identity-theme-previews">
+                <section class="visual-identity-theme-preview visual-identity-theme-preview--light" aria-label="@Localizer["VisualIdentityLightPreview"]">
+                    <MudText Typo="Typo.h3" Tag="@("h3")">@Localizer["VisualIdentityLightPreview"]</MudText>
+                    <img src="@PreviewUrl("mainlogo")" alt="@Localizer["VisualIdentityMainLogo"]" />
+                    <div class="visual-identity-theme-preview__colors">
+                        @Swatch("VisualIdentityPrimary", primaryColor)
+                        @Swatch("VisualIdentitySecondary", secondaryColor)
+                        @Swatch("VisualIdentityAccent", accentColor)
+                    </div>
+                </section>
+                <section class="visual-identity-theme-preview visual-identity-theme-preview--dark" aria-label="@Localizer["VisualIdentityDarkPreview"]">
+                    <MudText Typo="Typo.h3" Tag="@("h3")">@Localizer["VisualIdentityDarkPreview"]</MudText>
+                    <img src="@PreviewUrl("mainlogo")" alt="@Localizer["VisualIdentityMainLogo"]" />
+                    <div class="visual-identity-theme-preview__colors">
+                        @Swatch("VisualIdentityPrimary", primaryColor)
+                        @Swatch("VisualIdentitySecondary", secondaryColor)
+                        @Swatch("VisualIdentityAccent", accentColor)
+                    </div>
+                </section>
+            </div>
+        </MudPaper>
+
+        <MudButton ButtonType="ButtonType.Button" Size="Size.Small" Class="visual-identity-action" Color="Color.Error" Variant="Variant.Outlined" OnClick="RestoreDefaultsAsync" Disabled="@isSaving">
+            @Localizer["VisualIdentityRestoreDefaults"]
+        </MudButton>
+        </form>
+    }
+</MudContainer>
+
+@code {
+    private VisualIdentitySettingsModel? settings;
+    private string primaryColor = VisualIdentityValidator.DefaultPrimaryColor;
+    private string secondaryColor = VisualIdentityValidator.DefaultSecondaryColor;
+    private string accentColor = VisualIdentityValidator.DefaultAccentColor;
+    private bool logoColorsLinkedToPalette = true;
+    private string? logoColorStartOverride;
+    private string? logoColorEndOverride;
+    private string? statusMessage;
+    private Severity statusSeverity = Severity.Info;
+    private bool isLoading = true;
+    private bool isSaving;
+    private VisualIdentitySnapshot? initialSnapshot;
+    private IJSObjectReference? unsavedChangesModule;
+    private bool unsavedChangesModuleInitialized;
+    private bool beforeUnloadEnabled;
+    private bool HasUnsavedChanges => !isLoading && initialSnapshot is not null && CaptureSnapshot() != initialSnapshot;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (isLoading)
+        {
+            return;
+        }
+
+        unsavedChangesModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./js/experience-unsaved-changes.js?v=14");
+        if (!unsavedChangesModuleInitialized)
+        {
+            await unsavedChangesModule.InvokeVoidAsync(
+                "initialize",
+                "visual-identity-edit-form",
+                Localizer["VisualIdentityUnsavedChangesTitle"].Value,
+                Localizer["VisualIdentityUnsavedChangesConfirmation"].Value,
+                Localizer["StayOnPage"].Value,
+                Localizer["DiscardChanges"].Value,
+                "[data-ignore-unsaved-changes]");
+            unsavedChangesModuleInitialized = true;
+        }
+
+        if (beforeUnloadEnabled != HasUnsavedChanges)
+        {
+            beforeUnloadEnabled = HasUnsavedChanges;
+            await unsavedChangesModule.InvokeVoidAsync("setEnabled", beforeUnloadEnabled);
+        }
+    }
+
+    private RenderFragment ColorEditor(string id, string labelKey, string value, Action<ChangeEventArgs> change) => builder =>
+    {
+        var sequence = 0;
+        builder.OpenElement(sequence++, "div");
+        builder.AddAttribute(sequence++, "class", "visual-identity-color-field");
+        builder.OpenElement(sequence++, "label");
+        builder.AddAttribute(sequence++, "for", $"{id}-hex");
+        builder.AddContent(sequence++, Localizer[labelKey]);
+        builder.CloseElement();
+        builder.OpenElement(sequence++, "input");
+        builder.AddAttribute(sequence++, "id", id);
+        builder.AddAttribute(sequence++, "type", "color");
+        builder.AddAttribute(sequence++, "value", PickerColor(value));
+        builder.AddAttribute(sequence++, "aria-label", Localizer[labelKey]);
+        builder.AddAttribute(sequence++, "onchange", EventCallback.Factory.Create<ChangeEventArgs>(this, change));
+        builder.CloseElement();
+        builder.OpenElement(sequence++, "input");
+        builder.AddAttribute(sequence++, "id", $"{id}-hex");
+        builder.AddAttribute(sequence++, "type", "text");
+        builder.AddAttribute(sequence++, "value", value);
+        builder.AddAttribute(sequence++, "maxlength", 7);
+        builder.AddAttribute(sequence++, "spellcheck", false);
+        builder.AddAttribute(sequence++, "autocomplete", "off");
+        builder.AddAttribute(sequence++, "aria-label", Localizer[labelKey]);
+        builder.AddAttribute(sequence++, "oninput", EventCallback.Factory.Create<ChangeEventArgs>(this, change));
+        builder.CloseElement();
+        builder.CloseElement();
+    };
+
+    private RenderFragment Swatch(string labelKey, string color) => builder =>
+    {
+        builder.OpenElement(0, "div");
+        builder.AddAttribute(1, "class", "visual-identity-swatch");
+        builder.AddAttribute(2, "style", $"--swatch-color:{PickerColor(color)};--swatch-contrast:{VisualIdentityValidator.ContrastingTextColor(color)}");
+        builder.OpenElement(3, "span");
+        builder.AddContent(4, Localizer[labelKey]);
+        builder.CloseElement();
+        builder.OpenElement(5, "code");
+        builder.AddContent(6, color);
+        builder.CloseElement();
+        builder.CloseElement();
+    };
+
+    private void SetPrimaryColor(ChangeEventArgs args) => primaryColor = args.Value?.ToString() ?? string.Empty;
+
+    private void SetSecondaryColor(ChangeEventArgs args) => secondaryColor = args.Value?.ToString() ?? string.Empty;
+
+    private void SetAccentColor(ChangeEventArgs args) => accentColor = args.Value?.ToString() ?? string.Empty;
+
+    private void SetLogoStartColor(ChangeEventArgs args) => logoColorStartOverride = args.Value?.ToString();
+
+    private void SetLogoEndColor(ChangeEventArgs args) => logoColorEndOverride = args.Value?.ToString();
+
+    private void SetLogoColorsLinked(ChangeEventArgs args)
+    {
+        logoColorsLinkedToPalette = args.Value is bool linked && linked;
+        if (logoColorsLinkedToPalette)
+        {
+            logoColorStartOverride = null;
+            logoColorEndOverride = null;
+        }
+        else
+        {
+            logoColorStartOverride ??= primaryColor;
+            logoColorEndOverride ??= secondaryColor;
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        isSaving = true;
+        statusMessage = null;
+        try
+        {
+            var result = await VisualIdentityService.SaveAsync(CreateRequest());
+            if (!result.Succeeded)
+            {
+                statusSeverity = Severity.Error;
+                statusMessage = string.Join(" ", result.Errors.Select(error => Localizer[error.ResourceKey].Value));
+                return;
+            }
+
+            statusSeverity = Severity.Success;
+            statusMessage = Localizer["VisualIdentitySaved"];
+            await LoadAsync();
+            await DisableUnsavedChangesProtectionAsync();
+        }
+        catch
+        {
+            statusSeverity = Severity.Error;
+            statusMessage = Localizer["VisualIdentitySaveFailed"];
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    private Task UploadMainLogoAsync(InputFileChangeEventArgs args) => UploadAsync(args, VisualIdentityAssetKind.MainLogo);
+
+    private Task UploadFooterLogoAsync(InputFileChangeEventArgs args) => UploadAsync(args, VisualIdentityAssetKind.FooterLogo);
+
+    private Task UploadFaviconAsync(InputFileChangeEventArgs args) => UploadAsync(args, VisualIdentityAssetKind.Favicon);
+
+    private async Task UploadAsync(InputFileChangeEventArgs args, VisualIdentityAssetKind kind)
+    {
+        if (args.File is null)
+        {
+            return;
+        }
+
+        isSaving = true;
+        statusMessage = null;
+        try
+        {
+            await using var stream = args.File.OpenReadStream(VisualIdentityValidator.MaximumAssetSizeBytes);
+            var result = await VisualIdentityService.UploadAssetAsync(
+                kind,
+                args.File.Name,
+                args.File.ContentType,
+                args.File.Size,
+                stream);
+            if (!result.Succeeded)
+            {
+                statusSeverity = Severity.Error;
+                statusMessage = Localizer[result.Error switch
+                {
+                    VisualIdentityAssetError.UnsupportedType => "VisualIdentityFileTypeInvalid",
+                    VisualIdentityAssetError.TooLarge => "VisualIdentityFileTooLarge",
+                    VisualIdentityAssetError.InvalidContent => "VisualIdentityFileInvalid",
+                    _ => "VisualIdentityUploadFailed"
+                }];
+                return;
+            }
+
+            statusSeverity = result.SupportsAutomaticRecoloring || kind != VisualIdentityAssetKind.MainLogo
+                ? Severity.Success
+                : Severity.Warning;
+            statusMessage = kind == VisualIdentityAssetKind.MainLogo && !result.SupportsAutomaticRecoloring
+                ? Localizer["VisualIdentityLogoNotRecolorable"]
+                : Localizer["VisualIdentityUploadSucceeded"];
+            await RefreshSettingsAsync();
+        }
+        catch
+        {
+            statusSeverity = Severity.Error;
+            statusMessage = Localizer["VisualIdentityUploadFailed"];
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    private async Task RemoveVariantAsync(VisualIdentityAssetKind kind)
+    {
+        await VisualIdentityService.RemoveManualVariantAsync(kind);
+        await RefreshSettingsAsync();
+    }
+
+    private async Task RestoreLogoAsync()
+    {
+        await VisualIdentityService.RemoveManualVariantAsync(VisualIdentityAssetKind.MainLogo);
+        await RefreshSettingsAsync();
+    }
+
+    private async Task RestoreDefaultsAsync()
+    {
+        var confirmed = await DialogService.ShowMessageBox(
+            Localizer["VisualIdentityRestoreDefaults"],
+            Localizer["VisualIdentityRestoreConfirmation"],
+            yesText: Localizer["Confirm"],
+            cancelText: Localizer["Cancel"]);
+        if (confirmed != true)
+        {
+            return;
+        }
+
+        isSaving = true;
+        try
+        {
+            await VisualIdentityService.RestoreDefaultsAsync();
+            statusSeverity = Severity.Success;
+            statusMessage = Localizer["VisualIdentityDefaultsRestored"];
+            await LoadAsync();
+        }
+        catch
+        {
+            statusSeverity = Severity.Error;
+            statusMessage = Localizer["VisualIdentitySaveFailed"];
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    private async Task LoadAsync()
+    {
+        settings = await VisualIdentityService.GetAsync();
+        primaryColor = settings.PrimaryColor;
+        secondaryColor = settings.SecondaryColor;
+        accentColor = settings.AccentColor;
+        logoColorsLinkedToPalette = settings.LogoColorsLinkedToPalette;
+        logoColorStartOverride = settings.LogoColorStartOverride;
+        logoColorEndOverride = settings.LogoColorEndOverride;
+        isLoading = false;
+        initialSnapshot = CaptureSnapshot();
+    }
+
+    private async Task RefreshSettingsAsync()
+    {
+        settings = await VisualIdentityService.GetAsync();
+    }
+
+    private VisualIdentitySnapshot CaptureSnapshot() => new(
+        primaryColor,
+        secondaryColor,
+        accentColor,
+        logoColorsLinkedToPalette,
+        logoColorStartOverride,
+        logoColorEndOverride);
+
+    private async Task DisableUnsavedChangesProtectionAsync()
+    {
+        beforeUnloadEnabled = false;
+        if (unsavedChangesModule is not null)
+        {
+            await unsavedChangesModule.InvokeVoidAsync("setEnabled", false);
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (unsavedChangesModule is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await unsavedChangesModule.InvokeVoidAsync("setEnabled", false);
+            await unsavedChangesModule.InvokeVoidAsync("dispose");
+            await unsavedChangesModule.DisposeAsync();
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+    }
+
+    private VisualIdentityEditRequest CreateRequest() => new(
+        primaryColor,
+        secondaryColor,
+        accentColor,
+        logoColorsLinkedToPalette,
+        logoColorStartOverride,
+        logoColorEndOverride);
+
+    private string PreviewUrl(string kind)
+    {
+        var request = CreateRequest();
+        var query = string.Join("&", new[]
+        {
+            $"primaryColor={Uri.EscapeDataString(request.PrimaryColor)}",
+            $"secondaryColor={Uri.EscapeDataString(request.SecondaryColor)}",
+            $"accentColor={Uri.EscapeDataString(request.AccentColor)}",
+            $"logoColorsLinkedToPalette={request.LogoColorsLinkedToPalette.ToString().ToLowerInvariant()}",
+            $"logoColorStartOverride={Uri.EscapeDataString(request.LogoColorStartOverride ?? string.Empty)}",
+            $"logoColorEndOverride={Uri.EscapeDataString(request.LogoColorEndOverride ?? string.Empty)}"
+        });
+        return $"/admin/visual-identity/preview/{kind}?{query}";
+    }
+
+    private static string PickerColor(string? value) => VisualIdentityValidator.IsHexColor(value) ? value! : "#000000";
+
+    private static string StatusResourceKey(VisualIdentityVariantStatus? status) => status switch
+    {
+        VisualIdentityVariantStatus.Automatic => "VisualIdentityVariantAutomatic",
+        VisualIdentityVariantStatus.Manual => "VisualIdentityVariantManual",
+        VisualIdentityVariantStatus.GenericFallback => "VisualIdentityVariantGeneric",
+        _ => "VisualIdentityVariantUnavailable"
+    };
+
+    private sealed record VisualIdentitySnapshot(
+        string PrimaryColor,
+        string SecondaryColor,
+        string AccentColor,
+        bool LogoColorsLinkedToPalette,
+        string? LogoColorStartOverride,
+        string? LogoColorEndOverride);
+}

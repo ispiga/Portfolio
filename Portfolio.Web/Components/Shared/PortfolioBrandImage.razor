@@ -1,0 +1,31 @@
+@using Portfolio.Application.VisualIdentity
+@inject IVisualIdentityQueryService VisualIdentityService
+
+@if (imageUrl is not null)
+{
+    <img class="@Class" src="@imageUrl" alt="@AlternativeText" />
+}
+
+@code {
+    [Parameter]
+    public VisualIdentityAssetKind Kind { get; set; } = VisualIdentityAssetKind.MainLogo;
+
+    [Parameter]
+    public string AlternativeText { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Class { get; set; } = "portfolio-logo__mark";
+
+    private string? imageUrl;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var identity = await VisualIdentityService.GetAsync();
+        imageUrl = Kind switch
+        {
+            VisualIdentityAssetKind.MainLogo => identity.MainLogoUrl,
+            VisualIdentityAssetKind.FooterLogo => identity.FooterLogoUrl,
+            _ => null
+        };
+    }
+}

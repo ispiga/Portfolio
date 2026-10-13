@@ -114,6 +114,12 @@ Tailwind permite construir un sistema visual personalizado manteniendo un desarr
 
 Tailwind CSS se mantiene como dependencia local de `Portfolio.Web` mediante `@tailwindcss/cli` y los scripts npm `css:build` y `css:watch`. La entrada es `Styles/tailwind.css`, el análisis incluye `Components` y el resultado se genera en `wwwroot/css/tailwind.css`. Los estilos propios están en `wwwroot/css/app.css` e incluyen tokens semánticos, tipografía local o del sistema, temas, foco visible, layout responsive y `prefers-reduced-motion`. `App.razor` referencia `css/tailwind.css` y `css/app.css`.
 
+### Identidad visual administrable
+
+La paleta de marca es global y se administra desde `/admin/visual-identity`: colores principal (`#00A3FF`), secundario (`#3E00D1`) y acento (`#C98F42`). La fila singleton `VisualIdentitySettings` persiste la paleta, las opciones del degradado y los metadatos de los recursos; una migración EF Core debe generarse y aplicarse explícitamente durante el despliegue. Las variables CSS públicas y la paleta de MudBlazor se generan desde esta configuración central, mientras que los tokens neutrales (fondo, superficie, texto y borde) siguen siendo específicos de cada tema.
+
+El logo SVG fuente está en `docs/brand/logo_portfolio.svg`. Las variantes derivables se generan únicamente cuando la transformación SVG segura reconoce el formato esperado; en caso contrario se pueden cargar variantes manuales. Los activos se guardan fuera de `wwwroot` y de SQL Server, y se sirven mediante rutas versionadas. Las variantes manuales se conservan al cambiar el logo, pero se marcan para revisión. No se debe aplicar automáticamente la migración ni recolorear SVG arbitrarios.
+
 Se crearán componentes reutilizables propios, por ejemplo:
 
 - `PortfolioNavbar.razor`

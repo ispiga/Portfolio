@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+@using Portfolio.Application.VisualIdentity
+@inject IVisualIdentityQueryService VisualIdentityService
 <html lang="es">
 
 <head>
@@ -11,8 +13,41 @@
     <link rel="stylesheet" href="_content/MudBlazor/MudBlazor.min.css" />
     <link rel="stylesheet" href="@Assets["css/app.css"]" />
     <link rel="stylesheet" href="@Assets["Portfolio.Web.styles.css"]" />
+    @if (identity is not null)
+    {
+        <style>
+            :root {
+                --color-primary: @SafeColor(identity.PrimaryColor, VisualIdentityValidator.DefaultPrimaryColor);
+                --color-secondary: @SafeColor(identity.SecondaryColor, VisualIdentityValidator.DefaultSecondaryColor);
+                --color-accent: @SafeColor(identity.AccentColor, VisualIdentityValidator.DefaultAccentColor);
+                --color-primary-contrast: @VisualIdentityValidator.ContrastingTextColor(identity.PrimaryColor);
+                --color-secondary-contrast: @VisualIdentityValidator.ContrastingTextColor(identity.SecondaryColor);
+                --color-accent-contrast: @VisualIdentityValidator.ContrastingTextColor(identity.AccentColor);
+            }
+            .mud-theme-provider {
+                --mud-palette-primary: var(--color-primary) !important;
+                --mud-palette-primary-text: var(--color-primary-contrast) !important;
+                --mud-palette-secondary: var(--color-secondary) !important;
+                --mud-palette-secondary-text: var(--color-secondary-contrast) !important;
+                --mud-palette-tertiary: var(--color-accent) !important;
+                --mud-palette-tertiary-text: var(--color-accent-contrast) !important;
+                --mud-palette-background: var(--color-background) !important;
+                --mud-palette-background-gray: var(--color-background) !important;
+                --mud-palette-surface: var(--color-surface) !important;
+                --mud-palette-text-primary: var(--color-text) !important;
+                --mud-palette-text-secondary: var(--color-text-secondary) !important;
+                --mud-palette-divider: var(--color-border) !important;
+                --mud-palette-lines-default: var(--color-border) !important;
+                --mud-palette-table-lines: var(--color-border) !important;
+                --mud-palette-table-hover: var(--color-background) !important;
+            }
+        </style>
+    }
     <ImportMap />
-    <link rel="icon" type="image/png" href="favicon.png" />
+    @if (identity is not null)
+    {
+        <link rel="icon" type="@identity.FaviconContentType" href="@identity.FaviconUrl" />
+    }
     <HeadOutlet />
 </head>
 
@@ -28,3 +63,16 @@
 </body>
 
 </html>
+
+@code {
+    private VisualIdentitySettingsModel? identity;
+
+    protected override async Task OnInitializedAsync()
+    {
+        identity = await VisualIdentityService.GetAsync();
+    }
+
+    private static string SafeColor(string color, string fallback) =>
+        VisualIdentityValidator.IsHexColor(color) ? color : fallback;
+
+}

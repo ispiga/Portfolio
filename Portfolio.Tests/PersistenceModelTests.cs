@@ -5,6 +5,7 @@ using Portfolio.Application.Blog;
 using Portfolio.Application.Certifications;
 using Portfolio.Application.Experiences;
 using Portfolio.Application.Projects;
+using Portfolio.Application.VisualIdentity;
 using Portfolio.Domain.Entities;
 using Portfolio.Infrastructure;
 using Xunit;
@@ -24,11 +25,31 @@ public sealed class PersistenceModelTests
             .ToArray();
 
         Assert.All(
-            ["BlogPost", "BlogPostTranslation", "Certification", "CertificationAttachment", "CertificationTranslation", "Experience", "ExperienceAttachment", "ExperienceTranslation", "Project", "ProjectTranslation"],
+            ["BlogPost", "BlogPostTranslation", "Certification", "CertificationAttachment", "CertificationTranslation", "Experience", "ExperienceAttachment", "ExperienceTranslation", "Project", "ProjectTranslation", "VisualIdentitySettings"],
             entityName => Assert.Contains(entityName, entityNames));
         Assert.All(
             ["PortfolioUser", "IdentityRole", "IdentityRoleClaim`1", "IdentityUserClaim`1", "IdentityUserLogin`1", "IdentityUserRole`1", "IdentityUserToken`1"],
             entityName => Assert.Contains(entityName, entityNames));
+    }
+
+    [Fact]
+    public void Visual_identity_settings_use_singleton_row_and_seed_brand_defaults()
+    {
+        using var context = CreateContext();
+
+        var entity = context.Model.FindEntityType(typeof(VisualIdentitySettings))!;
+        var designTimeEntity = context.GetService<IDesignTimeModel>().Model
+            .FindEntityType(typeof(VisualIdentitySettings))!;
+        var seed = Assert.Single(designTimeEntity.GetSeedData());
+
+        Assert.Equal("VisualIdentitySettings", entity.GetTableName());
+        Assert.Equal(1, seed[nameof(VisualIdentitySettings.Id)]);
+        Assert.Equal(VisualIdentityValidator.DefaultPrimaryColor, seed[nameof(VisualIdentitySettings.PrimaryColor)]);
+        Assert.Equal(VisualIdentityValidator.DefaultSecondaryColor, seed[nameof(VisualIdentitySettings.SecondaryColor)]);
+        Assert.Equal(VisualIdentityValidator.DefaultAccentColor, seed[nameof(VisualIdentitySettings.AccentColor)]);
+        Assert.Contains(
+            designTimeEntity.GetCheckConstraints(),
+            constraint => constraint.Name == "CK_VisualIdentitySettings_Singleton");
     }
 
     [Fact]
