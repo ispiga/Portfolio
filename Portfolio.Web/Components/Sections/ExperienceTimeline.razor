@@ -2,10 +2,12 @@
 @using System.Globalization
 @using Portfolio.Application.Experiences
 @using Portfolio.Web.Components.Shared
+@implements IAsyncDisposable
 @inject IStringLocalizer<SharedResource> Localizer
 @inject IExperienceQueryService ExperienceQueryService
+@inject IJSRuntime JS
 
-<section class="home-section" aria-labelledby="experience-title">
+<section @ref="timelineElement" class="home-section" aria-labelledby="experience-title">
     <div class="section-heading">
         <p class="eyebrow">@Localizer["ExperienceEyebrow"]</p>
         <h2 id="experience-title">@Localizer["ExperienceTitle"]</h2>
@@ -36,14 +38,17 @@
                         <div>
                             <h3>@experience.RoleTitle</h3>
                             <p class="experience-card__company">@experience.CompanyName</p>
-                            <p id="experience-description-@experience.Id" class="experience-card__description @(expandedDescriptions.Contains(experience.Id) ? "is-expanded" : string.Empty)">@experience.Summary</p>
-                            <button class="button button--secondary experience-card__description-toggle"
-                                    type="button"
-                                    aria-expanded="@expandedDescriptions.Contains(experience.Id)"
-                                    aria-controls="experience-description-@experience.Id"
-                                    @onclick="() => ToggleDescription(experience.Id)">
-                                @Localizer[expandedDescriptions.Contains(experience.Id) ? "ExperienceDescriptionCollapse" : "ExperienceDescriptionExpand"]
-                            </button>
+                            <p id="experience-description-@experience.Id" data-experience-id="@experience.Id" class="experience-card__description @(expandedDescriptions.Contains(experience.Id) ? "is-expanded" : string.Empty)">@experience.Summary</p>
+                            @if (truncatedDescriptions.Contains(experience.Id))
+                            {
+                                <button class="button button--secondary experience-card__description-toggle"
+                                        type="button"
+                                        aria-expanded="@expandedDescriptions.Contains(experience.Id)"
+                                        aria-controls="experience-description-@experience.Id"
+                                        @onclick="() => ToggleDescription(experience.Id)">
+                                    @Localizer[expandedDescriptions.Contains(experience.Id) ? "ExperienceDescriptionCollapse" : "ExperienceDescriptionExpand"]
+                                </button>
+                            }
                             @if (experience.Attachments is { Count: > 0 } publicAttachments)
                             {
                                 <section class="experience-public-attachments" aria-label="@Localizer["ExperiencePublicAttachments"]">
@@ -77,6 +82,11 @@
 @code {
     private IReadOnlyList<ExperienceReadModel>? experiences;
     private readonly HashSet<Guid> expandedDescriptions = [];
+    private readonly HashSet<Guid> truncatedDescriptions = [];
+    private ElementReference timelineElement;
+    private IJSObjectReference? descriptionModule;
+    private DotNetObjectReference<ExperienceTimeline>? objectReference;
+    private bool disposed;
 
     private void ToggleDescription(Guid experienceId)
     {
@@ -89,5 +99,66 @@
     protected override async Task OnInitializedAsync()
     {
         experiences = await ExperienceQueryService.GetExperiencesAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        try
+        {
+            descriptionModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/experience-description.js");
+            objectReference = DotNetObjectReference.Create(this);
+            await descriptionModule.InvokeVoidAsync("observeDescriptions", timelineElement, objectReference);
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+    }
+
+    [JSInvokable]
+    public Task UpdateTruncatedDescriptions(string[] experienceIds)
+    {
+        if (disposed)
+        {
+            return Task.CompletedTask;
+        }
+
+        var updatedIds = experienceIds
+            .Select(id => Guid.TryParse(id, out var experienceId) ? experienceId : Guid.Empty)
+            .Where(id => id != Guid.Empty)
+            .ToHashSet();
+
+        if (truncatedDescriptions.SetEquals(updatedIds))
+        {
+            return Task.CompletedTask;
+        }
+
+        truncatedDescriptions.Clear();
+        truncatedDescriptions.UnionWith(updatedIds);
+        return InvokeAsync(StateHasChanged);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        disposed = true;
+        objectReference?.Dispose();
+
+        if (descriptionModule is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await descriptionModule.InvokeVoidAsync("stopObservingDescriptions", timelineElement);
+            await descriptionModule.DisposeAsync();
+        }
+        catch (JSDisconnectedException)
+        {
+        }
     }
 }
