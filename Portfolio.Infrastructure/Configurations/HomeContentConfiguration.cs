@@ -91,6 +91,7 @@ public sealed class SkillGroupConfiguration : IEntityTypeConfiguration<SkillGrou
         builder.ToTable("SkillGroups", table => table.HasCheckConstraint(
             "CK_SkillGroups_DisplayOrder", "[DisplayOrder] >= 0"));
         builder.HasKey(group => group.Id);
+        builder.Property(group => group.BackgroundColor).HasMaxLength(7);
         builder.HasIndex(group => group.DisplayOrder);
         builder.HasMany(group => group.Translations)
             .WithOne(translation => translation.SkillGroup)

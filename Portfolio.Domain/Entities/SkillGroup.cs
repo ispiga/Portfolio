@@ -6,6 +6,8 @@ public sealed class SkillGroup
 
     public int DisplayOrder { get; set; }
 
+    public string? BackgroundColor { get; set; }
+
     public ICollection<SkillGroupTranslation> Translations { get; set; } = [];
 
     public ICollection<Skill> Skills { get; set; } = [];

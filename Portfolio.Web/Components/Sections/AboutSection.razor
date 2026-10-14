@@ -21,7 +21,8 @@
             {
                 @foreach (var group in content.Groups)
                 {
-                    <article class="surface area-card">
+                    <article class="surface area-card @(string.IsNullOrWhiteSpace(group.BackgroundColor) ? string.Empty : "area-card--custom-color")"
+                             style="@GetGroupColorStyle(group.BackgroundColor)">
                         <h3>@group.Name</h3>
                         <ul class="about-skill-list">
                             @foreach (var skill in group.Skills)
@@ -63,4 +64,9 @@
     private AboutContentReadModel? content;
 
     protected override async Task OnInitializedAsync() => content = await AboutQueryService.GetAsync();
+
+    private static string? GetGroupColorStyle(string? color) =>
+        color is { Length: 7 } && color[0] == '#' && color.AsSpan(1).ToString().All(Uri.IsHexDigit)
+            ? $"--skill-group-color: {color};"
+            : null;
 }

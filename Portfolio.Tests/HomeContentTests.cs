@@ -105,7 +105,8 @@ public sealed class HomeContentTests
         var admin = new AboutAdministrationService(factory, storage);
         var firstGroup = new SkillGroupEditModel(
             Guid.NewGuid(), "Backend", null, 0,
-            [new SkillEditModel(Guid.NewGuid(), "C#", null, 1), new SkillEditModel(Guid.NewGuid(), ".NET", "Dotnet", 0)]);
+            [new SkillEditModel(Guid.NewGuid(), "C#", null, 1), new SkillEditModel(Guid.NewGuid(), ".NET", "Dotnet", 0)],
+            "#5C78D2");
         var secondGroup = new SkillGroupEditModel(Guid.NewGuid(), "Datos", "Data", 1, []);
         var firstHobby = Hobby(1, "Lectura", "Novelas", null, null);
         var secondHobby = Hobby(0, "Senderismo", "Montaña", "Hiking", "Hills");
@@ -113,6 +114,8 @@ public sealed class HomeContentTests
             "Perfil español", null, [secondGroup, firstGroup], [firstHobby, secondHobby]);
 
         Assert.True((await admin.SaveAsync(request)).Succeeded);
+        var edited = await admin.GetAsync();
+        Assert.Equal("#5C78D2", edited.Groups.Single(group => group.Id == firstGroup.Id).BackgroundColor);
 
         var previousCulture = CultureInfo.CurrentUICulture;
         try
@@ -121,6 +124,8 @@ public sealed class HomeContentTests
             var result = await new AboutQueryService(factory).GetAsync();
             Assert.Equal("Perfil español", result.Profile);
             Assert.Equal(new[] { "Backend", "Data" }, result.Groups.Select(group => group.Name));
+            Assert.Equal("#5C78D2", result.Groups[0].BackgroundColor);
+            Assert.Null(result.Groups[1].BackgroundColor);
             Assert.Equal(new[] { "Dotnet", "C#" }, result.Groups[0].Skills.Select(skill => skill.Name));
             Assert.Equal(new[] { "Hiking", "Lectura" }, result.Hobbies.Select(hobby => hobby.Name));
             Assert.Equal(new[] { 0, 1 }, result.Hobbies.Select(hobby => hobby.DisplayOrder));
@@ -207,6 +212,24 @@ public sealed class HomeContentTests
         Assert.Empty(AboutContentValidator.Validate(request));
     }
 
+    [Theory]
+    [InlineData("blue")]
+    [InlineData("#12345G")]
+    [InlineData("#12345678")]
+    public void About_validator_rejects_invalid_skill_group_background_color(string color)
+    {
+        var request = new AboutContentEditRequest(
+            "Perfil español",
+            null,
+            [new SkillGroupEditModel(Guid.NewGuid(), "Desarrollo", null, 0, [], color)],
+            []);
+
+        var errors = AboutContentValidator.Validate(request);
+
+        Assert.Contains(errors, error => error.Field == "Groups[0].BackgroundColor"
+            && error.ResourceKey == "AboutGroupColorInvalid");
+    }
+
     [Fact]
     public void Both_home_content_administration_pages_require_administrator_policy()
     {
@@ -231,6 +254,11 @@ public sealed class HomeContentTests
             .FindProperty(nameof(HeroContent.Id))!.ValueGenerated);
         Assert.Equal(ValueGenerated.Never, context.Model.FindEntityType(typeof(AboutProfile))!
             .FindProperty(nameof(AboutProfile.Id))!.ValueGenerated);
+
+        var groupColor = context.Model.FindEntityType(typeof(SkillGroup))!
+            .FindProperty(nameof(SkillGroup.BackgroundColor))!;
+        Assert.True(groupColor.IsNullable);
+        Assert.Equal(7, groupColor.GetMaxLength());
 
         var translation = context.Model.FindEntityType(typeof(HobbyTranslation))!;
         Assert.Equal(

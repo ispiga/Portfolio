@@ -18,6 +18,11 @@
   <data name="TechnologyWeb" xml:space="preserve"><value>Web</value></data>
   <data name="AboutEyebrow" xml:space="preserve"><value>Perfil</value></data>
   <data name="AboutTitle" xml:space="preserve"><value>Sobre mí</value></data>
+	<data name="AboutGroupBackgroundColor" xml:space="preserve"><value>Color de fondo</value></data>
+	<data name="AboutGroupBackgroundColorHex" xml:space="preserve"><value>Valor hexadecimal del color de fondo</value></data>
+  <data name="AboutGroupBackgroundColorReset" xml:space="preserve"><value>Restablecer</value></data>
+  <data name="AboutGroupBackgroundColorHint" xml:space="preserve"><value>El color se aplica como tinte; restablecer conserva el degradado predeterminado del tema.</value></data>
+  <data name="AboutGroupColorInvalid" xml:space="preserve"><value>El color de fondo del grupo no es válido.</value></data>
   <data name="AboutPlaceholder" xml:space="preserve"><value>Esta sección se completará con el perfil profesional, la especialización y el enfoque tecnológico definitivos.</value></data>
   <data name="AboutAreasLabel" xml:space="preserve"><value>Áreas principales de trabajo</value></data>
   <data name="AreaBackend" xml:space="preserve"><value>Backend</value></data>

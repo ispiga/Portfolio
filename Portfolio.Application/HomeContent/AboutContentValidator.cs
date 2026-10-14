@@ -32,6 +32,11 @@ public static class AboutContentValidator
                 errors.Add(new($"{groupField}.DisplayOrder", "HomeOrderInvalid"));
             }
 
+            if (!IsValidBackgroundColor(group.BackgroundColor))
+            {
+                errors.Add(new($"{groupField}.BackgroundColor", "AboutGroupColorInvalid"));
+            }
+
             for (var skillIndex = 0; skillIndex < group.Skills.Count; skillIndex++)
             {
                 var skill = group.Skills[skillIndex];
@@ -97,6 +102,10 @@ public static class AboutContentValidator
 
         return errors;
     }
+
+    private static bool IsValidBackgroundColor(string? color) =>
+        string.IsNullOrWhiteSpace(color)
+        || (color.Length == 7 && color[0] == '#' && color.Skip(1).All(Uri.IsHexDigit));
 
     private static void ValidateLocalized(
         string? spanish,

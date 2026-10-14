@@ -77,6 +77,29 @@
                                 <label for="@($"group-order-{group.Id:N}")">@Localizer["HomeDisplayOrder"]</label>
                                 <InputNumber id="@($"group-order-{group.Id:N}")" @bind-Value="group.DisplayOrder" @bind-Value:after="() => MarkGroupOrderAssigned(group)" TValue="int" min="0" />
                             </div>
+                            <div class="admin-field">
+                                <label for="@($"group-color-{group.Id:N}")">@Localizer["AboutGroupBackgroundColor"]</label>
+                                <div class="about-group-color-field">
+                                    <input id="@($"group-color-{group.Id:N}")"
+                                           class="about-group-color-field__input"
+                                           type="color"
+                                           value="@GroupColorPickerValue(group.BackgroundColor)"
+                                           @onchange="args => SetGroupBackgroundColor(group, args)" />
+                                    <input id="@($"group-color-hex-{group.Id:N}")"
+                                           class="about-group-color-field__hex"
+                                           type="text"
+                                           value="@(group.BackgroundColor ?? DefaultGroupColor)"
+                                           maxlength="7"
+                                           spellcheck="false"
+                                           autocomplete="off"
+                                           aria-label="@Localizer["AboutGroupBackgroundColorHex"]"
+                                           @oninput="args => SetGroupBackgroundColor(group, args)" />
+                                    <MudButton ButtonType="ButtonType.Button" OnClick="@(() => ResetGroupBackgroundColor(group))" Variant="Variant.Outlined" Size="Size.Small">
+                                        @Localizer["AboutGroupBackgroundColorReset"]
+                                    </MudButton>
+                                </div>
+                                <span class="admin-field__hint">@Localizer["AboutGroupBackgroundColorHint"]</span>
+                            </div>
                         </div>
                         <div class="admin-module-heading home-content-editor-card__subheading">
                             <MudText Typo="Typo.h4" Tag="@("h4")">@Localizer["AboutSkills"]</MudText>
@@ -198,6 +221,7 @@
     private string? operationMessage;
     private Severity operationSeverity = Severity.Info;
     private bool uploading => activeUploads > 0;
+    private const string DefaultGroupColor = "#20314A";
 
     private bool HasUnsavedChanges => loaded
         && initialSnapshot is not null
@@ -216,6 +240,7 @@
                 SpanishName = group.SpanishName,
                 EnglishName = group.EnglishName ?? string.Empty,
                 DisplayOrder = group.DisplayOrder,
+                BackgroundColor = group.BackgroundColor,
                 HasAssignedDisplayOrder = true,
                 Skills = group.Skills.Select(skill => new SkillFormModel
                 {
@@ -280,6 +305,16 @@
     });
 
     private static void MarkGroupOrderAssigned(SkillGroupFormModel group) => group.HasAssignedDisplayOrder = true;
+
+    private static void SetGroupBackgroundColor(SkillGroupFormModel group, ChangeEventArgs args) =>
+        group.BackgroundColor = args.Value?.ToString();
+
+    private static void ResetGroupBackgroundColor(SkillGroupFormModel group) => group.BackgroundColor = null;
+
+    private static string GroupColorPickerValue(string? value) =>
+        value is { Length: 7 } && value[0] == '#' && value.AsSpan(1).ToString().All(Uri.IsHexDigit)
+            ? value
+            : DefaultGroupColor;
 
     private void RemoveGroup(SkillGroupFormModel group) => model.Groups.Remove(group);
 
@@ -371,7 +406,8 @@
                     group.EnglishName,
                     group.DisplayOrder,
                     group.Skills.Select(skill => new SkillEditModel(
-                        skill.Id, skill.SpanishName, skill.EnglishName, skill.DisplayOrder)).ToArray())).ToArray(),
+                        skill.Id, skill.SpanishName, skill.EnglishName, skill.DisplayOrder)).ToArray(),
+                    group.BackgroundColor)).ToArray(),
                 model.Hobbies.Select(hobby => new HobbyEditModel(
                     hobby.Id, hobby.StorageKey, hobby.ContentType, hobby.SizeBytes, hobby.DisplayOrder,
                     hobby.SpanishName, hobby.SpanishDescription, hobby.EnglishName, hobby.EnglishDescription)).ToArray());
@@ -424,6 +460,7 @@
             group.SpanishName,
             group.EnglishName,
             group.DisplayOrder,
+            group.BackgroundColor,
             group.Skills.Select(skill => new SkillSnapshot(
                 skill.Id,
                 skill.SpanishName,
@@ -452,6 +489,7 @@
         && left.SpanishName == right.SpanishName
         && left.EnglishName == right.EnglishName
         && left.DisplayOrder == right.DisplayOrder
+        && left.BackgroundColor == right.BackgroundColor
         && left.Skills.SequenceEqual(right.Skills);
 
     private async Task DisableUnsavedChangesProtectionAsync()
@@ -510,6 +548,7 @@
         public string SpanishName { get; set; } = string.Empty;
         public string EnglishName { get; set; } = string.Empty;
         public int DisplayOrder { get; set; }
+        public string? BackgroundColor { get; set; }
         public bool HasAssignedDisplayOrder { get; set; }
         public int CreationOrder { get; set; }
         public List<SkillFormModel> Skills { get; set; } = [];
@@ -552,6 +591,7 @@
         string SpanishName,
         string EnglishName,
         int DisplayOrder,
+        string? BackgroundColor,
         SkillSnapshot[] Skills);
 
     private sealed record SkillSnapshot(

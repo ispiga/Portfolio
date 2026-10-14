@@ -46,7 +46,8 @@ public sealed class AboutQueryService(IDbContextFactory<PortfolioDbContext> dbCo
                         .Where(skill => skill.Name is not null)
                         .OrderBy(skill => skill.Model.DisplayOrder).ThenBy(skill => skill.Model.Id)
                         .Select(skill => new SkillReadModel(skill.Name!, skill.Model.DisplayOrder))
-                        .ToArray()))
+                        .ToArray(),
+                    item.Model.BackgroundColor))
                 .ToArray(),
             hobbies.Select(hobby => new
                 {

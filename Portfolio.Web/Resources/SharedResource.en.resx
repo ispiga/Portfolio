@@ -1356,6 +1356,11 @@
   <data name="AboutGroupEditorLabel" xml:space="preserve"><value>Edit group {0}</value></data>
   <data name="AboutGroupNameSpanish" xml:space="preserve"><value>Group name in Spanish</value></data>
   <data name="AboutGroupNameEnglish" xml:space="preserve"><value>Group name in English</value></data>
+  <data name="AboutGroupBackgroundColor" xml:space="preserve"><value>Background color</value></data>
+  <data name="AboutGroupBackgroundColorHex" xml:space="preserve"><value>Background color hexadecimal value</value></data>
+  <data name="AboutGroupBackgroundColorReset" xml:space="preserve"><value>Reset</value></data>
+  <data name="AboutGroupBackgroundColorHint" xml:space="preserve"><value>The color is applied as a tint; reset restores the theme's default gradient.</value></data>
+  <data name="AboutGroupColorInvalid" xml:space="preserve"><value>The skill group background color is invalid.</value></data>
   <data name="AboutSkills" xml:space="preserve"><value>Skills</value></data>
   <data name="AboutAddSkill" xml:space="preserve"><value>Add skill</value></data>
   <data name="AboutSkillNameSpanish" xml:space="preserve"><value>Skill in Spanish</value></data>

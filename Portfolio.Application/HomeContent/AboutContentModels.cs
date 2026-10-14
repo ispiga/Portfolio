@@ -11,7 +11,8 @@ public sealed record SkillGroupEditModel(
     string SpanishName,
     string? EnglishName,
     int DisplayOrder,
-    IReadOnlyList<SkillEditModel> Skills);
+    IReadOnlyList<SkillEditModel> Skills,
+    string? BackgroundColor = null);
 
 public sealed record SkillEditModel(Guid Id, string SpanishName, string? EnglishName, int DisplayOrder);
 
@@ -35,7 +36,11 @@ public sealed record AboutContentReadModel(
     IReadOnlyList<SkillGroupReadModel> Groups,
     IReadOnlyList<HobbyReadModel> Hobbies);
 
-public sealed record SkillGroupReadModel(string Name, int DisplayOrder, IReadOnlyList<SkillReadModel> Skills);
+public sealed record SkillGroupReadModel(
+    string Name,
+    int DisplayOrder,
+    IReadOnlyList<SkillReadModel> Skills,
+    string? BackgroundColor = null);
 
 public sealed record SkillReadModel(string Name, int DisplayOrder);
 

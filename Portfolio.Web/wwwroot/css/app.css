@@ -417,6 +417,13 @@ html[data-theme="dark"] {
     break-inside: avoid;
     page-break-inside: avoid;
 }
+.about-skills .area-card--custom-color {
+    --about-paper: color-mix(in srgb, var(--color-surface) 88%, var(--skill-group-color));
+    --about-paper-highlight: color-mix(in srgb, var(--color-surface) 95%, var(--skill-group-color));
+    border-color: color-mix(in srgb, var(--color-border) 82%, var(--skill-group-color));
+    background: linear-gradient(148deg, var(--about-paper-highlight), var(--about-paper) 76%, color-mix(in srgb, var(--about-paper) 92%, var(--skill-group-color)));
+}
+.about-skills .area-card--custom-color .about-skill-list li { background-color: var(--color-surface); }
 .about-skills .area-card::before {
     position: absolute;
     inset-inline-end: -1px;
@@ -1238,6 +1245,9 @@ p {
 }
 
 .admin-field input[type="checkbox"] { width: auto; min-height: auto; padding: 0; }
+.about-group-color-field { display: flex; align-items: center; gap: 0.5rem; }
+.admin-field .about-group-color-field__input { width: 3.5rem; min-height: 2.875rem; padding: 0.25rem; }
+.admin-field .about-group-color-field__hex { width: 7rem; min-height: 2.875rem; padding: 0.5rem 0.625rem; }
 
 .admin-field input:focus-visible,
 .admin-field textarea:focus-visible,

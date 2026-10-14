@@ -1356,6 +1356,11 @@
   <data name="AboutGroupEditorLabel" xml:space="preserve"><value>Editar grupo {0}</value></data>
   <data name="AboutGroupNameSpanish" xml:space="preserve"><value>Nombre del grupo en español</value></data>
   <data name="AboutGroupNameEnglish" xml:space="preserve"><value>Nombre del grupo en inglés</value></data>
+  <data name="AboutGroupBackgroundColor" xml:space="preserve"><value>Color de fondo</value></data>
+  <data name="AboutGroupBackgroundColorHex" xml:space="preserve"><value>Valor hexadecimal del color de fondo</value></data>
+  <data name="AboutGroupBackgroundColorReset" xml:space="preserve"><value>Restablecer</value></data>
+  <data name="AboutGroupBackgroundColorHint" xml:space="preserve"><value>El color se aplica como tinte; restablecer conserva el degradado predeterminado del tema.</value></data>
+  <data name="AboutGroupColorInvalid" xml:space="preserve"><value>El color de fondo del grupo no es válido.</value></data>
   <data name="AboutSkills" xml:space="preserve"><value>Skills</value></data>
   <data name="AboutAddSkill" xml:space="preserve"><value>Añadir skill</value></data>
   <data name="AboutSkillNameSpanish" xml:space="preserve"><value>Skill en español</value></data>

@@ -37,7 +37,8 @@ public sealed class AboutAdministrationService(
                         skill.Id,
                         FindTranslation(skill.Translations, "es-ES")?.Name ?? string.Empty,
                         FindTranslation(skill.Translations, "en-US")?.Name,
-                        skill.DisplayOrder)).ToArray())).ToArray(),
+                        skill.DisplayOrder)).ToArray(),
+                group.BackgroundColor)).ToArray(),
             hobbies.Select(hobby => new HobbyEditModel(
                 hobby.Id,
                 hobby.StorageKey,
@@ -99,6 +100,9 @@ public sealed class AboutAdministrationService(
             }
 
             group.DisplayOrder = inputGroup.DisplayOrder;
+            group.BackgroundColor = string.IsNullOrWhiteSpace(inputGroup.BackgroundColor)
+                ? null
+                : inputGroup.BackgroundColor;
             SetGroupTranslation(group, "es-ES", inputGroup.SpanishName);
             SetGroupTranslation(group, "en-US", inputGroup.EnglishName);
             foreach (var inputSkill in inputGroup.Skills)
