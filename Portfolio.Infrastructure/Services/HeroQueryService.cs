@@ -25,6 +25,10 @@ public sealed class HeroQueryService(IDbContextFactory<PortfolioDbContext> dbCon
             return null;
         }
 
+        var description = HomeContentTranslationSelector.Select(
+            content.Translations.SingleOrDefault(item => item.LanguageCode == languageCode)?.Description,
+            content.Translations.SingleOrDefault(item => item.LanguageCode == "es-ES")?.Description);
+
         var logos = await context.TechnologyLogos.AsNoTracking()
             .OrderBy(logo => logo.Orbit)
             .ThenBy(logo => logo.DisplayOrder)
@@ -45,6 +49,7 @@ public sealed class HeroQueryService(IDbContextFactory<PortfolioDbContext> dbCon
             content.ProfileImageId is { } profileImageId
                 ? $"/home-content-images/hero-profile/{profileImageId:N}"
                 : null,
-            content.ProfileImageAlternativeText);
+            content.ProfileImageAlternativeText,
+            description);
     }
 }

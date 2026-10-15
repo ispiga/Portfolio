@@ -42,6 +42,15 @@
                         <span class="admin-field__hint">@Localizer["HomeEnglishFallbackHint"]</span>
                     </div>
                     <div class="admin-field">
+                        <label for="hero-description-es">@Localizer["HeroSpanishDescription"]</label>
+                        <InputTextArea id="hero-description-es" @bind-Value="model.SpanishDescription" maxlength="2000" />
+                    </div>
+                    <div class="admin-field">
+                        <label for="hero-description-en">@Localizer["HeroEnglishDescription"]</label>
+                        <InputTextArea id="hero-description-en" @bind-Value="model.EnglishDescription" maxlength="2000" />
+                        <span class="admin-field__hint">@Localizer["HomeEnglishFallbackHint"]</span>
+                    </div>
+                    <div class="admin-field">
                         <label for="hero-orbit-count">@Localizer["HeroOrbitCount"]</label>
                         <InputNumber id="hero-orbit-count" @bind-Value="model.OrbitCount" TValue="int" min="1" max="3" />
                     </div>
@@ -180,6 +189,8 @@
             ProfileImageContentType = stored.ProfileImageContentType ?? string.Empty,
             ProfileImageSizeBytes = stored.ProfileImageSizeBytes ?? 0,
             ProfileImageAlternativeText = stored.ProfileImageAlternativeText ?? string.Empty,
+            SpanishDescription = stored.SpanishDescription ?? Localizer["HeroDescription"].Value,
+            EnglishDescription = stored.EnglishDescription ?? string.Empty,
             ProfileImagePreviewUrl = stored.ProfileImageId is { } profileImageId
                 ? $"/home-content-images/hero-profile/{profileImageId:N}"
                 : null,
@@ -416,7 +427,9 @@
                 string.IsNullOrWhiteSpace(model.ProfileImageStorageKey) ? null : model.ProfileImageStorageKey,
                 string.IsNullOrWhiteSpace(model.ProfileImageContentType) ? null : model.ProfileImageContentType,
                 model.ProfileImageId is null ? null : model.ProfileImageSizeBytes,
-                string.IsNullOrWhiteSpace(model.ProfileImageAlternativeText) ? null : model.ProfileImageAlternativeText));
+                string.IsNullOrWhiteSpace(model.ProfileImageAlternativeText) ? null : model.ProfileImageAlternativeText,
+                model.SpanishDescription,
+                model.EnglishDescription));
             if (!result.Succeeded)
             {
                 operationMessage = Localizer[result.Errors[0].ResourceKey];
@@ -455,6 +468,8 @@
         model.OrbitCount,
         model.SpanishHeadline,
         model.EnglishHeadline,
+        model.SpanishDescription,
+        model.EnglishDescription,
         model.ProfileImageId,
         model.ProfileImageStorageKey,
         model.ProfileImageContentType,
@@ -474,6 +489,8 @@
         left.OrbitCount == right.OrbitCount
         && left.SpanishHeadline == right.SpanishHeadline
         && left.EnglishHeadline == right.EnglishHeadline
+        && left.SpanishDescription == right.SpanishDescription
+        && left.EnglishDescription == right.EnglishDescription
         && left.ProfileImageId == right.ProfileImageId
         && left.ProfileImageStorageKey == right.ProfileImageStorageKey
         && left.ProfileImageContentType == right.ProfileImageContentType
@@ -589,6 +606,8 @@
         public int OrbitCount { get; set; } = 1;
         public string SpanishHeadline { get; set; } = string.Empty;
         public string EnglishHeadline { get; set; } = string.Empty;
+        public string SpanishDescription { get; set; } = string.Empty;
+        public string EnglishDescription { get; set; } = string.Empty;
         public Guid? ProfileImageId { get; set; }
         public string ProfileImageStorageKey { get; set; } = string.Empty;
         public string ProfileImageContentType { get; set; } = string.Empty;
@@ -618,6 +637,8 @@
         int OrbitCount,
         string SpanishHeadline,
         string EnglishHeadline,
+        string SpanishDescription,
+        string EnglishDescription,
         Guid? ProfileImageId,
         string ProfileImageStorageKey,
         string ProfileImageContentType,

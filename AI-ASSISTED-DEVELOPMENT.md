@@ -3339,3 +3339,28 @@ Adapta los tamaños a móviles mediante reglas responsive. Evita solapamientos e
 Tras implementar los cambios, comprueba los tamaños, la continuidad de las animaciones y la coincidencia geométrica entre las líneas y los logos. Si no puedes ejecutar visualmente la aplicación, indícalo expresamente y no afirmes que has verificado el resultado en el navegador.
 
 Al finalizar, resume qué causaba los saltos, qué has cambiado y qué comprobaciones has podido realizar.
+
+
+# ***************************************************************************************
+# PROMPT PARA REALIZAR LA FASE 7 - AÑADIDO EN ADMINISTRACIÓN CONFIGURACIÓN VISUAL Y LOGOS
+# ***************************************************************************************
+
+La propuesta me parece correcta. Quiero implementarla manteniendo la arquitectura actual del portfolio (.NET 10, Blazor Web App, SQL Server y EF Core), centralizando la configuración visual y evitando duplicar valores o lógica.
+
+Requisitos que quiero respetar:
+
+1. **Colores corporativos:** principal `#00A3FF`, secundario `#3E00D1` y acento `#C98F42`. Los tres deben ser configurables desde administración y persistirse en SQL Server.
+
+2. **Logo SVG:** el logo actual debe utilizar por defecto los colores principal y secundario. Los dos degradados opuestos del SVG deben depender del mismo par de colores, sin valores duplicados independientes. Añadir una opción para vincular o desvincular los colores del logo respecto a la paleta corporativa. El color de acento no debe incorporarse automáticamente al degradado del logo.
+
+3. **Variantes:** reutilizar el logo principal en la web pública y la administración. Generar una variante monocromática blanca para el footer y un favicon simplificado específico. Estas variantes deben poder regenerarse cuando cambie el logo principal o su configuración.
+
+4. **Sustitución del logo:** permitir subir un nuevo SVG y validar si su estructura admite recoloreado automático. Si no es compatible, conservar el archivo como logo utilizable, pero informar de que no se puede garantizar su edición automática de colores. No alterar silenciosamente su geometría.
+
+5. **Persistencia y seguridad:** guardar la configuración mediante servicios de Application e Infrastructure y EF Core. Validar los colores hexadecimales y los archivos SVG. No introducir colores corporativos dispersos como valores hardcodeados por toda la interfaz.
+
+6. **Vista previa:** mostrar los colores y las variantes del logo sobre fondos claros y oscuros antes de guardar. Permitir restaurar la configuración predeterminada.
+
+7. **Caché:** al cambiar el logo o sus variantes, actualizar la versión de las URLs para que el navegador no conserve recursos anteriores.
+
+Antes de modificar código, revisa la estructura existente y propón los cambios concretos en entidades, servicios, persistencia y componentes de administración. Implementa la funcionalidad por etapas, reutilizando lo que ya exista y sin crear abstracciones innecesarias.

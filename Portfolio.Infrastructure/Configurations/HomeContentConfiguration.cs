@@ -35,6 +35,7 @@ public sealed class HeroTranslationConfiguration : IEntityTypeConfiguration<Hero
         builder.HasKey(translation => new { translation.HeroContentId, translation.LanguageCode });
         builder.Property(translation => translation.LanguageCode).HasMaxLength(10).IsRequired();
         builder.Property(translation => translation.Headline).HasMaxLength(250).IsRequired();
+        builder.Property(translation => translation.Description).HasMaxLength(2000);
     }
 }
 

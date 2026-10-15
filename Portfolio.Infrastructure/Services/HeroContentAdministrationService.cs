@@ -29,7 +29,9 @@ public sealed class HeroContentAdministrationService(
             content?.ProfileImageStorageKey,
             content?.ProfileImageContentType,
             content?.ProfileImageSizeBytes,
-            content?.ProfileImageAlternativeText);
+            content?.ProfileImageAlternativeText,
+            content?.Translations.SingleOrDefault(translation => translation.LanguageCode == "es-ES")?.Description,
+            content?.Translations.SingleOrDefault(translation => translation.LanguageCode == "en-US")?.Description);
     }
 
     public async Task<HeroSaveResult> SaveAsync(
@@ -62,6 +64,8 @@ public sealed class HeroContentAdministrationService(
         content.ProfileImageAlternativeText = request.ProfileImageAlternativeText?.Trim();
         SetHeadline(content, "es-ES", request.SpanishHeadline);
         SetHeadline(content, "en-US", request.EnglishHeadline);
+        SetDescription(content, "es-ES", request.SpanishDescription);
+        SetDescription(content, "en-US", request.EnglishDescription);
 
         var existing = await context.TechnologyLogos.ToDictionaryAsync(logo => logo.Id, cancellationToken);
         var requestedIds = request.Logos.Select(logo => logo.Id).ToHashSet();
@@ -116,7 +120,7 @@ public sealed class HeroContentAdministrationService(
         {
             if (translation is not null)
             {
-                content.Translations.Remove(translation);
+                translation.Headline = string.Empty;
             }
 
             return;
@@ -134,6 +138,40 @@ public sealed class HeroContentAdministrationService(
         else
         {
             translation.Headline = value.Trim();
+        }
+    }
+
+    private static void SetDescription(HeroContent content, string languageCode, string? value)
+    {
+        var translation = content.Translations.SingleOrDefault(item => item.LanguageCode == languageCode);
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            if (translation is not null)
+            {
+                translation.Description = null;
+                if (string.IsNullOrWhiteSpace(translation.Headline)
+                    && languageCode != "es-ES")
+                {
+                    content.Translations.Remove(translation);
+                }
+            }
+
+            return;
+        }
+
+        if (translation is null)
+        {
+            content.Translations.Add(new HeroTranslation
+            {
+                HeroContentId = content.Id,
+                LanguageCode = languageCode,
+                Headline = string.Empty,
+                Description = value.Trim()
+            });
+        }
+        else
+        {
+            translation.Description = value.Trim();
         }
     }
 }

@@ -553,6 +553,10 @@ namespace Portfolio.Infrastructure.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
                     b.HasKey("HeroContentId", "LanguageCode");
 
                     b.ToTable("HeroTranslations", null, t =>

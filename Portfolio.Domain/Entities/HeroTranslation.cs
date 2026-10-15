@@ -8,5 +8,7 @@ public sealed class HeroTranslation
 
     public string Headline { get; set; } = string.Empty;
 
+    public string? Description { get; set; }
+
     public HeroContent HeroContent { get; set; } = null!;
 }

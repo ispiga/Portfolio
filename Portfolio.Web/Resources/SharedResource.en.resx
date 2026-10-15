@@ -126,6 +126,9 @@
   <data name="HeroEyebrow" xml:space="preserve">
     <value>Professional portfolio</value>
   </data>
+  <data name="HeroBrandName" xml:space="preserve">
+    <value>ISMAEL PI</value>
+  </data>
   <data name="HeroTitle" xml:space="preserve">
     <value>Building digital solutions with .NET</value>
   </data>
@@ -1306,13 +1309,15 @@
   <data name="HeroUnsavedChangesTitle" xml:space="preserve"><value>Unsaved changes</value></data>
   <data name="HeroUnsavedChangesConfirmation" xml:space="preserve"><value>Your Hero changes will be lost if you leave without saving. Do you want to leave without saving?</value></data>
   <data name="HeroAdminDescription" xml:space="preserve"><value>Edit the localized headline and manage the logos orbiting in the home page.</value></data>
-  <data name="HeroHeadlineSection" xml:space="preserve"><value>Headline and orbits</value></data>
+  <data name="HeroHeadlineSection" xml:space="preserve"><value>Headline, description and orbits</value></data>
   <data name="HeroProfileImageSection" xml:space="preserve"><value>Central portrait</value></data>
   <data name="HeroProfileImage" xml:space="preserve"><value>Personal photo or image</value></data>
   <data name="HeroProfileImageAlt" xml:space="preserve"><value>Profile photo</value></data>
   <data name="HeroProfileImageRemove" xml:space="preserve"><value>Remove photo</value></data>
   <data name="HeroSpanishHeadline" xml:space="preserve"><value>Spanish headline</value></data>
   <data name="HeroEnglishHeadline" xml:space="preserve"><value>English headline</value></data>
+  <data name="HeroSpanishDescription" xml:space="preserve"><value>Spanish description</value></data>
+  <data name="HeroEnglishDescription" xml:space="preserve"><value>English description</value></data>
   <data name="HomeEnglishFallbackHint" xml:space="preserve"><value>If the English text is missing, the Spanish version will be shown.</value></data>
   <data name="HeroOrbitCount" xml:space="preserve"><value>Number of orbits</value></data>
   <data name="HeroTechnologyLogos" xml:space="preserve"><value>Technology logos</value></data>
@@ -1335,6 +1340,7 @@
   <data name="HomeOrbitCountInvalid" xml:space="preserve"><value>The number of orbits must be greater than zero.</value></data>
   <data name="HomeSpanishHeadlineRequired" xml:space="preserve"><value>The Spanish headline is required.</value></data>
   <data name="HomeHeadlineTooLong" xml:space="preserve"><value>The headline cannot exceed 250 characters.</value></data>
+  <data name="HomeDescriptionTooLong" xml:space="preserve"><value>The description cannot exceed 2000 characters.</value></data>
   <data name="HomeLogoIdInvalid" xml:space="preserve"><value>Duplicate logos or an invalid identifier were found.</value></data>
   <data name="HomeLogoNameInvalid" xml:space="preserve"><value>The logo name is required and cannot exceed 100 characters.</value></data>
   <data name="HomeLogoAltInvalid" xml:space="preserve"><value>Alternative text is required and cannot exceed 200 characters.</value></data>

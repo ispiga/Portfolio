@@ -7,6 +7,7 @@
   <data name="HomeTitle" xml:space="preserve"><value>Portfolio</value></data>
   <data name="HomeDescription" xml:space="preserve"><value>Aplicación en construcción</value></data>
   <data name="HeroEyebrow" xml:space="preserve"><value>Portfolio profesional</value></data>
+	<data name="HeroBrandName" xml:space="preserve"><value>ISMAEL PI</value></data>
   <data name="HeroTitle" xml:space="preserve"><value>Construyendo soluciones digitales con .NET</value></data>
 	<data name="HeroDescription" xml:space="preserve"><value>Una estructura inicial para presentar experiencia, proyectos y conocimiento tecnológico.</value></data>
   <data name="HeroCta" xml:space="preserve"><value>Hablemos</value></data>

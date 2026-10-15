@@ -6,9 +6,9 @@
 
 <section class="home-hero" aria-labelledby="hero-title">
     <div class="home-hero__content">
-        <p class="eyebrow">@Localizer["HeroEyebrow"]</p>
+        <p class="home-hero__eyebrow">@Localizer["HeroEyebrow"]</p>
         <h1 id="hero-title">@(hero?.Headline ?? Localizer["HeroTitle"].Value)</h1>
-        <p class="home-hero__description">@Localizer["HeroDescription"]</p>
+        <p class="home-hero__description">@(hero?.Description ?? Localizer["HeroDescription"].Value)</p>
         <a class="button button--primary" href="#contact">@Localizer["HeroCta"]</a>
     </div>
     @if (hero is { Logos.Count: > 0 } || !string.IsNullOrWhiteSpace(hero?.ProfileImageUrl))

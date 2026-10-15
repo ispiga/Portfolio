@@ -4,6 +4,7 @@ public static class HeroContentValidator
 {
     public const long MaximumImageSizeBytes = 10 * 1024 * 1024;
     public const int MaximumOrbitCount = 3;
+    public const int MaximumDescriptionLength = 2000;
 
     public static IReadOnlyList<HeroValidationError> Validate(HeroEditRequest request)
     {
@@ -15,6 +16,9 @@ public static class HeroContentValidator
 
         ValidateHeadline(request.SpanishHeadline, "SpanishHeadline", required: true, errors);
         ValidateHeadline(request.EnglishHeadline, "EnglishHeadline", required: false, errors);
+        // Description is optional; only maximum length is validated when a value is provided.
+        ValidateDescription(request.SpanishDescription, "SpanishDescription", errors);
+        ValidateDescription(request.EnglishDescription, "EnglishDescription", errors);
 
         if (request.ProfileImageId is null
             && (request.ProfileImageStorageKey is not null
@@ -95,6 +99,18 @@ public static class HeroContentValidator
             || value?.Trim().Length > 250)
         {
             errors.Add(new(field, field == "SpanishHeadline" ? "HomeSpanishHeadlineRequired" : "HomeHeadlineTooLong"));
+        }
+    }
+
+    private static void ValidateDescription(
+        string? value,
+        string field,
+        ICollection<HeroValidationError> errors)
+    {
+        // Optional field: null/empty values are valid.
+        if (value?.Trim().Length > MaximumDescriptionLength)
+        {
+            errors.Add(new(field, "HomeDescriptionTooLong"));
         }
     }
 }

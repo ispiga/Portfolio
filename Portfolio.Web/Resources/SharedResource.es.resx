@@ -124,7 +124,10 @@
     <value>Aplicación en construcción</value>
   </data>
   <data name="HeroEyebrow" xml:space="preserve">
-    <value>Portfolio profesional</value>
+    <value>Hola, soy Ismael</value>
+  </data>
+  <data name="HeroBrandName" xml:space="preserve">
+    <value>ISMAEL PI</value>
   </data>
   <data name="HeroTitle" xml:space="preserve">
     <value>Construyendo soluciones digitales con .NET</value>
@@ -1306,13 +1309,15 @@
   <data name="HeroUnsavedChangesTitle" xml:space="preserve"><value>Cambios sin guardar</value></data>
   <data name="HeroUnsavedChangesConfirmation" xml:space="preserve"><value>Los cambios del Hero se perderán si sales sin guardar. ¿Quieres salir sin guardar?</value></data>
   <data name="HeroAdminDescription" xml:space="preserve"><value>Edita el titular localizado y gestiona los logos que orbitan en la portada.</value></data>
-  <data name="HeroHeadlineSection" xml:space="preserve"><value>Titular y órbitas</value></data>
+  <data name="HeroHeadlineSection" xml:space="preserve"><value>Titular, descripción y órbitas</value></data>
   <data name="HeroProfileImageSection" xml:space="preserve"><value>Fotografía central</value></data>
   <data name="HeroProfileImage" xml:space="preserve"><value>Fotografía o imagen personal</value></data>
   <data name="HeroProfileImageAlt" xml:space="preserve"><value>Fotografía de perfil</value></data>
   <data name="HeroProfileImageRemove" xml:space="preserve"><value>Quitar fotografía</value></data>
   <data name="HeroSpanishHeadline" xml:space="preserve"><value>Titular en español</value></data>
   <data name="HeroEnglishHeadline" xml:space="preserve"><value>Titular en inglés</value></data>
+  <data name="HeroSpanishDescription" xml:space="preserve"><value>Descripción en español</value></data>
+  <data name="HeroEnglishDescription" xml:space="preserve"><value>Descripción en inglés</value></data>
   <data name="HomeEnglishFallbackHint" xml:space="preserve"><value>Si falta el texto en inglés, se mostrará la versión en español.</value></data>
   <data name="HeroOrbitCount" xml:space="preserve"><value>Número de órbitas</value></data>
   <data name="HeroTechnologyLogos" xml:space="preserve"><value>Logos tecnológicos</value></data>
@@ -1335,6 +1340,7 @@
   <data name="HomeOrbitCountInvalid" xml:space="preserve"><value>El número de órbitas debe ser mayor que cero.</value></data>
   <data name="HomeSpanishHeadlineRequired" xml:space="preserve"><value>El titular en español es obligatorio.</value></data>
   <data name="HomeHeadlineTooLong" xml:space="preserve"><value>El titular no puede superar los 250 caracteres.</value></data>
+  <data name="HomeDescriptionTooLong" xml:space="preserve"><value>La descripción no puede superar los 2000 caracteres.</value></data>
   <data name="HomeLogoIdInvalid" xml:space="preserve"><value>Hay logos duplicados o con un identificador no válido.</value></data>
   <data name="HomeLogoNameInvalid" xml:space="preserve"><value>El nombre del logo es obligatorio y no puede superar los 100 caracteres.</value></data>
   <data name="HomeLogoAltInvalid" xml:space="preserve"><value>El texto alternativo es obligatorio y no puede superar los 200 caracteres.</value></data>

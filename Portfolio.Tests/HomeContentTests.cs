@@ -30,7 +30,11 @@ public sealed class HomeContentTests
         var admin = new HeroContentAdministrationService(factory, storage);
         var inner = Logo(0, 1, "C#");
         var outer = Logo(1, 2, ".NET");
-        var request = new HeroEditRequest(2, "Titular español", "English headline", [outer, inner]);
+        var request = new HeroEditRequest(2, "Titular español", "English headline", [outer, inner])
+        {
+            SpanishDescription = "Descripción española",
+            EnglishDescription = "English description"
+        };
 
         Assert.True((await admin.SaveAsync(request)).Succeeded);
 
@@ -41,6 +45,7 @@ public sealed class HomeContentTests
             var result = await new HeroQueryService(factory).GetAsync();
             Assert.NotNull(result);
             Assert.Equal("English headline", result.Headline);
+            Assert.Equal("English description", result.Description);
             Assert.Equal(2, result.OrbitCount);
             Assert.Equal(new[] { "C#", ".NET" }, result.Logos.Select(logo => logo.Name));
             Assert.Equal(new[] { 1, 2 }, result.Logos.Select(logo => logo.Orbit));
@@ -50,6 +55,12 @@ public sealed class HomeContentTests
             result = await new HeroQueryService(factory).GetAsync();
             Assert.NotNull(result);
             Assert.Equal("Titular español", result.Headline);
+            Assert.Equal("English description", result.Description);
+
+            Assert.True((await admin.SaveAsync(request with { EnglishDescription = null })).Succeeded);
+            result = await new HeroQueryService(factory).GetAsync();
+            Assert.NotNull(result);
+            Assert.Equal("Descripción española", result.Description);
         }
         finally
         {

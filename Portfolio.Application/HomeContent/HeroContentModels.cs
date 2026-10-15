@@ -9,7 +9,9 @@ public sealed record HeroEditRequest(
     string? ProfileImageStorageKey = null,
     string? ProfileImageContentType = null,
     long? ProfileImageSizeBytes = null,
-    string? ProfileImageAlternativeText = null);
+    string? ProfileImageAlternativeText = null,
+    string? SpanishDescription = null,
+    string? EnglishDescription = null);
 
 public sealed record TechnologyLogoEditModel(
     Guid Id,
@@ -30,7 +32,8 @@ public sealed record HeroReadModel(
     int OrbitCount,
     IReadOnlyList<TechnologyLogoReadModel> Logos,
     string? ProfileImageUrl = null,
-    string? ProfileImageAlternativeText = null);
+    string? ProfileImageAlternativeText = null,
+    string? Description = null);
 
 public sealed record TechnologyLogoReadModel(
     Guid Id,
