@@ -1,244 +1,825 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
-  <resheader name="version"><value>2.0</value></resheader>
-  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
-  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
-  <data name="HomeTitle" xml:space="preserve"><value>Portfolio</value></data>
-  <data name="HomeDescription" xml:space="preserve"><value>Aplicación en construcción</value></data>
-  <data name="HeroEyebrow" xml:space="preserve"><value>Portfolio profesional</value></data>
-	<data name="HeroBrandName" xml:space="preserve"><value>ISMAEL PI</value></data>
-  <data name="HeroTitle" xml:space="preserve"><value>Construyendo soluciones digitales con .NET</value></data>
-	<data name="HeroDescription" xml:space="preserve"><value>Una estructura inicial para presentar experiencia, proyectos y conocimiento tecnológico.</value></data>
-  <data name="HeroCta" xml:space="preserve"><value>Hablemos</value></data>
-  <data name="TechnologyVisualLabel" xml:space="preserve"><value>Composición visual de tecnologías</value></data>
-  <data name="TechnologyCore" xml:space="preserve"><value>&lt;/&gt;</value></data>
-  <data name="TechnologyDotNet" xml:space="preserve"><value>.NET</value></data>
-  <data name="TechnologyCSharp" xml:space="preserve"><value>C#</value></data>
-  <data name="TechnologySql" xml:space="preserve"><value>SQL</value></data>
-  <data name="TechnologyWeb" xml:space="preserve"><value>Web</value></data>
-  <data name="AboutEyebrow" xml:space="preserve"><value>Perfil</value></data>
-  <data name="AboutTitle" xml:space="preserve"><value>Sobre mí</value></data>
-	<data name="AboutGroupBackgroundColor" xml:space="preserve"><value>Color de fondo</value></data>
-	<data name="AboutGroupBackgroundColorHex" xml:space="preserve"><value>Valor hexadecimal del color de fondo</value></data>
-  <data name="AboutGroupBackgroundColorReset" xml:space="preserve"><value>Restablecer</value></data>
-  <data name="AboutGroupBackgroundColorHint" xml:space="preserve"><value>El color se aplica como tinte; restablecer conserva el degradado predeterminado del tema.</value></data>
-  <data name="AboutGroupColorInvalid" xml:space="preserve"><value>El color de fondo del grupo no es válido.</value></data>
-  <data name="AboutPlaceholder" xml:space="preserve"><value>Esta sección se completará con el perfil profesional, la especialización y el enfoque tecnológico definitivos.</value></data>
-  <data name="AboutAreasLabel" xml:space="preserve"><value>Áreas principales de trabajo</value></data>
-  <data name="AreaBackend" xml:space="preserve"><value>Backend</value></data>
-  <data name="AreaBackendDescription" xml:space="preserve"><value>C# y desarrollo .NET</value></data>
-  <data name="AreaFrontend" xml:space="preserve"><value>Frontend</value></data>
-  <data name="AreaFrontendDescription" xml:space="preserve"><value>Blazor, HTML y CSS</value></data>
-  <data name="AreaData" xml:space="preserve"><value>Datos</value></data>
-  <data name="AreaDataDescription" xml:space="preserve"><value>Datos y análisis</value></data>
-  <data name="AreaDevOps" xml:space="preserve"><value>DevOps</value></data>
-  <data name="AreaDevOpsDescription" xml:space="preserve"><value>Automatización y entrega</value></data>
-  <data name="ExperienceEyebrow" xml:space="preserve"><value>Trayectoria</value></data>
-  <data name="ExperienceTitle" xml:space="preserve"><value>Experiencia</value></data>
-  <data name="ExperienceEmpty" xml:space="preserve"><value>La experiencia profesional se incorporará cuando estén disponibles los datos definitivos.</value></data>
-	<data name="ExperienceCurrent" xml:space="preserve"><value>Actualidad</value></data>
-  <data name="ExperienceDateSeparator" xml:space="preserve"><value>—</value></data>
-  <data name="ProjectsEyebrow" xml:space="preserve"><value>Trabajo seleccionado</value></data>
-  <data name="ProjectsTitle" xml:space="preserve"><value>Proyectos</value></data>
-  <data name="ProjectsIntro" xml:space="preserve"><value>Una selección de proyectos estará disponible próximamente.</value></data>
-	<data name="ProjectsEmpty" xml:space="preserve"><value>Aún no hay proyectos disponibles para mostrar.</value></data>
-  <data name="ProjectPlaceholderTitle" xml:space="preserve"><value>Proyecto pendiente de publicar</value></data>
-  <data name="ProjectPlaceholderDescription" xml:space="preserve"><value>La ficha mostrará el propósito, las tecnologías y los enlaces cuando exista contenido real.</value></data>
-  <data name="TechnologiesLabel" xml:space="preserve"><value>Tecnologías del proyecto</value></data>
-  <data name="ProjectTechnologyPlaceholder" xml:space="preserve"><value>Tecnologías por definir</value></data>
-  <data name="ProjectStatusPlaceholder" xml:space="preserve"><value>Próximamente</value></data>
-  <data name="ProjectVisualPlaceholder" xml:space="preserve"><value>Vista previa de proyecto</value></data>
-	<data name="ProjectFeatured" xml:space="preserve"><value>Proyecto destacado</value></data>
-  <data name="ProjectRepository" xml:space="preserve"><value>Ver repositorio</value></data>
-  <data name="ProjectDemo" xml:space="preserve"><value>Ver demo</value></data>
-  <data name="CertificatesEyebrow" xml:space="preserve"><value>Formación</value></data>
-  <data name="CertificatesTitle" xml:space="preserve"><value>Certificaciones</value></data>
-	<data name="CertificationsEmpty" xml:space="preserve"><value>Aún no hay certificaciones disponibles para mostrar.</value></data>
-  <data name="CertificationIssuedOn" xml:space="preserve"><value>Obtenida:</value></data>
-  <data name="CertificationCredential" xml:space="preserve"><value>Ver credencial</value></data>
-  <data name="CertificationPlaceholderTitle" xml:space="preserve"><value>Certificación pendiente de publicar</value></data>
-  <data name="CertificationPlaceholderDescription" xml:space="preserve"><value>Los detalles de la certificación se mostrarán cuando estén disponibles.</value></data>
-  <data name="BlogEyebrow" xml:space="preserve"><value>Ideas y aprendizaje</value></data>
-	<data name="BlogTitle" xml:space="preserve"><value>Artículos recientes</value></data>
-  <data name="BlogPlaceholderVisual" xml:space="preserve"><value>Artículo destacado</value></data>
-	<data name="BlogFeatured" xml:space="preserve"><value>Artículo destacado</value></data>
-  <data name="BlogPublishedOn" xml:space="preserve"><value>Publicado:</value></data>
-  <data name="BlogEmpty" xml:space="preserve"><value>Aún no hay artículos publicados para destacar.</value></data>
-	<data name="BlogReadPost" xml:space="preserve"><value>Leer artículo</value></data>
-  <data name="BlogViewAll" xml:space="preserve"><value>Ver todos los artículos</value></data>
-  <data name="BlogArchiveTitle" xml:space="preserve"><value>Todos los artículos</value></data>
-  <data name="BlogArchiveDescription" xml:space="preserve"><value>Artículos publicados en el blog.</value></data>
-  <data name="BlogArchiveEmpty" xml:space="preserve"><value>Todavía no hay artículos publicados.</value></data>
-  <data name="BlogBackHome" xml:space="preserve"><value>Volver al inicio</value></data>
-  <data name="BlogBackToArchive" xml:space="preserve"><value>Volver a todos los artículos</value></data>
-  <data name="PageNotFoundTitle" xml:space="preserve"><value>Página no encontrada</value></data>
-  <data name="PageNotFoundDescription" xml:space="preserve"><value>La página solicitada no existe.</value></data>
-  <data name="ContactEyebrow" xml:space="preserve"><value>Conversemos</value></data>
-  <data name="ContactTitle" xml:space="preserve"><value>Contacto</value></data>
-	<data name="ContactIntro" xml:space="preserve"><value>¿Tienes una idea o una oportunidad? Envíame un mensaje.</value></data>
-  <data name="ContactFormNote" xml:space="preserve"><value>Responderé a tu mensaje lo antes posible.</value></data>
-  <data name="ContactName" xml:space="preserve"><value>Nombre</value></data>
-  <data name="ContactEmail" xml:space="preserve"><value>Email</value></data>
-  <data name="ContactMessage" xml:space="preserve"><value>Mensaje</value></data>
-	<data name="ContactSubmit" xml:space="preserve"><value>Enviar mensaje</value></data>
-  <data name="ContactSending" xml:space="preserve"><value>Enviando mensaje…</value></data>
-  <data name="ContactSuccess" xml:space="preserve"><value>Tu mensaje se ha enviado correctamente.</value></data>
-  <data name="ContactError" xml:space="preserve"><value>No se ha podido enviar el mensaje. Inténtalo de nuevo más tarde.</value></data>
-  <data name="ContactValidationError" xml:space="preserve"><value>Revisa los campos indicados antes de enviar el formulario.</value></data>
-  <data name="ContactRequired" xml:space="preserve"><value>Este campo es obligatorio.</value></data>
-  <data name="ContactEmailInvalid" xml:space="preserve"><value>Introduce una dirección de email válida.</value></data>
-  <data name="ContactNameMaxLength" xml:space="preserve"><value>El nombre no puede superar los 100 caracteres.</value></data>
-  <data name="ContactEmailMaxLength" xml:space="preserve"><value>El email no puede superar los 254 caracteres.</value></data>
-  <data name="ContactMessageMaxLength" xml:space="preserve"><value>El mensaje no puede superar los 4000 caracteres.</value></data>
-  <data name="ContactHoneypotLabel" xml:space="preserve"><value>Empresa</value></data>
-  <data name="Language" xml:space="preserve"><value>Idioma</value></data>
-  <data name="LanguageSpanish" xml:space="preserve"><value>Español</value></data>
-  <data name="LanguageEnglish" xml:space="preserve"><value>English</value></data>
-  <data name="AdminAreaLabel" xml:space="preserve"><value>Administración</value></data>
-  <data name="AdminNavigation" xml:space="preserve"><value>Navegación administrativa</value></data>
-  <data name="AdminDashboard" xml:space="preserve"><value>Dashboard</value></data>
-  <data name="AdminDashboardTitle" xml:space="preserve"><value>Panel de administración</value></data>
-  <data name="AdminLoginTitle" xml:space="preserve"><value>Acceso administrativo</value></data>
-  <data name="AdminLoginDescription" xml:space="preserve"><value>Inicia sesión con la cuenta administrativa.</value></data>
-  <data name="AdminEmailLabel" xml:space="preserve"><value>Correo electrónico</value></data>
-  <data name="AdminEmailRequired" xml:space="preserve"><value>Introduce el correo electrónico.</value></data>
-  <data name="AdminEmailInvalid" xml:space="preserve"><value>Introduce un correo electrónico válido.</value></data>
-  <data name="AdminPasswordLabel" xml:space="preserve"><value>Contraseña</value></data>
-  <data name="AdminPasswordRequired" xml:space="preserve"><value>Introduce la contraseña.</value></data>
-	<data name="ShowPassword" xml:space="preserve"><value>Mostrar contraseña</value></data>
-  <data name="HidePassword" xml:space="preserve"><value>Ocultar contraseña</value></data>
-  <data name="AdminLoginButton" xml:space="preserve"><value>Iniciar sesión</value></data>
-  <data name="AdminLoginFailed" xml:space="preserve"><value>No se pudo iniciar sesión. Comprueba las credenciales e inténtalo de nuevo.</value></data>
-  <data name="AdminValidationSummary" xml:space="preserve"><value>Revisa los campos indicados antes de continuar.</value></data>
-  <data name="AdminLoggedOut" xml:space="preserve"><value>La sesión se ha cerrado correctamente.</value></data>
-  <data name="AdminLogout" xml:space="preserve"><value>Cerrar sesión</value></data>
-  <data name="AdminWelcome" xml:space="preserve"><value>Sesión iniciada como {0}.</value></data>
-  <data name="AdminIdentityTitle" xml:space="preserve"><value>Identidad</value></data>
-  <data name="AdminIdentityLabel" xml:space="preserve"><value>Usuario autenticado</value></data>
-  <data name="AdminRoleLabel" xml:space="preserve"><value>Administrador</value></data>
-  <data name="AdminActionsTitle" xml:space="preserve"><value>Áreas de contenido</value></data>
-  <data name="AdminExperiences" xml:space="preserve"><value>Experiencias</value></data>
-  <data name="AdminExperiencesDescription" xml:space="preserve"><value>Gestión de la trayectoria profesional.</value></data>
-  <data name="AdminProjects" xml:space="preserve"><value>Proyectos</value></data>
-  <data name="AdminProjectsDescription" xml:space="preserve"><value>Gestión de proyectos del portfolio.</value></data>
-  <data name="AdminCertifications" xml:space="preserve"><value>Certificaciones</value></data>
-  <data name="AdminCertificationsDescription" xml:space="preserve"><value>Gestión de certificaciones y credenciales.</value></data>
-  <data name="AdminBlog" xml:space="preserve"><value>Blog</value></data>
-  <data name="AdminBlogDescription" xml:space="preserve"><value>Gestión de artículos y publicaciones.</value></data>
-  <data name="AdminModuleNotAvailable" xml:space="preserve"><value>Preparado para una próxima entrega</value></data>
-  <data name="AdminOpenModule" xml:space="preserve"><value>Próximamente</value></data>
-  <data name="AdminContentSummaryTitle" xml:space="preserve"><value>Estado del contenido</value></data>
-	<data name="AdminContentSummary" xml:space="preserve"><value>La administración permite gestionar experiencias y proyectos. Las certificaciones y el blog continúan pendientes.</value></data>
-  <data name="AdminPublicSiteAction" xml:space="preserve"><value>Ver sitio público</value></data>
-  <data name="AdminAccessDeniedTitle" xml:space="preserve"><value>Acceso denegado</value></data>
-  <data name="AdminAccessDeniedMessage" xml:space="preserve"><value>Tu cuenta no tiene permisos para acceder a esta área.</value></data>
-  <data name="AdminLoginRequiredTitle" xml:space="preserve"><value>Inicia sesión para continuar</value></data>
-  <data name="AdminLoginRequiredMessage" xml:space="preserve"><value>Esta área requiere una cuenta administrativa autorizada.</value></data>
-  <data name="AdminLoginLink" xml:space="preserve"><value>Ir al acceso administrativo</value></data>
-	<data name="AdminReturnHome" xml:space="preserve"><value>Volver al sitio público</value></data>
-  <data name="BlogAdminTitle" xml:space="preserve"><value>Administración del blog</value></data>
-  <data name="BlogAdminDescription" xml:space="preserve"><value>Administra artículos, traducciones, imágenes y publicación.</value></data>
-  <data name="BlogAdminEmpty" xml:space="preserve"><value>Aún no hay artículos.</value></data>
-  <data name="BlogPostCreate" xml:space="preserve"><value>Crear artículo</value></data>
-  <data name="BlogPostEdit" xml:space="preserve"><value>Editar artículo</value></data>
-  <data name="BlogPostDetails" xml:space="preserve"><value>Datos del artículo</value></data>
-  <data name="BlogPostTitle" xml:space="preserve"><value>Título</value></data>
-  <data name="BlogPostSlug" xml:space="preserve"><value>Slug</value></data>
-  <data name="BlogPostExcerpt" xml:space="preserve"><value>Extracto</value></data>
-  <data name="BlogPostContent" xml:space="preserve"><value>Contenido</value></data>
-  <data name="BlogPostFeaturedImageAlt" xml:space="preserve"><value>Texto alternativo de la imagen destacada</value></data>
-  <data name="BlogPostSpanish" xml:space="preserve"><value>Español</value></data>
-  <data name="BlogPostEnglish" xml:space="preserve"><value>English</value></data>
-  <data name="BlogPostTranslations" xml:space="preserve"><value>Traducciones</value></data>
-  <data name="BlogPostTranslationMissingSpanish" xml:space="preserve"><value>Falta o está incompleta la traducción en español.</value></data>
-  <data name="BlogPostTranslationMissingEnglish" xml:space="preserve"><value>Falta o está incompleta la traducción en English.</value></data>
-  <data name="BlogPostEditorialStatus" xml:space="preserve"><value>Estado editorial</value></data>
-  <data name="BlogPostStatusDraft" xml:space="preserve"><value>Incompleto/Borrador</value></data>
-  <data name="BlogPostStatusReadyToPublish" xml:space="preserve"><value>Listo para publicar</value></data>
-  <data name="BlogPostStatusPublished" xml:space="preserve"><value>Publicado</value></data>
-  <data name="BlogPostFeatured" xml:space="preserve"><value>Artículo destacado</value></data>
-  <data name="BlogPostPublishedOn" xml:space="preserve"><value>Publicado el</value></data>
-  <data name="BlogPostImages" xml:space="preserve"><value>Imágenes</value></data>
-  <data name="BlogPostDeleteConfirmation" xml:space="preserve"><value>¿Quieres eliminar este artículo? Si tiene imágenes, elimínalas primero desde su editor.</value></data>
-  <data name="BlogPostDeleteHasImages" xml:space="preserve"><value>El artículo contiene imágenes; elimínalas desde el editor antes de borrar el artículo.</value></data>
-  <data name="BlogPostDeleted" xml:space="preserve"><value>El artículo se ha eliminado.</value></data>
-  <data name="BlogPostNotFound" xml:space="preserve"><value>No se ha encontrado el artículo.</value></data>
-  <data name="BlogPostSaving" xml:space="preserve"><value>Guardando…</value></data>
-  <data name="BlogPostSaved" xml:space="preserve"><value>El artículo se ha guardado.</value></data>
-  <data name="BlogPostSaveFailed" xml:space="preserve"><value>No se ha podido guardar el artículo. Revisa los campos indicados.</value></data>
-  <data name="BlogPostUnsavedChangesTitle" xml:space="preserve"><value>Cambios sin guardar</value></data>
-  <data name="BlogPostUnsavedChangesConfirmation" xml:space="preserve"><value>Hay cambios sin guardar. ¿Quieres descartarlos?</value></data>
-  <data name="BlogPostStatusInvalid" xml:space="preserve"><value>Selecciona un estado editorial válido.</value></data>
-  <data name="BlogPostFieldRequired" xml:space="preserve"><value>Este campo es obligatorio para este estado editorial.</value></data>
-  <data name="BlogPostFieldTooLong" xml:space="preserve"><value>El valor supera la longitud máxima permitida.</value></data>
-  <data name="BlogPostSlugDuplicate" xml:space="preserve"><value>Ya existe un artículo con ese slug en este idioma.</value></data>
-  <data name="BlogPostManageAction" xml:space="preserve"><value>Gestionar artículos</value></data>
-	<data name="BlogImageRules" xml:space="preserve"><value>JPG, JPEG, PNG, WebP y SVG. Máximo {0} MiB por archivo.</value></data>
-  <data name="BlogImageUpload" xml:space="preserve"><value>Subir imágenes</value></data>
-  <data name="BlogImagesEmpty" xml:space="preserve"><value>Este artículo aún no tiene imágenes.</value></data>
-  <data name="BlogImagePreviewAlt" xml:space="preserve"><value>Vista previa de la imagen del artículo</value></data>
-  <data name="BlogImageFeatured" xml:space="preserve"><value>Imagen destacada</value></data>
-  <data name="BlogImageSetFeatured" xml:space="preserve"><value>Usar como imagen destacada</value></data>
-  <data name="BlogImageDeleteConfirmation" xml:space="preserve"><value>¿Quieres eliminar esta imagen? No se podrá eliminar mientras esté insertada en una traducción.</value></data>
-  <data name="BlogImageInUse" xml:space="preserve"><value>La imagen todavía está insertada en el contenido de una traducción. Retírala y guarda el artículo antes de eliminarla.</value></data>
-  <data name="BlogImageDeleted" xml:space="preserve"><value>La imagen se ha eliminado.</value></data>
-  <data name="BlogImageUploaded" xml:space="preserve"><value>La imagen se ha subido.</value></data>
-  <data name="BlogImageUploadFailed" xml:space="preserve"><value>No se ha podido subir o modificar la imagen.</value></data>
-  <data name="BlogImageUnsupportedType" xml:space="preserve"><value>El formato de imagen no está permitido.</value></data>
-  <data name="BlogImageTooLarge" xml:space="preserve"><value>La imagen supera el tamaño máximo permitido.</value></data>
-  <data name="BlogImageInvalidContent" xml:space="preserve"><value>El contenido del archivo no coincide con un formato de imagen válido.</value></data>
-  <data name="BlogImageSaveArticleFirst" xml:space="preserve"><value>Guarda primero el artículo para poder subir imágenes.</value></data>
-  <data name="BlogImageFeaturedSet" xml:space="preserve"><value>La imagen destacada se ha actualizado.</value></data>
-  <data name="BlogImageOperationFailed" xml:space="preserve"><value>No se ha podido completar la operación de imagen.</value></data>
-  <data name="AdminContentSummary" xml:space="preserve"><value>La administración permite gestionar experiencias, proyectos, certificaciones y artículos del blog.</value></data>
-  <data name="BlogPostNotFeatured" xml:space="preserve">
-	<value>Not featured</value>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="HomeTitle" xml:space="preserve">
+    <value>Portfolio</value>
   </data>
-  <data name="AdminVisualIdentity" xml:space="preserve"><value>Identidad visual</value></data>
-  <data name="AdminVisualIdentityDescription" xml:space="preserve"><value>Configura la paleta corporativa y los recursos gráficos del portfolio.</value></data>
-  <data name="VisualIdentityManageAction" xml:space="preserve"><value>Gestionar identidad visual</value></data>
-  <data name="VisualIdentityTitle" xml:space="preserve"><value>Identidad visual</value></data>
-  <data name="VisualIdentityDescription" xml:space="preserve"><value>Administra los colores de marca, el logo y sus variantes.</value></data>
-  <data name="VisualIdentityColorsHeading" xml:space="preserve"><value>Colores corporativos</value></data>
-  <data name="VisualIdentityColorsDescription" xml:space="preserve"><value>La paleta se comparte entre temas; los fondos, textos y colores funcionales conservan sus tokens específicos.</value></data>
-  <data name="VisualIdentityPrimary" xml:space="preserve"><value>Principal</value></data>
-  <data name="VisualIdentitySecondary" xml:space="preserve"><value>Secundario</value></data>
-  <data name="VisualIdentityAccent" xml:space="preserve"><value>Acento</value></data>
-  <data name="VisualIdentityLinkLogoColors" xml:space="preserve"><value>Vincular el degradado del logo a los colores principal y secundario</value></data>
-  <data name="VisualIdentityLogoStartColor" xml:space="preserve"><value>Color inicial del logo</value></data>
-  <data name="VisualIdentityLogoEndColor" xml:space="preserve"><value>Color final del logo</value></data>
-  <data name="VisualIdentityLogoNotRecolorable" xml:space="preserve"><value>Este SVG se conserva como logo, pero su estructura no permite garantizar el recoloreado automático. Puedes cargar variantes manuales.</value></data>
-  <data name="VisualIdentitySaveColors" xml:space="preserve"><value>Guardar colores</value></data>
-  <data name="VisualIdentityLogoHeading" xml:space="preserve"><value>Logo y variantes</value></data>
-  <data name="VisualIdentityLogoDescription" xml:space="preserve"><value>El logo principal se comparte en la web pública, administración y acceso de administrador.</value></data>
-  <data name="VisualIdentityMainLogo" xml:space="preserve"><value>Logo principal</value></data>
-  <data name="VisualIdentityFooterLogo" xml:space="preserve"><value>Logo blanco del footer</value></data>
-  <data name="VisualIdentityFooterVariantUnavailable" xml:space="preserve"><value>No hay una variante blanca segura disponible. Sube una variante manual.</value></data>
-  <data name="VisualIdentityFavicon" xml:space="preserve"><value>Favicon</value></data>
-  <data name="VisualIdentityVariantAutomatic" xml:space="preserve"><value>Generada automáticamente</value></data>
-  <data name="VisualIdentityVariantManual" xml:space="preserve"><value>Subida manualmente</value></data>
-  <data name="VisualIdentityVariantGeneric" xml:space="preserve"><value>Favicon genérico de respaldo</value></data>
-  <data name="VisualIdentityVariantUnavailable" xml:space="preserve"><value>No disponible</value></data>
-  <data name="VisualIdentityVariantNeedsReview" xml:space="preserve"><value>El logo principal ha cambiado. Revisa esta variante manual.</value></data>
-  <data name="VisualIdentityUseGeneratedVariant" xml:space="preserve"><value>Usar variante automática</value></data>
-  <data name="VisualIdentityUploadImmediate" xml:space="preserve"><value>Las cargas de logo y variantes se aplican inmediatamente; los cambios de color requieren guardar.</value></data>
-  <data name="VisualIdentityRestoreLogo" xml:space="preserve"><value>Restaurar logo predeterminado</value></data>
-  <data name="VisualIdentityPreviewHeading" xml:space="preserve"><value>Vista previa antes de guardar</value></data>
-  <data name="VisualIdentityLightPreview" xml:space="preserve"><value>Tema claro</value></data>
-  <data name="VisualIdentityDarkPreview" xml:space="preserve"><value>Tema oscuro</value></data>
-  <data name="VisualIdentityRestoreDefaults" xml:space="preserve"><value>Restaurar configuración predeterminada</value></data>
-  <data name="VisualIdentityRestoreConfirmation" xml:space="preserve"><value>Se restaurarán los colores y el logo predeterminados y se eliminarán las variantes manuales. ¿Quieres continuar?</value></data>
-  <data name="VisualIdentitySaved" xml:space="preserve"><value>Los colores de identidad visual se han guardado.</value></data>
-	<data name="VisualIdentityUnsavedChangesTitle" xml:space="preserve"><value>Cambios sin guardar</value></data>
-  <data name="VisualIdentityUnsavedChangesConfirmation" xml:space="preserve"><value>Los cambios de identidad visual se perderán si sales sin guardar. ¿Quieres salir sin guardar?</value></data>
-  <data name="VisualIdentitySaveFailed" xml:space="preserve"><value>No se pudo guardar la configuración. Inténtalo de nuevo.</value></data>
-  <data name="VisualIdentityDefaultsRestored" xml:space="preserve"><value>Se ha restaurado la configuración predeterminada.</value></data>
-  <data name="VisualIdentityFileTypeInvalid" xml:space="preserve"><value>El formato del archivo no está admitido.</value></data>
-  <data name="VisualIdentityFileTooLarge" xml:space="preserve"><value>El archivo supera el límite de 10 MiB.</value></data>
-  <data name="VisualIdentityFileInvalid" xml:space="preserve"><value>El archivo no es válido o contiene contenido SVG no permitido.</value></data>
-  <data name="VisualIdentityUploadFailed" xml:space="preserve"><value>No se pudo subir el archivo. Inténtalo de nuevo.</value></data>
-  <data name="VisualIdentityUploadSucceeded" xml:space="preserve"><value>El recurso visual se ha actualizado.</value></data>
-  <data name="VisualIdentityColorInvalid" xml:space="preserve"><value>Introduce un color hexadecimal válido con el formato #RRGGBB.</value></data>
-  <data name="VisualIdentityLinkedColorsCannotHaveOverrides" xml:space="preserve"><value>Desvincula los colores del logo antes de establecer valores independientes.</value></data>
+  <data name="HomeDescription" xml:space="preserve">
+    <value>Aplicación en construcción</value>
+  </data>
+  <data name="HeroEyebrow" xml:space="preserve">
+    <value>Portfolio profesional</value>
+  </data>
+  <data name="HeroBrandName" xml:space="preserve">
+    <value>ISMAEL PI</value>
+  </data>
+  <data name="HeroTitle" xml:space="preserve">
+    <value>Construyendo soluciones digitales con .NET</value>
+  </data>
+  <data name="HeroDescription" xml:space="preserve">
+    <value>Una estructura inicial para presentar experiencia, proyectos y conocimiento tecnológico.</value>
+  </data>
+  <data name="HeroCta" xml:space="preserve">
+    <value>Hablemos</value>
+  </data>
+  <data name="TechnologyVisualLabel" xml:space="preserve">
+    <value>Composición visual de tecnologías</value>
+  </data>
+  <data name="TechnologyCore" xml:space="preserve">
+    <value>&lt;/&gt;</value>
+  </data>
+  <data name="TechnologyDotNet" xml:space="preserve">
+    <value>.NET</value>
+  </data>
+  <data name="TechnologyCSharp" xml:space="preserve">
+    <value>C#</value>
+  </data>
+  <data name="TechnologySql" xml:space="preserve">
+    <value>SQL</value>
+  </data>
+  <data name="TechnologyWeb" xml:space="preserve">
+    <value>Web</value>
+  </data>
+  <data name="AboutEyebrow" xml:space="preserve">
+    <value>Perfil</value>
+  </data>
+  <data name="AboutTitle" xml:space="preserve">
+    <value>Sobre mí</value>
+  </data>
+  <data name="HobbyImageEnlarge" xml:space="preserve">
+    <value>Ampliar imagen de la afición: {0}</value>
+  </data>
+  <data name="HobbyImagePreview" xml:space="preserve">
+    <value>Vista ampliada de la imagen de la afición: {0}</value>
+  </data>
+  <data name="AboutGroupBackgroundColor" xml:space="preserve">
+    <value>Color de fondo</value>
+  </data>
+  <data name="AboutGroupBackgroundColorHex" xml:space="preserve">
+    <value>Valor hexadecimal del color de fondo</value>
+  </data>
+  <data name="AboutGroupBackgroundColorReset" xml:space="preserve">
+    <value>Restablecer</value>
+  </data>
+  <data name="AboutGroupBackgroundColorHint" xml:space="preserve">
+    <value>El color se aplica como tinte; restablecer conserva el degradado predeterminado del tema.</value>
+  </data>
+  <data name="AboutGroupColorInvalid" xml:space="preserve">
+    <value>El color de fondo del grupo no es válido.</value>
+  </data>
+  <data name="AboutPlaceholder" xml:space="preserve">
+    <value>Esta sección se completará con el perfil profesional, la especialización y el enfoque tecnológico definitivos.</value>
+  </data>
+  <data name="AboutAreasLabel" xml:space="preserve">
+    <value>Áreas principales de trabajo</value>
+  </data>
+  <data name="AreaBackend" xml:space="preserve">
+    <value>Backend</value>
+  </data>
+  <data name="AreaBackendDescription" xml:space="preserve">
+    <value>C# y desarrollo .NET</value>
+  </data>
+  <data name="AreaFrontend" xml:space="preserve">
+    <value>Frontend</value>
+  </data>
+  <data name="AreaFrontendDescription" xml:space="preserve">
+    <value>Blazor, HTML y CSS</value>
+  </data>
+  <data name="AreaData" xml:space="preserve">
+    <value>Datos</value>
+  </data>
+  <data name="AreaDataDescription" xml:space="preserve">
+    <value>Datos y análisis</value>
+  </data>
+  <data name="AreaDevOps" xml:space="preserve">
+    <value>DevOps</value>
+  </data>
+  <data name="AreaDevOpsDescription" xml:space="preserve">
+    <value>Automatización y entrega</value>
+  </data>
+  <data name="ExperienceEyebrow" xml:space="preserve">
+    <value>Trayectoria</value>
+  </data>
+  <data name="ExperienceTitle" xml:space="preserve">
+    <value>Experiencia</value>
+  </data>
+  <data name="ExperienceEmpty" xml:space="preserve">
+    <value>La experiencia profesional se incorporará cuando estén disponibles los datos definitivos.</value>
+  </data>
+  <data name="ExperienceCurrent" xml:space="preserve">
+    <value>Actualidad</value>
+  </data>
+  <data name="ExperienceDateSeparator" xml:space="preserve">
+    <value>—</value>
+  </data>
+  <data name="ProjectsEyebrow" xml:space="preserve">
+    <value>Trabajo seleccionado</value>
+  </data>
+  <data name="ProjectsTitle" xml:space="preserve">
+    <value>Proyectos</value>
+  </data>
+  <data name="ProjectsEmpty" xml:space="preserve">
+    <value>Aún no hay proyectos disponibles para mostrar.</value>
+  </data>
+  <data name="ProjectPlaceholderTitle" xml:space="preserve">
+    <value>Proyecto pendiente de publicar</value>
+  </data>
+  <data name="ProjectPlaceholderDescription" xml:space="preserve">
+    <value>La ficha mostrará el propósito, las tecnologías y los enlaces cuando exista contenido real.</value>
+  </data>
+  <data name="TechnologiesLabel" xml:space="preserve">
+    <value>Tecnologías del proyecto</value>
+  </data>
+  <data name="ProjectTechnologyPlaceholder" xml:space="preserve">
+    <value>Tecnologías por definir</value>
+  </data>
+  <data name="ProjectStatusPlaceholder" xml:space="preserve">
+    <value>Próximamente</value>
+  </data>
+  <data name="ProjectVisualPlaceholder" xml:space="preserve">
+    <value>Vista previa de proyecto</value>
+  </data>
+  <data name="ProjectFeatured" xml:space="preserve">
+    <value>Proyecto destacado</value>
+  </data>
+  <data name="ProjectRepository" xml:space="preserve">
+    <value>Ver repositorio</value>
+  </data>
+  <data name="ProjectDemo" xml:space="preserve">
+    <value>Ver demo</value>
+  </data>
+  <data name="CertificatesEyebrow" xml:space="preserve">
+    <value>Formación</value>
+  </data>
+  <data name="CertificatesTitle" xml:space="preserve">
+    <value>Certificaciones</value>
+  </data>
+  <data name="CertificationsEmpty" xml:space="preserve">
+    <value>Aún no hay certificaciones disponibles para mostrar.</value>
+  </data>
+  <data name="CertificationIssuedOn" xml:space="preserve">
+    <value>Obtenida:</value>
+  </data>
+  <data name="CertificationCredential" xml:space="preserve">
+    <value>Ver credencial</value>
+  </data>
+  <data name="CertificationPlaceholderTitle" xml:space="preserve">
+    <value>Certificación pendiente de publicar</value>
+  </data>
+  <data name="CertificationPlaceholderDescription" xml:space="preserve">
+    <value>Los detalles de la certificación se mostrarán cuando estén disponibles.</value>
+  </data>
+  <data name="BlogEyebrow" xml:space="preserve">
+    <value>Ideas y aprendizaje</value>
+  </data>
+  <data name="BlogTitle" xml:space="preserve">
+    <value>Artículos recientes</value>
+  </data>
+  <data name="BlogPlaceholderVisual" xml:space="preserve">
+    <value>Artículo destacado</value>
+  </data>
+  <data name="BlogFeatured" xml:space="preserve">
+    <value>Artículo destacado</value>
+  </data>
+  <data name="BlogPublishedOn" xml:space="preserve">
+    <value>Publicado:</value>
+  </data>
+  <data name="BlogEmpty" xml:space="preserve">
+    <value>Aún no hay artículos publicados para destacar.</value>
+  </data>
+  <data name="BlogReadPost" xml:space="preserve">
+    <value>Leer artículo</value>
+  </data>
+  <data name="BlogViewAll" xml:space="preserve">
+    <value>Ver todos los artículos</value>
+  </data>
+  <data name="BlogArchiveTitle" xml:space="preserve">
+    <value>Todos los artículos</value>
+  </data>
+  <data name="BlogArchiveDescription" xml:space="preserve">
+    <value>Artículos publicados en el blog.</value>
+  </data>
+  <data name="BlogArchiveEmpty" xml:space="preserve">
+    <value>Todavía no hay artículos publicados.</value>
+  </data>
+  <data name="BlogBackHome" xml:space="preserve">
+    <value>Volver al inicio</value>
+  </data>
+  <data name="BlogBackToArchive" xml:space="preserve">
+    <value>Volver a todos los artículos</value>
+  </data>
+  <data name="PageNotFoundTitle" xml:space="preserve">
+    <value>Página no encontrada</value>
+  </data>
+  <data name="PageNotFoundDescription" xml:space="preserve">
+    <value>La página solicitada no existe.</value>
+  </data>
+  <data name="ContactEyebrow" xml:space="preserve">
+    <value>Conversemos</value>
+  </data>
+  <data name="ContactTitle" xml:space="preserve">
+    <value>Contacto</value>
+  </data>
+  <data name="ContactIntro" xml:space="preserve">
+    <value>¿Tienes una idea o una oportunidad? Envíame un mensaje.</value>
+  </data>
+  <data name="ContactFormNote" xml:space="preserve">
+    <value>Responderé a tu mensaje lo antes posible.</value>
+  </data>
+  <data name="ContactName" xml:space="preserve">
+    <value>Nombre</value>
+  </data>
+  <data name="ContactEmail" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="ContactMessage" xml:space="preserve">
+    <value>Mensaje</value>
+  </data>
+  <data name="ContactSubmit" xml:space="preserve">
+    <value>Enviar mensaje</value>
+  </data>
+  <data name="ContactSending" xml:space="preserve">
+    <value>Enviando mensaje…</value>
+  </data>
+  <data name="ContactSuccess" xml:space="preserve">
+    <value>Tu mensaje se ha enviado correctamente.</value>
+  </data>
+  <data name="ContactError" xml:space="preserve">
+    <value>No se ha podido enviar el mensaje. Inténtalo de nuevo más tarde.</value>
+  </data>
+  <data name="ContactValidationError" xml:space="preserve">
+    <value>Revisa los campos indicados antes de enviar el formulario.</value>
+  </data>
+  <data name="ContactRequired" xml:space="preserve">
+    <value>Este campo es obligatorio.</value>
+  </data>
+  <data name="ContactEmailInvalid" xml:space="preserve">
+    <value>Introduce una dirección de email válida.</value>
+  </data>
+  <data name="ContactNameMaxLength" xml:space="preserve">
+    <value>El nombre no puede superar los 100 caracteres.</value>
+  </data>
+  <data name="ContactEmailMaxLength" xml:space="preserve">
+    <value>El email no puede superar los 254 caracteres.</value>
+  </data>
+  <data name="ContactMessageMaxLength" xml:space="preserve">
+    <value>El mensaje no puede superar los 4000 caracteres.</value>
+  </data>
+  <data name="ContactHoneypotLabel" xml:space="preserve">
+    <value>Empresa</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Idioma</value>
+  </data>
+  <data name="LanguageSpanish" xml:space="preserve">
+    <value>Español</value>
+  </data>
+  <data name="LanguageEnglish" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="AdminAreaLabel" xml:space="preserve">
+    <value>Administración</value>
+  </data>
+  <data name="AdminNavigation" xml:space="preserve">
+    <value>Navegación administrativa</value>
+  </data>
+  <data name="AdminDashboard" xml:space="preserve">
+    <value>Dashboard</value>
+  </data>
+  <data name="AdminDashboardTitle" xml:space="preserve">
+    <value>Panel de administración</value>
+  </data>
+  <data name="AdminLoginTitle" xml:space="preserve">
+    <value>Acceso administrativo</value>
+  </data>
+  <data name="AdminLoginDescription" xml:space="preserve">
+    <value>Inicia sesión con la cuenta administrativa.</value>
+  </data>
+  <data name="AdminEmailLabel" xml:space="preserve">
+    <value>Correo electrónico</value>
+  </data>
+  <data name="AdminEmailRequired" xml:space="preserve">
+    <value>Introduce el correo electrónico.</value>
+  </data>
+  <data name="AdminEmailInvalid" xml:space="preserve">
+    <value>Introduce un correo electrónico válido.</value>
+  </data>
+  <data name="AdminPasswordLabel" xml:space="preserve">
+    <value>Contraseña</value>
+  </data>
+  <data name="AdminPasswordRequired" xml:space="preserve">
+    <value>Introduce la contraseña.</value>
+  </data>
+  <data name="ShowPassword" xml:space="preserve">
+    <value>Mostrar contraseña</value>
+  </data>
+  <data name="HidePassword" xml:space="preserve">
+    <value>Ocultar contraseña</value>
+  </data>
+  <data name="AdminLoginButton" xml:space="preserve">
+    <value>Iniciar sesión</value>
+  </data>
+  <data name="AdminLoginFailed" xml:space="preserve">
+    <value>No se pudo iniciar sesión. Comprueba las credenciales e inténtalo de nuevo.</value>
+  </data>
+  <data name="AdminValidationSummary" xml:space="preserve">
+    <value>Revisa los campos indicados antes de continuar.</value>
+  </data>
+  <data name="AdminLoggedOut" xml:space="preserve">
+    <value>La sesión se ha cerrado correctamente.</value>
+  </data>
+  <data name="AdminLogout" xml:space="preserve">
+    <value>Cerrar sesión</value>
+  </data>
+  <data name="AdminWelcome" xml:space="preserve">
+    <value>Sesión iniciada como {0}.</value>
+  </data>
+  <data name="AdminIdentityTitle" xml:space="preserve">
+    <value>Identidad</value>
+  </data>
+  <data name="AdminIdentityLabel" xml:space="preserve">
+    <value>Usuario autenticado</value>
+  </data>
+  <data name="AdminRoleLabel" xml:space="preserve">
+    <value>Administrador</value>
+  </data>
+  <data name="AdminActionsTitle" xml:space="preserve">
+    <value>Áreas de contenido</value>
+  </data>
+  <data name="AdminExperiences" xml:space="preserve">
+    <value>Experiencias</value>
+  </data>
+  <data name="AdminExperiencesDescription" xml:space="preserve">
+    <value>Gestión de la trayectoria profesional.</value>
+  </data>
+  <data name="AdminProjects" xml:space="preserve">
+    <value>Proyectos</value>
+  </data>
+  <data name="AdminProjectsDescription" xml:space="preserve">
+    <value>Gestión de proyectos del portfolio.</value>
+  </data>
+  <data name="AdminCertifications" xml:space="preserve">
+    <value>Certificaciones</value>
+  </data>
+  <data name="AdminCertificationsDescription" xml:space="preserve">
+    <value>Gestión de certificaciones y credenciales.</value>
+  </data>
+  <data name="AdminBlog" xml:space="preserve">
+    <value>Blog</value>
+  </data>
+  <data name="AdminBlogDescription" xml:space="preserve">
+    <value>Gestión de artículos y publicaciones.</value>
+  </data>
+  <data name="AdminModuleNotAvailable" xml:space="preserve">
+    <value>Preparado para una próxima entrega</value>
+  </data>
+  <data name="AdminOpenModule" xml:space="preserve">
+    <value>Próximamente</value>
+  </data>
+  <data name="AdminContentSummaryTitle" xml:space="preserve">
+    <value>Estado del contenido</value>
+  </data>
+  <data name="AdminContentSummary" xml:space="preserve">
+    <value>La administración permite gestionar experiencias, proyectos, certificaciones y artículos del blog.</value>
+  </data>
+  <data name="AdminPublicSiteAction" xml:space="preserve">
+    <value>Ver sitio público</value>
+  </data>
+  <data name="AdminAccessDeniedTitle" xml:space="preserve">
+    <value>Acceso denegado</value>
+  </data>
+  <data name="AdminAccessDeniedMessage" xml:space="preserve">
+    <value>Tu cuenta no tiene permisos para acceder a esta área.</value>
+  </data>
+  <data name="AdminLoginRequiredTitle" xml:space="preserve">
+    <value>Inicia sesión para continuar</value>
+  </data>
+  <data name="AdminLoginRequiredMessage" xml:space="preserve">
+    <value>Esta área requiere una cuenta administrativa autorizada.</value>
+  </data>
+  <data name="AdminLoginLink" xml:space="preserve">
+    <value>Ir al acceso administrativo</value>
+  </data>
+  <data name="AdminReturnHome" xml:space="preserve">
+    <value>Volver al sitio público</value>
+  </data>
+  <data name="BlogAdminTitle" xml:space="preserve">
+    <value>Administración del blog</value>
+  </data>
+  <data name="BlogAdminDescription" xml:space="preserve">
+    <value>Administra artículos, traducciones, imágenes y publicación.</value>
+  </data>
+  <data name="BlogAdminEmpty" xml:space="preserve">
+    <value>Aún no hay artículos.</value>
+  </data>
+  <data name="BlogPostCreate" xml:space="preserve">
+    <value>Crear artículo</value>
+  </data>
+  <data name="BlogPostEdit" xml:space="preserve">
+    <value>Editar artículo</value>
+  </data>
+  <data name="BlogPostDetails" xml:space="preserve">
+    <value>Datos del artículo</value>
+  </data>
+  <data name="BlogPostTitle" xml:space="preserve">
+    <value>Título</value>
+  </data>
+  <data name="BlogPostSlug" xml:space="preserve">
+    <value>Slug</value>
+  </data>
+  <data name="BlogPostExcerpt" xml:space="preserve">
+    <value>Extracto</value>
+  </data>
+  <data name="BlogPostContent" xml:space="preserve">
+    <value>Contenido</value>
+  </data>
+  <data name="BlogPostFeaturedImageAlt" xml:space="preserve">
+    <value>Texto alternativo de la imagen destacada</value>
+  </data>
+  <data name="BlogPostSpanish" xml:space="preserve">
+    <value>Español</value>
+  </data>
+  <data name="BlogPostEnglish" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="BlogPostTranslations" xml:space="preserve">
+    <value>Traducciones</value>
+  </data>
+  <data name="BlogPostTranslationMissingSpanish" xml:space="preserve">
+    <value>Falta o está incompleta la traducción en español.</value>
+  </data>
+  <data name="BlogPostTranslationMissingEnglish" xml:space="preserve">
+    <value>Falta o está incompleta la traducción en English.</value>
+  </data>
+  <data name="BlogPostEditorialStatus" xml:space="preserve">
+    <value>Estado editorial</value>
+  </data>
+  <data name="BlogPostStatusDraft" xml:space="preserve">
+    <value>Incompleto/Borrador</value>
+  </data>
+  <data name="BlogPostStatusReadyToPublish" xml:space="preserve">
+    <value>Listo para publicar</value>
+  </data>
+  <data name="BlogPostStatusPublished" xml:space="preserve">
+    <value>Publicado</value>
+  </data>
+  <data name="BlogPostFeatured" xml:space="preserve">
+    <value>Artículo destacado</value>
+  </data>
+  <data name="BlogPostPublishedOn" xml:space="preserve">
+    <value>Publicado el</value>
+  </data>
+  <data name="BlogPostImages" xml:space="preserve">
+    <value>Imágenes</value>
+  </data>
+  <data name="BlogPostDeleteConfirmation" xml:space="preserve">
+    <value>¿Quieres eliminar este artículo? Si tiene imágenes, elimínalas primero desde su editor.</value>
+  </data>
+  <data name="BlogPostDeleteHasImages" xml:space="preserve">
+    <value>El artículo contiene imágenes; elimínalas desde el editor antes de borrar el artículo.</value>
+  </data>
+  <data name="BlogPostDeleted" xml:space="preserve">
+    <value>El artículo se ha eliminado.</value>
+  </data>
+  <data name="BlogPostNotFound" xml:space="preserve">
+    <value>No se ha encontrado el artículo.</value>
+  </data>
+  <data name="BlogPostSaving" xml:space="preserve">
+    <value>Guardando…</value>
+  </data>
+  <data name="BlogPostSaved" xml:space="preserve">
+    <value>El artículo se ha guardado.</value>
+  </data>
+  <data name="BlogPostSaveFailed" xml:space="preserve">
+    <value>No se ha podido guardar el artículo. Revisa los campos indicados.</value>
+  </data>
+  <data name="BlogPostUnsavedChangesTitle" xml:space="preserve">
+    <value>Cambios sin guardar</value>
+  </data>
+  <data name="BlogPostUnsavedChangesConfirmation" xml:space="preserve">
+    <value>Hay cambios sin guardar. ¿Quieres descartarlos?</value>
+  </data>
+  <data name="BlogPostStatusInvalid" xml:space="preserve">
+    <value>Selecciona un estado editorial válido.</value>
+  </data>
+  <data name="BlogPostFieldRequired" xml:space="preserve">
+    <value>Este campo es obligatorio para este estado editorial.</value>
+  </data>
+  <data name="BlogPostFieldTooLong" xml:space="preserve">
+    <value>El valor supera la longitud máxima permitida.</value>
+  </data>
+  <data name="BlogPostSlugDuplicate" xml:space="preserve">
+    <value>Ya existe un artículo con ese slug en este idioma.</value>
+  </data>
+  <data name="BlogPostManageAction" xml:space="preserve">
+    <value>Gestionar artículos</value>
+  </data>
+  <data name="BlogImageRules" xml:space="preserve">
+    <value>JPG, JPEG, PNG, WebP y SVG. Máximo {0} MiB por archivo.</value>
+  </data>
+  <data name="BlogImageUpload" xml:space="preserve">
+    <value>Subir imágenes</value>
+  </data>
+  <data name="BlogImagesEmpty" xml:space="preserve">
+    <value>Este artículo aún no tiene imágenes.</value>
+  </data>
+  <data name="BlogImagePreviewAlt" xml:space="preserve">
+    <value>Vista previa de la imagen del artículo</value>
+  </data>
+  <data name="BlogImageFeatured" xml:space="preserve">
+    <value>Imagen destacada</value>
+  </data>
+  <data name="BlogImageSetFeatured" xml:space="preserve">
+    <value>Usar como imagen destacada</value>
+  </data>
+  <data name="BlogImageDeleteConfirmation" xml:space="preserve">
+    <value>¿Quieres eliminar esta imagen? No se podrá eliminar mientras esté insertada en una traducción.</value>
+  </data>
+  <data name="BlogImageInUse" xml:space="preserve">
+    <value>La imagen todavía está insertada en el contenido de una traducción. Retírala y guarda el artículo antes de eliminarla.</value>
+  </data>
+  <data name="BlogImageDeleted" xml:space="preserve">
+    <value>La imagen se ha eliminado.</value>
+  </data>
+  <data name="BlogImageUploaded" xml:space="preserve">
+    <value>La imagen se ha subido.</value>
+  </data>
+  <data name="BlogImageUploadFailed" xml:space="preserve">
+    <value>No se ha podido subir o modificar la imagen.</value>
+  </data>
+  <data name="BlogImageUnsupportedType" xml:space="preserve">
+    <value>El formato de imagen no está permitido.</value>
+  </data>
+  <data name="BlogImageTooLarge" xml:space="preserve">
+    <value>La imagen supera el tamaño máximo permitido.</value>
+  </data>
+  <data name="BlogImageInvalidContent" xml:space="preserve">
+    <value>El contenido del archivo no coincide con un formato de imagen válido.</value>
+  </data>
+  <data name="BlogImageSaveArticleFirst" xml:space="preserve">
+    <value>Guarda primero el artículo para poder subir imágenes.</value>
+  </data>
+  <data name="BlogImageFeaturedSet" xml:space="preserve">
+    <value>La imagen destacada se ha actualizado.</value>
+  </data>
+  <data name="BlogImageOperationFailed" xml:space="preserve">
+    <value>No se ha podido completar la operación de imagen.</value>
+  </data>
+  <data name="BlogPostNotFeatured" xml:space="preserve">
+    <value>Not featured</value>
+  </data>
+  <data name="AdminVisualIdentity" xml:space="preserve">
+    <value>Identidad visual</value>
+  </data>
+  <data name="AdminVisualIdentityDescription" xml:space="preserve">
+    <value>Configura la paleta corporativa y los recursos gráficos del portfolio.</value>
+  </data>
+  <data name="VisualIdentityManageAction" xml:space="preserve">
+    <value>Gestionar identidad visual</value>
+  </data>
+  <data name="VisualIdentityTitle" xml:space="preserve">
+    <value>Identidad visual</value>
+  </data>
+  <data name="VisualIdentityDescription" xml:space="preserve">
+    <value>Administra los colores de marca, el logo y sus variantes.</value>
+  </data>
+  <data name="VisualIdentityColorsHeading" xml:space="preserve">
+    <value>Colores corporativos</value>
+  </data>
+  <data name="VisualIdentityColorsDescription" xml:space="preserve">
+    <value>La paleta se comparte entre temas; los fondos, textos y colores funcionales conservan sus tokens específicos.</value>
+  </data>
+  <data name="VisualIdentityPrimary" xml:space="preserve">
+    <value>Principal</value>
+  </data>
+  <data name="VisualIdentitySecondary" xml:space="preserve">
+    <value>Secundario</value>
+  </data>
+  <data name="VisualIdentityAccent" xml:space="preserve">
+    <value>Acento</value>
+  </data>
+  <data name="VisualIdentityLinkLogoColors" xml:space="preserve">
+    <value>Vincular el degradado del logo a los colores principal y secundario</value>
+  </data>
+  <data name="VisualIdentityLogoStartColor" xml:space="preserve">
+    <value>Color inicial del logo</value>
+  </data>
+  <data name="VisualIdentityLogoEndColor" xml:space="preserve">
+    <value>Color final del logo</value>
+  </data>
+  <data name="VisualIdentityLogoNotRecolorable" xml:space="preserve">
+    <value>Este SVG se conserva como logo, pero su estructura no permite garantizar el recoloreado automático. Puedes cargar variantes manuales.</value>
+  </data>
+  <data name="VisualIdentitySaveColors" xml:space="preserve">
+    <value>Guardar colores</value>
+  </data>
+  <data name="VisualIdentityLogoHeading" xml:space="preserve">
+    <value>Logo y variantes</value>
+  </data>
+  <data name="VisualIdentityLogoDescription" xml:space="preserve">
+    <value>El logo principal se comparte en la web pública, administración y acceso de administrador.</value>
+  </data>
+  <data name="VisualIdentityMainLogo" xml:space="preserve">
+    <value>Logo principal</value>
+  </data>
+  <data name="VisualIdentityFooterLogo" xml:space="preserve">
+    <value>Logo blanco del footer</value>
+  </data>
+  <data name="VisualIdentityFooterVariantUnavailable" xml:space="preserve">
+    <value>No hay una variante blanca segura disponible. Sube una variante manual.</value>
+  </data>
+  <data name="VisualIdentityFavicon" xml:space="preserve">
+    <value>Favicon</value>
+  </data>
+  <data name="VisualIdentityVariantAutomatic" xml:space="preserve">
+    <value>Generada automáticamente</value>
+  </data>
+  <data name="VisualIdentityVariantManual" xml:space="preserve">
+    <value>Subida manualmente</value>
+  </data>
+  <data name="VisualIdentityVariantGeneric" xml:space="preserve">
+    <value>Favicon genérico de respaldo</value>
+  </data>
+  <data name="VisualIdentityVariantUnavailable" xml:space="preserve">
+    <value>No disponible</value>
+  </data>
+  <data name="VisualIdentityVariantNeedsReview" xml:space="preserve">
+    <value>El logo principal ha cambiado. Revisa esta variante manual.</value>
+  </data>
+  <data name="VisualIdentityUseGeneratedVariant" xml:space="preserve">
+    <value>Usar variante automática</value>
+  </data>
+  <data name="VisualIdentityUploadImmediate" xml:space="preserve">
+    <value>Las cargas de logo y variantes se aplican inmediatamente; los cambios de color requieren guardar.</value>
+  </data>
+  <data name="VisualIdentityRestoreLogo" xml:space="preserve">
+    <value>Restaurar logo predeterminado</value>
+  </data>
+  <data name="VisualIdentityPreviewHeading" xml:space="preserve">
+    <value>Vista previa antes de guardar</value>
+  </data>
+  <data name="VisualIdentityLightPreview" xml:space="preserve">
+    <value>Tema claro</value>
+  </data>
+  <data name="VisualIdentityDarkPreview" xml:space="preserve">
+    <value>Tema oscuro</value>
+  </data>
+  <data name="VisualIdentityRestoreDefaults" xml:space="preserve">
+    <value>Restaurar configuración predeterminada</value>
+  </data>
+  <data name="VisualIdentityRestoreConfirmation" xml:space="preserve">
+    <value>Se restaurarán los colores y el logo predeterminados y se eliminarán las variantes manuales. ¿Quieres continuar?</value>
+  </data>
+  <data name="VisualIdentitySaved" xml:space="preserve">
+    <value>Los colores de identidad visual se han guardado.</value>
+  </data>
+  <data name="VisualIdentityUnsavedChangesTitle" xml:space="preserve">
+    <value>Cambios sin guardar</value>
+  </data>
+  <data name="VisualIdentityUnsavedChangesConfirmation" xml:space="preserve">
+    <value>Los cambios de identidad visual se perderán si sales sin guardar. ¿Quieres salir sin guardar?</value>
+  </data>
+  <data name="VisualIdentitySaveFailed" xml:space="preserve">
+    <value>No se pudo guardar la configuración. Inténtalo de nuevo.</value>
+  </data>
+  <data name="VisualIdentityDefaultsRestored" xml:space="preserve">
+    <value>Se ha restaurado la configuración predeterminada.</value>
+  </data>
+  <data name="VisualIdentityFileTypeInvalid" xml:space="preserve">
+    <value>El formato del archivo no está admitido.</value>
+  </data>
+  <data name="VisualIdentityFileTooLarge" xml:space="preserve">
+    <value>El archivo supera el límite de 10 MiB.</value>
+  </data>
+  <data name="VisualIdentityFileInvalid" xml:space="preserve">
+    <value>El archivo no es válido o contiene contenido SVG no permitido.</value>
+  </data>
+  <data name="VisualIdentityUploadFailed" xml:space="preserve">
+    <value>No se pudo subir el archivo. Inténtalo de nuevo.</value>
+  </data>
+  <data name="VisualIdentityUploadSucceeded" xml:space="preserve">
+    <value>El recurso visual se ha actualizado.</value>
+  </data>
+  <data name="VisualIdentityColorInvalid" xml:space="preserve">
+    <value>Introduce un color hexadecimal válido con el formato #RRGGBB.</value>
+  </data>
+  <data name="VisualIdentityLinkedColorsCannotHaveOverrides" xml:space="preserve">
+    <value>Desvincula los colores del logo antes de establecer valores independientes.</value>
+  </data>
 </root>

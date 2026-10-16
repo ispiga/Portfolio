@@ -47,8 +47,13 @@
                 @foreach (var hobby in content.Hobbies)
                 {
                     <article class="surface about-hobby-card">
-                        <img src="@hobby.ImageUrl" alt="@hobby.Name" loading="lazy" />
-                        <div>
+                        <button type="button"
+                                class="about-hobby-card__image-button"
+                                aria-label="@Localizer["HobbyImageEnlarge", hobby.Name]"
+                                @onclick="() => OpenHobbyImage(hobby.ImageUrl, hobby.Name)">
+                            <img src="@hobby.ImageUrl" alt="" loading="lazy" />
+                        </button>
+                        <div class="about-hobby-card__content">
                             <h4>@hobby.Name</h4>
                             <p>@hobby.Description</p>
                         </div>
@@ -59,11 +64,64 @@
     }
     <ExperienceTimeline />
 </section>
+@if (expandedHobbyImageUrl is not null)
+{
+    <div class="hobby-image-lightbox"
+         role="dialog"
+         aria-modal="true"
+         aria-label="@Localizer["HobbyImagePreview", expandedHobbyName]"
+         tabindex="-1"
+         @onclick="CloseHobbyImage"
+         @onkeydown="HandleLightboxKeyDown">
+        <div class="hobby-image-lightbox__content" @onclick:stopPropagation="true">
+            <button @ref="lightboxCloseButton"
+                    type="button"
+                    class="hobby-image-lightbox__close"
+                    aria-label="@Localizer["Close"]"
+                    @onclick="CloseHobbyImage">×</button>
+            <img src="@expandedHobbyImageUrl" alt="@expandedHobbyName" />
+        </div>
+    </div>
+}
 
 @code {
     private AboutContentReadModel? content;
+    private string? expandedHobbyImageUrl;
+    private string? expandedHobbyName;
+    private ElementReference lightboxCloseButton;
+    private bool focusLightboxCloseButton;
 
     protected override async Task OnInitializedAsync() => content = await AboutQueryService.GetAsync();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (focusLightboxCloseButton)
+        {
+            focusLightboxCloseButton = false;
+            await lightboxCloseButton.FocusAsync();
+        }
+    }
+
+    private void OpenHobbyImage(string imageUrl, string name)
+    {
+        expandedHobbyImageUrl = imageUrl;
+        expandedHobbyName = name;
+        focusLightboxCloseButton = true;
+    }
+
+    private void CloseHobbyImage()
+    {
+        expandedHobbyImageUrl = null;
+        expandedHobbyName = null;
+    }
+
+    private void HandleLightboxKeyDown(KeyboardEventArgs args)
+    {
+        if (args.Key == "Escape")
+        {
+            CloseHobbyImage();
+        }
+    }
 
     private static string? GetGroupColorStyle(string? color) =>
         color is { Length: 7 } && color[0] == '#' && color.AsSpan(1).ToString().All(Uri.IsHexDigit)

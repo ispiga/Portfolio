@@ -353,7 +353,7 @@ html[data-theme="dark"] {
     column-count: 2;
     column-gap: 0.625rem;
 }
-.card-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 30rem), 1fr)); gap: 1rem; }
 .surface { color: var(--color-text); }
 .content-card, .area-card, .project-card, .certification-card, .timeline-empty, .contact-form { padding: clamp(1.25rem, 3vw, 2rem); }
 .content-card { display: flex; align-items: center; min-height: 100%; }
@@ -454,11 +454,17 @@ html[data-theme="dark"] {
 .about-content-empty { column-span: all; color: var(--color-text-secondary); }
 .about-hobbies { margin-top: 3rem; }
 .about-hobbies > h3 { margin-bottom: 1rem; font-size: clamp(1.4rem, 3vw, 2rem); }
-.about-hobbies-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: 1rem; }
-.about-hobby-card { display: grid; grid-template-columns: minmax(5rem, 0.35fr) minmax(0, 1fr); align-items: center; gap: 1rem; padding: 1rem; }
-.about-hobby-card img { width: 100%; aspect-ratio: 1; border-radius: var(--radius-small); object-fit: cover; }
+.about-hobbies-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 18rem)); align-items: start; gap: 1rem; }
+.about-hobby-card { overflow: hidden; }
+.about-hobby-card__image-button { display: block; width: 100%; padding: 0; border: 0; background: transparent; cursor: zoom-in; }
+.about-hobby-card img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+.about-hobby-card__content { padding: 1rem; }
 .about-hobby-card h4 { margin-bottom: 0.35rem; }
 .about-hobby-card p { margin-bottom: 0; white-space: pre-line; }
+.hobby-image-lightbox { position: fixed; z-index: 1200; inset: 0; display: grid; place-items: center; padding: 2rem; background-color: color-mix(in srgb, var(--color-background) 92%, transparent); backdrop-filter: blur(4px); }
+.hobby-image-lightbox__content { position: relative; max-width: 100%; }
+.hobby-image-lightbox img { display: block; max-width: calc(100vw - 4rem); max-height: 90vh; width: auto; height: auto; border-radius: var(--radius-small); object-fit: contain; }
+.hobby-image-lightbox__close { position: absolute; z-index: 1; inset-block-start: 0.75rem; inset-inline-end: 0.75rem; display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border: 1px solid var(--color-border); border-radius: 50%; background-color: var(--color-surface); color: var(--color-text); font: inherit; font-size: 1.5rem; cursor: pointer; }
 .home-content-editor-card { margin-top: 1rem; padding: clamp(1rem, 2.5vw, 1.5rem); border: 1px solid var(--color-border); border-radius: var(--radius-small); }
 .home-content-editor-card__heading, .admin-module-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
 .home-content-editor-card__heading { margin-bottom: 1rem; }
@@ -484,10 +490,10 @@ html[data-theme="dark"] {
 .experience-card__description-toggle { margin-top: 0.75rem; }
 .experience-card__date { display: flex; flex-wrap: wrap; align-content: start; gap: 0.35rem; color: var(--color-text-secondary); font-size: var(--text-small); font-weight: 700; }
 .experience-card__company { margin-bottom: 0.75rem !important; color: var(--color-primary); font-weight: 700; }
-.project-card { overflow: hidden; padding: 0; }
+.project-card { display: grid; grid-template-columns: min(9rem, 30%) minmax(0, 1fr); min-width: 0; align-items: center; gap: clamp(0.75rem, 2vw, 1.25rem); overflow: hidden; padding: 1rem; }
 .project-card--featured { border: 2px solid var(--color-primary); }
-.project-card__visual { display: grid; place-items: center; min-height: 10rem; background-color: var(--color-background); color: var(--color-primary); font-family: var(--font-mono); }
-.project-card__image { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background-color: var(--color-background); }
+.project-card__visual { display: grid; place-items: center; width: 100%; aspect-ratio: 1; background-color: var(--color-background); color: var(--color-primary); font-family: var(--font-mono); }
+.project-card__image { display: block; width: 100%; aspect-ratio: 1; border-radius: var(--radius-small); object-fit: cover; background-color: var(--color-background); }
 .blog-home__posts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: 1rem; }
 .blog-home__all { margin-top: 1rem; }
 .blog-home__empty, .blog-archive__empty { padding: clamp(1.25rem, 3vw, 2rem); border: 1px solid var(--color-border); border-radius: var(--radius-medium); }
@@ -517,7 +523,7 @@ html[data-theme="dark"] {
 .blog-post-detail__content pre, .blog-post-detail__content table { display: block; max-width: 100%; overflow-x: auto; }
 .blog-post-detail__content blockquote { margin-inline: 0; padding-inline-start: 1rem; border-inline-start: 0.25rem solid var(--color-border); color: var(--color-text-secondary); }
 .blog-post-detail__back { margin-top: 2rem; }
-.project-card__content { padding: clamp(1.25rem, 3vw, 2rem); }
+.project-card__content { min-width: 0; }
 .project-card__featured { margin-bottom: 0.75rem; color: var(--color-primary); font-size: var(--text-small); font-weight: 700; text-transform: uppercase; }
 .project-card--featured .project-card__featured { display: inline-flex; padding: 0.25rem 0.6rem; border-radius: 999px; background-color: var(--color-primary); color: var(--color-background); }
 .project-card__description-toggle { min-height: 2.875rem; margin-top: 0.75rem; padding: 0.5rem 0.75rem; border: 1px solid var(--color-border); border-radius: var(--radius-small); background-color: var(--color-surface); color: var(--color-primary); font: inherit; font-weight: 700; cursor: pointer; }
@@ -618,11 +624,12 @@ html[data-theme="dark"] {
     .technology-orbit__core { width: clamp(7rem, 36%, 8.5rem); }
     .technology-orbit__item-counter { width: 2.75rem; height: 2.75rem; }
     .technology-orbit__item-image { width: 1.75rem; height: 1.75rem; }
-    .about-hobby-card { grid-template-columns: 5rem minmax(0, 1fr); }
     .admin-module-heading, .home-content-editor-card__heading { align-items: flex-start; flex-wrap: wrap; }
     .section-heading--split { display: block; }
     .section-heading--split > p { margin-top: 1rem; }
     .experience-card { grid-template-columns: 1fr; gap: 0.75rem; }
+    .project-card { grid-template-columns: 5rem minmax(0, 1fr); gap: 0.75rem; padding: 0.75rem; }
+    .project-card__links { gap: 0.5rem; margin-top: 1rem; }
     .blog-post-summary--archive { grid-template-columns: minmax(0, 1fr); }
     .blog-post-summary--archive .blog-post-summary__image,
     .blog-post-summary--archive .blog-post-summary__visual { max-height: 15rem; }
