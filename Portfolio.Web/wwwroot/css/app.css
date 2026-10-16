@@ -210,7 +210,7 @@ html[data-theme="dark"] {
     aspect-ratio: 1.42;
     margin-inline: auto;
     perspective: 180rem;
-    transform-style: flat;
+    transform-style: preserve-3d;
 }
 
 .technology-orbit__plane,
@@ -223,7 +223,6 @@ html[data-theme="dark"] {
 }
 
 .technology-orbit__plane {
-    z-index: 1;
     transform: rotateY(var(--orbit-tilt-y)) rotateX(var(--orbit-tilt-x));
     transform-style: preserve-3d;
 }
@@ -240,13 +239,14 @@ html[data-theme="dark"] {
 .technology-orbit__orbit-layer {
     position: absolute;
     inset: 0;
-    z-index: 1;
     transform-style: preserve-3d;
 }
 
 .technology-orbit__track {
+    fill: none;
     stroke: color-mix(in srgb, var(--color-primary) 42%, var(--color-border));
-    stroke-width: 1px;
+    stroke-width: 0.5px;
+    stroke-linecap: butt;
 }
 
 .technology-orbit__track--orbit-1,
@@ -271,7 +271,6 @@ html[data-theme="dark"] {
     font-family: var(--font-mono);
     font-size: 1.25rem;
     font-weight: 700;
-    z-index: 2;
 }
 
 .technology-orbit__core img {

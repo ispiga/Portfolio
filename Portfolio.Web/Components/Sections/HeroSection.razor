@@ -9,15 +9,30 @@
         <p class="home-hero__eyebrow">@Localizer["HeroEyebrow"]</p>
         <h1 id="hero-title">@(hero?.Headline ?? Localizer["HeroTitle"].Value)</h1>
         <p class="home-hero__description">@(hero?.Description ?? Localizer["HeroDescription"].Value)</p>
-        <a class="button button--primary" href="#contact">@Localizer["HeroCta"]</a> 
+        <a class="button button--primary" href="#contact">@Localizer["HeroCta"]</a>
     </div>
     @if (hero is { Logos.Count: > 0 } || !string.IsNullOrWhiteSpace(hero?.ProfileImageUrl))
     {
         <div class="technology-orbit" aria-label="@Localizer["TechnologyVisualLabel"]">
             <svg class="technology-orbit__tracks" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-                <ellipse class="technology-orbit__track technology-orbit__track--orbit-1" cx="50" cy="50" rx="25.2" ry="21.4" fill="none" stroke-width="0.8" stroke-linecap="round" />
-                <ellipse class="technology-orbit__track technology-orbit__track--orbit-2" cx="50" cy="50" rx="35.6" ry="30.2" fill="none" stroke-width="0.8" stroke-linecap="round" />
-                <ellipse class="technology-orbit__track technology-orbit__track--orbit-3" cx="50" cy="50" rx="46" ry="39" fill="none" stroke-width="0.8" stroke-linecap="round"  />
+                <path class="technology-orbit__track technology-orbit__track--orbit-1" d="M 31.932284 64.917964 A 25.2 21.4 0 0 1 68.067716 35.082036" />
+                <path class="technology-orbit__track technology-orbit__track--orbit-2" d="M 24.488802 71.063821 A 35.6 30.2 0 0 1 75.511198 28.936179" />
+                <path class="technology-orbit__track technology-orbit__track--orbit-3" d="M 17.045332 77.209668 A 46 39 0 0 1 82.954668 22.790332" />
+            </svg>
+            <div class="technology-orbit__core">
+                @if (!string.IsNullOrWhiteSpace(hero.ProfileImageUrl))
+                {
+                    <img src="@hero.ProfileImageUrl" alt="@hero.ProfileImageAlternativeText" />
+                }   
+                else
+                {
+                    <span aria-hidden="true">@Localizer["TechnologyCore"]</span>
+                }
+            </div>
+            <svg class="technology-orbit__tracks technology-orbit__tracks--front" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+                <path class="technology-orbit__track technology-orbit__track--orbit-1" d="M 68.067716 35.082036 A 25.2 21.4 0 0 1 31.932284 64.917964" />
+                <path class="technology-orbit__track technology-orbit__track--orbit-2" d="M 75.511198 28.936179 A 35.6 30.2 0 0 1 24.488802 71.063821" />
+                <path class="technology-orbit__track technology-orbit__track--orbit-3" d="M 82.954668 22.790332 A 46 39 0 0 1 17.045332 77.209668" />
             </svg>
             <div class="technology-orbit__plane">
                 @foreach (var orbit in hero.Logos.GroupBy(logo => ((logo.Orbit - 1) % 3) + 1).OrderBy(group => group.Key))
@@ -38,16 +53,6 @@
                             </span>
                         }
                     </div>
-                }
-            </div>
-            <div class="technology-orbit__core">
-                @if (!string.IsNullOrWhiteSpace(hero.ProfileImageUrl))
-                {
-                    <img src="@hero.ProfileImageUrl" alt="@hero.ProfileImageAlternativeText" />
-                }
-                else
-                {
-                    <span aria-hidden="true">@Localizer["TechnologyCore"]</span>
                 }
             </div>
         </div>
