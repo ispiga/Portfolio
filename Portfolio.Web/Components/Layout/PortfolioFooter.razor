@@ -3,8 +3,10 @@
 
 <footer class="portfolio-footer">
     <div class="portfolio-shell portfolio-footer__content">
-        <PortfolioBrandImage Kind="Portfolio.Application.VisualIdentity.VisualIdentityAssetKind.FooterLogo" Class="portfolio-logo__mark portfolio-footer__logo" AlternativeText="@Localizer["PortfolioName"]" />
-        <p class="portfolio-footer__identity">@Localizer["PortfolioName"]</p>
+        <div class="portfolio-footer__brand">
+            <PortfolioBrandImage Kind="Portfolio.Application.VisualIdentity.VisualIdentityAssetKind.FooterLogo" Class="portfolio-logo__mark portfolio-footer__logo" AlternativeText="@Localizer["PortfolioName"]" />
+            <span class="portfolio-logo__name portfolio-footer__name">ISMAELPI</span>
+        </div>
         <p>@string.Format(Localizer["Copyright"].Value, DateTime.Now.Year)</p>
     </div>
 </footer>

@@ -611,7 +611,17 @@ En móvil se utilizará una navegación adaptada, previsiblemente mediante menú
 
 ### Implementación de la Fase 3
 
-`MainLayout.razor` usa `header`, `main`, `footer` y `@Body`; `NavMenu.razor` implementa la navbar y el espacio provisional `[ LOGO ]`; `PortfolioFooter.razor` muestra identidad, año y derechos reservados; y `ThemeSelector.razor` se integra en la navbar. Los enlaces apuntan provisionalmente a anchors de la Home. En escritorio se muestran horizontalmente y el selector de tema se alinea a la derecha. En móvil, por debajo de `48rem`, el botón usa `aria-expanded`, el panel permanece oculto hasta abrirlo y se cierra al seleccionar un enlace.
+`MainLayout.razor` usa `header`, `main`, `footer` y `@Body`; `NavMenu.razor` implementa la navbar con `PortfolioBrandImage` y la marca `ISMAELPI`; `PortfolioFooter.razor` muestra identidad, año y derechos reservados; y `ThemeSelector.razor` se integra en la navbar. Los enlaces apuntan provisionalmente a anchors de la Home. En escritorio se muestran horizontalmente y el selector de tema se alinea a la derecha. En móvil, por debajo de `48rem`, el botón usa `aria-expanded`, el panel permanece oculto hasta abrirlo y se cierra al seleccionar un enlace.
+
+### Navbar sticky y translúcida del Home
+
+La navbar pública también aparece en páginas del Blog, por lo que el sticky y el efecto de scroll son opt-in para la Home: el `header` exterior de `MainLayout.razor` usa `position: sticky` únicamente cuando el layout contiene `.home-hero`. El fondo debe aplicarse a ese `header`, que ocupa toda la superficie sticky; el fondo del `nav` interior es transparente solo en Home para permitir que se vea el estado del contenedor. En el resto de páginas se conserva el fondo opaco normal del `nav`.
+
+`home-navbar-scroll.js` añade la clase `is-scrolled` cuando `window.scrollY > 20` y la retira al volver a `20px` o menos. Mantiene un único listener `scroll` pasivo, lo activa solo en Home, sincroniza la ruta mediante `Navigation.LocationChanged` y lo elimina al salir de Home o disponer el layout. La integración Blazor usa `IAsyncDisposable` y limpia también la referencia del módulo JS.
+
+En `app.css`, el estado base utiliza `--color-surface`; `is-scrolled` compone ese mismo token al 85 % con transparencia y aplica `backdrop-filter: blur(4px)`, sin reducir la opacidad del contenido del navbar. El panel móvil abierto (`.is-open`) fuerza el fondo opaco del `header` y del `nav`. Las transiciones respetan la regla común `prefers-reduced-motion`. Las anclas de las secciones Home conservan `scroll-margin-top: 5rem`, que debe revisarse si cambia la altura real del header.
+
+Para aplicar el patrón a otras barras de navegación, habilitarlo explícitamente en su layout/ruta y sobre su contenedor exterior; no ampliar el selector Home ni afectar por defecto a la navbar compartida del Blog, administración u otras pantallas. Reutilizar o adaptar el módulo solo si encajan el ciclo de vida y el estado de esa pantalla; debe mantenerse una única suscripción activa, desactivarse al abandonar el ámbito y limpiarse al disponer el componente. Conservar la superficie semántica del tema, el fondo opaco del menú expandido, el contraste de los controles y el ajuste de anclas correspondiente. No usar JavaScript para sustituir la navegación de Blazor.
 
 ---
 
@@ -756,6 +766,12 @@ La información más extensa estará en "Sobre mí".
 El elemento visual del Hero será una composición de **logos tecnológicos orbitando alrededor de un centro**, como evolución del recurso estático provisional actual. El conjunto de logos, su orden y la órbita asignada se gestionarán desde administración; el frontend distribuirá los elementos de manera equilibrada en cada órbita.
 
 La animación se implementará con HTML/CSS y componentes Blazor, no mediante un GIF pesado. Será sutil, responsive y compatible con tema claro/oscuro; deberá respetar `prefers-reduced-motion` y mantener una presentación legible cuando el movimiento esté reducido o desactivado. El diseño no debe saturar el Hero.
+
+### Implementación actual de Technology Orbit
+
+El Hero conserva dos capas SVG con tres arcos complementarios cada una: la capa trasera se renderiza antes de la fotografía central y la delantera después. Los logos mantienen su movimiento mediante `offset-path` y la profundidad actual respecto a la fotografía mediante las transformaciones 3D. El estilo común de los trazados se centraliza en `.technology-orbit__track` de `wwwroot/css/app.css`: `fill: none`, color basado en los tokens semánticos, grosor efectivo `0.5px` y `stroke-linecap: butt`; el anillo central mantiene sus ajustes propios de color y opacidad.
+
+La composición actual se considera definitiva y se acepta que, en algunas posiciones, una línea orbital pueda verse sobre una insignia. No se considera una corrección pendiente: no se deben introducir más cambios de apilamiento ni máscaras dinámicas para eliminar ese efecto salvo petición expresa, y se debe conservar el movimiento y la profundidad actuales de los logos respecto a la fotografía.
 
 El titular del Hero será contenido localizado y editable desde administración. El texto del Hero se conservará breve —aproximadamente una frase/titular y 2-3 líneas como máximo— y no se convertirá en una biografía. Los elementos de interfaz, como el texto del CTA, seguirán los recursos compartidos de localización.
 

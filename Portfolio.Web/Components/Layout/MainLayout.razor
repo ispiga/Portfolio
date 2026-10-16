@@ -1,5 +1,5 @@
 @inherits LayoutComponentBase
-@implements IDisposable
+@implements IAsyncDisposable
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.Extensions.Localization
@@ -8,9 +8,10 @@
 @inject AdminSessionExpirationState ExpirationState
 @inject IStringLocalizer<SharedResource> Localizer
 @inject NavigationManager Navigation
+@inject IJSRuntime JS
 
 <div class="site-layout">
-    <header>
+    <header @ref="navbarHeader">
         <NavMenu />
     </header>
     <main class="site-main" id="main-content" tabindex="-1">
@@ -31,6 +32,9 @@
 }
 
 @code {
+    private ElementReference navbarHeader;
+    private IJSObjectReference? navbarScrollModule;
+    private bool? isNavbarHome;
     private bool showExpirationDialog;
 
     protected override async Task OnInitializedAsync()
@@ -60,20 +64,49 @@
 
     private bool IsHome => string.IsNullOrEmpty(Navigation.ToBaseRelativePath(Navigation.Uri).Split('#', 2)[0]);
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            navbarScrollModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/home-navbar-scroll.js");
+        }
+
+        if (navbarScrollModule is not null && isNavbarHome != IsHome)
+        {
+            await navbarScrollModule.InvokeVoidAsync("setHomeScrollTracking", navbarHeader, IsHome);
+            isNavbarHome = IsHome;
+        }
+    }
+
     private void OnLocationChanged(object? sender, LocationChangedEventArgs args)
     {
         if (IsHome && ExpirationState.IsExpired)
         {
             showExpirationDialog = true;
-            _ = InvokeAsync(StateHasChanged);
         }
+
+        _ = InvokeAsync(StateHasChanged);
     }
 
     private void DismissExpiration() => showExpirationDialog = false;
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
         ExpirationState.Expired -= OnSessionExpired;
         Navigation.LocationChanged -= OnLocationChanged;
+
+        if (navbarScrollModule is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await navbarScrollModule.InvokeVoidAsync("dispose", navbarHeader);
+            await navbarScrollModule.DisposeAsync();
+        }
+        catch (JSDisconnectedException)
+        {
+        }
     }
 }

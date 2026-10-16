@@ -131,7 +131,7 @@ html[data-theme="dark"] {
 
 .home-section {
     padding-block: clamp(3.5rem, 8vw, 7rem);
-    scroll-margin-top: 1.5rem;
+    scroll-margin-top: 5rem;
 }
 
 .home-hero {
@@ -736,6 +736,32 @@ p {
 
 .site-layout:has(.home-hero) { --home-page-inset: clamp(1rem, 4vw, 4rem); }
 
+.site-layout:has(.home-hero) > header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: var(--color-surface);
+    transition: background-color var(--transition-standard), backdrop-filter var(--transition-standard);
+}
+
+.site-layout:has(.home-hero) > header .portfolio-navbar {
+    background-color: transparent;
+}
+
+.site-layout:has(.home-hero) > header.is-scrolled {
+    background-color: color-mix(in srgb, var(--color-surface) 85%, transparent);
+    backdrop-filter: blur(4px);
+}
+
+.site-layout:has(.home-hero) > header:has(.portfolio-navbar__panel.is-open) {
+    background-color: var(--color-surface);
+    backdrop-filter: none;
+}
+
+.site-layout:has(.home-hero) > header:has(.portfolio-navbar__panel.is-open) .portfolio-navbar {
+    background-color: var(--color-surface);
+}
+
 @media (min-width: 1280px) {
     .site-layout:has(.home-hero) { --home-page-inset: clamp(4.8rem, 6vw, 7.5rem); }
 }
@@ -792,6 +818,16 @@ p {
 .portfolio-footer__logo {
     height: 2rem;
     max-width: 8rem;
+}
+
+.portfolio-footer__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+}
+
+.portfolio-footer__name {
+    color: var(--color-footer-text);
 }
 
 .portfolio-menu-toggle {
@@ -1003,11 +1039,6 @@ p {
 
 .portfolio-footer__content p {
     margin: 0;
-}
-
-.portfolio-footer__identity {
-    color: var(--color-footer-text) !important;
-    font-weight: 700;
 }
 
 .visual-identity-editor { display: grid; gap: 1rem; width: min(100%, 80rem); min-width: 0; padding-inline: clamp(0.75rem, 2vw, 1.5rem); }
