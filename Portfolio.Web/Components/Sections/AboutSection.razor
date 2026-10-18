@@ -1,9 +1,11 @@
 @using Microsoft.Extensions.Localization
 @using Portfolio.Application.HomeContent
+@implements IAsyncDisposable
 @inject IStringLocalizer<SharedResource> Localizer
 @inject IAboutQueryService AboutQueryService
+@inject IJSRuntime JS
 
-<section id="about" class="home-section" aria-labelledby="about-title">
+<section @ref="aboutElement" id="about" class="home-section" aria-labelledby="about-title">
     <div class="section-heading">
         <p class="eyebrow">@Localizer["AboutEyebrow"]</p>
         <h2 id="about-title">@Localizer["AboutTitle"]</h2>
@@ -47,7 +49,7 @@
             <div class="about-hobbies-grid">
                 @foreach (var hobby in content.Hobbies)
                 {
-                    <article class="surface about-hobby-card">
+                    <article @key="hobby.Id" class="surface about-hobby-card">
                         <button type="button"
                                 class="about-hobby-card__image-button"
                                 aria-label="@Localizer["HobbyImageEnlarge", hobby.Name]"
@@ -56,7 +58,19 @@
                         </button>
                         <div class="about-hobby-card__content">
                             <h4>@hobby.Name</h4>
-                            <p>@hobby.Description</p>
+                            <p id="hobby-description-@hobby.Id"
+                               data-hobby-id="@hobby.Id"
+                               class="about-hobby-card__description @(expandedHobbyDescriptions.Contains(hobby.Id) ? "is-expanded" : string.Empty)">@hobby.Description</p>
+                            @if (truncatedHobbyDescriptions.Contains(hobby.Id))
+                            {
+                                <button class="button button--secondary about-hobby-card__description-toggle"
+                                        type="button"
+                                        aria-expanded="@expandedHobbyDescriptions.Contains(hobby.Id)"
+                                        aria-controls="hobby-description-@hobby.Id"
+                                        @onclick="() => ToggleHobbyDescription(hobby.Id)">
+                                    @Localizer[expandedHobbyDescriptions.Contains(hobby.Id) ? "HobbyDescriptionCollapse" : "HobbyDescriptionExpand"]
+                                </button>
+                            }
                         </div>
                     </article>
                 }
@@ -90,7 +104,13 @@
     private string? expandedHobbyImageUrl;
     private string? expandedHobbyName;
     private ElementReference lightboxCloseButton;
+    private ElementReference aboutElement;
+    private IJSObjectReference? hobbyDescriptionModule;
+    private DotNetObjectReference<AboutSection>? objectReference;
+    private readonly HashSet<Guid> expandedHobbyDescriptions = [];
+    private readonly HashSet<Guid> truncatedHobbyDescriptions = [];
     private bool focusLightboxCloseButton;
+    private bool disposed;
 
     protected override async Task OnInitializedAsync() => content = await AboutQueryService.GetAsync();
 
@@ -100,6 +120,72 @@
         {
             focusLightboxCloseButton = false;
             await lightboxCloseButton.FocusAsync();
+        }
+
+        if (!firstRender)
+        {
+            return;
+        }
+
+        try
+        {
+            hobbyDescriptionModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/about-hobby-descriptions.js");
+            objectReference = DotNetObjectReference.Create(this);
+            await hobbyDescriptionModule.InvokeVoidAsync("observeDescriptions", aboutElement, objectReference);
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+    }
+
+    private void ToggleHobbyDescription(Guid hobbyId)
+    {
+        if (!expandedHobbyDescriptions.Add(hobbyId))
+        {
+            expandedHobbyDescriptions.Remove(hobbyId);
+        }
+    }
+
+    [JSInvokable]
+    public Task UpdateTruncatedHobbyDescriptions(string[] hobbyIds)
+    {
+        if (disposed)
+        {
+            return Task.CompletedTask;
+        }
+
+        var updatedIds = hobbyIds
+            .Select(id => Guid.TryParse(id, out var hobbyId) ? hobbyId : Guid.Empty)
+            .Where(id => id != Guid.Empty)
+            .ToHashSet();
+
+        if (truncatedHobbyDescriptions.SetEquals(updatedIds))
+        {
+            return Task.CompletedTask;
+        }
+
+        truncatedHobbyDescriptions.Clear();
+        truncatedHobbyDescriptions.UnionWith(updatedIds);
+        return InvokeAsync(StateHasChanged);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        disposed = true;
+        objectReference?.Dispose();
+
+        if (hobbyDescriptionModule is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await hobbyDescriptionModule.InvokeVoidAsync("stopObservingDescriptions", aboutElement);
+            await hobbyDescriptionModule.DisposeAsync();
+        }
+        catch (JSDisconnectedException)
+        {
         }
     }
 

@@ -168,6 +168,12 @@
   <data name="HobbyImagePreview" xml:space="preserve">
     <value>Vista ampliada de la imagen de la afición: {0}</value>
   </data>
+  <data name="HobbyDescriptionExpand" xml:space="preserve">
+    <value>Ver más</value>
+  </data>
+  <data name="HobbyDescriptionCollapse" xml:space="preserve">
+    <value>Ver menos</value>
+  </data>
   <data name="AboutGroupBackgroundColor" xml:space="preserve">
     <value>Color de fondo</value>
   </data>
