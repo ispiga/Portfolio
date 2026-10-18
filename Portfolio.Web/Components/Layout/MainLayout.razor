@@ -34,7 +34,6 @@
 @code {
     private ElementReference navbarHeader;
     private IJSObjectReference? navbarScrollModule;
-    private bool? isNavbarHome;
     private bool showExpirationDialog;
 
     protected override async Task OnInitializedAsync()
@@ -66,16 +65,13 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (!firstRender)
         {
-            navbarScrollModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/home-navbar-scroll.js");
+            return;
         }
 
-        if (navbarScrollModule is not null && isNavbarHome != IsHome)
-        {
-            await navbarScrollModule.InvokeVoidAsync("setHomeScrollTracking", navbarHeader, IsHome);
-            isNavbarHome = IsHome;
-        }
+        navbarScrollModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/home-navbar-scroll.js");
+        await navbarScrollModule.InvokeVoidAsync("setNavbarScrollTracking", navbarHeader, true);
     }
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs args)

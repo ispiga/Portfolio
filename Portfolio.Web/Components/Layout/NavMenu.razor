@@ -2,10 +2,12 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Routing
 @using Portfolio.Infrastructure.Identity
+@implements IAsyncDisposable
 @inject IStringLocalizer<SharedResource> Localizer
 @inject NavigationManager Navigation
+@inject IJSRuntime JS
 
-<nav class="portfolio-navbar" aria-label="@Localizer["MainNavigation"]">
+<nav class="portfolio-navbar @(isMenuOpen ? "is-menu-open" : string.Empty)" aria-label="@Localizer["MainNavigation"]">
     <div class="portfolio-shell portfolio-navbar__content">
         <NavLink class="portfolio-logo" href="/" Match="NavLinkMatch.All" @onclick="GoHome" data-unsaved-navigation>
             <PortfolioBrandImage AlternativeText="@Localizer["PortfolioName"]" />
@@ -22,7 +24,7 @@
                 <li><a class="@(IsCurrent("about") ? "is-active" : string.Empty)" href="/#about" @onclick="SelectAbout" @onclick:preventDefault="true" data-unsaved-navigation>@Localizer["About"]</a></li>
                 <li><a class="@(IsCurrent("projects") ? "is-active" : string.Empty)" href="/#projects" @onclick="SelectProjects" @onclick:preventDefault="true" data-unsaved-navigation>@Localizer["Projects"]</a></li>
                 <li><a class="@(IsCurrent("certificates") ? "is-active" : string.Empty)" href="/#certificates" @onclick="SelectCertificates" @onclick:preventDefault="true" data-unsaved-navigation>@Localizer["Certificates"]</a></li>
-                <li><a class="@(IsCurrent("blog") ? "is-active" : string.Empty)" href="/#blog" @onclick="SelectBlog" @onclick:preventDefault="true" data-unsaved-navigation>@Localizer["Blog"]</a></li>
+                <li><a class="@(IsCurrent("blog") ? "is-active" : string.Empty)" href="@BlogHref" @onclick="SelectBlog" @onclick:preventDefault="true" data-unsaved-navigation>@Localizer["Blog"]</a></li>
                 <li><a class="@(IsCurrent("contact") ? "is-active" : string.Empty)" href="/#contact" @onclick="SelectContact" @onclick:preventDefault="true" data-unsaved-navigation>@Localizer["Contact"]</a></li>
                 <AuthorizeView Policy="@PortfolioAuthorization.AdministratorPolicy">
                     <Authorized>
@@ -55,6 +57,41 @@
 @code {
     private bool isMenuOpen;
     private string? activeSection;
+    private IJSObjectReference? scrollModule;
+    private string? pendingSectionId;
+    private bool pendingScrollToTop;
+
+    protected override void OnInitialized() => Navigation.LocationChanged += OnLocationChanged;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                scrollModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/home-navbar-scroll.js");
+            }
+
+            if (scrollModule is null)
+            {
+                return;
+            }
+
+            if (pendingSectionId is { } sectionId)
+            {
+                pendingSectionId = null;
+                await scrollModule.InvokeVoidAsync("scrollToSection", sectionId);
+            }
+            else if (pendingScrollToTop)
+            {
+                pendingScrollToTop = false;
+                await scrollModule.InvokeVoidAsync("scrollToTop");
+            }
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+    }
 
     private void ToggleMenu() => isMenuOpen = !isMenuOpen;
 
@@ -72,7 +109,26 @@
 
     private void SelectCertificates() => SelectSection("certificates");
 
-    private void SelectBlog() => SelectSection("blog");
+    private void SelectBlog()
+    {
+        activeSection = "blog";
+        CloseMenu();
+
+        if (IsBlogDetail)
+        {
+            pendingScrollToTop = true;
+            Navigation.NavigateTo("/blog");
+        }
+        else if (IsBlogArchive)
+        {
+            pendingScrollToTop = true;
+        }
+        else
+        {
+            pendingSectionId = "blog";
+            Navigation.NavigateTo("/#blog");
+        }
+    }
 
     private void SelectContact() => SelectSection("contact");
 
@@ -83,6 +139,16 @@
         Navigation.NavigateTo($"/#{section}");
     }
 
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs args)
+    {
+        _ = InvokeAsync(() =>
+        {
+            activeSection = null;
+            CloseMenu();
+            StateHasChanged();
+        });
+    }
+
     private bool IsCurrent(string section)
     {
         if (activeSection is not null)
@@ -91,7 +157,43 @@
         }
 
         var relativeUri = Navigation.ToBaseRelativePath(Navigation.Uri);
+        var path = relativeUri.Split('#', 2)[0].Split('?', 2)[0].Trim('/');
+        if (section == "blog" &&
+            (string.Equals(path, "blog", StringComparison.OrdinalIgnoreCase) || path.StartsWith("blog/", StringComparison.OrdinalIgnoreCase)))
+        {
+            return true;
+        }
+
         var fragment = relativeUri.Split('#', 2).ElementAtOrDefault(1);
         return string.Equals(fragment, section, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private string CurrentPath => Navigation.ToBaseRelativePath(Navigation.Uri)
+        .Split('#', 2)[0]
+        .Split('?', 2)[0]
+        .Trim('/');
+
+    private bool IsBlogArchive => string.Equals(CurrentPath, "blog", StringComparison.OrdinalIgnoreCase);
+
+    private bool IsBlogDetail => CurrentPath.StartsWith("blog/", StringComparison.OrdinalIgnoreCase);
+
+    private string BlogHref => IsBlogArchive || IsBlogDetail ? "/blog" : "/#blog";
+
+    public async ValueTask DisposeAsync()
+    {
+        Navigation.LocationChanged -= OnLocationChanged;
+
+        if (scrollModule is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await scrollModule.DisposeAsync();
+        }
+        catch (JSDisconnectedException)
+        {
+        }
     }
 }

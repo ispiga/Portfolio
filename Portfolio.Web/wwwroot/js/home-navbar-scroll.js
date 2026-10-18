@@ -1,6 +1,6 @@
 const headerStates = new WeakMap();
 
-export function setHomeScrollTracking(header, isHome) {
+export function setNavbarScrollTracking(header, isEnabled) {
     if (!header) {
         return;
     }
@@ -19,11 +19,11 @@ export function setHomeScrollTracking(header, isHome) {
         headerStates.set(header, state);
     }
 
-    if (isHome && !state.isActive) {
+    if (isEnabled && !state.isActive) {
         window.addEventListener("scroll", state.update, { passive: true });
         state.isActive = true;
         state.update();
-    } else if (!isHome && state.isActive) {
+    } else if (!isEnabled && state.isActive) {
         window.removeEventListener("scroll", state.update);
         state.isActive = false;
         header.classList.remove("is-scrolled");
@@ -38,4 +38,25 @@ export function dispose(header) {
 
     header?.classList.remove("is-scrolled");
     headerStates.delete(header);
+}
+
+export function scrollToSection(id) {
+    let attempts = 0;
+    const scrollWhenAvailable = () => {
+        const target = document.getElementById(id);
+        if (target) {
+            target.scrollIntoView({ behavior: "auto", block: "start" });
+            return;
+        }
+
+        if (++attempts < 120) {
+            requestAnimationFrame(scrollWhenAvailable);
+        }
+    };
+
+    requestAnimationFrame(scrollWhenAvailable);
+}
+
+export function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: "auto" });
 }

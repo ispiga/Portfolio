@@ -757,13 +757,12 @@ p {
     padding-block: clamp(2rem, 6vw, 5rem);
 }
 
-.site-main:has(.certification-archive) {
-    width: min(calc(100% - (var(--space-page) * 2)), 120rem);
-}
+.site-layout:has(.home-hero),
+.site-layout:has(.certification-archive),
+.site-layout:has(.blog-archive),
+.site-layout:has(.blog-post-detail) { --home-page-inset: clamp(1rem, 4vw, 4rem); }
 
-.site-layout:has(.home-hero) { --home-page-inset: clamp(1rem, 4vw, 4rem); }
-
-.site-layout:has(.home-hero) > header {
+.site-layout > header {
     position: sticky;
     top: 0;
     z-index: 10;
@@ -771,33 +770,37 @@ p {
     transition: background-color var(--transition-standard), backdrop-filter var(--transition-standard);
 }
 
-.site-layout:has(.home-hero) > header .portfolio-navbar {
+.site-layout > header .portfolio-navbar {
     background-color: transparent;
 }
 
-.site-layout:has(.home-hero) > header.is-scrolled {
+.site-layout > header.is-scrolled {
     background-color: color-mix(in srgb, var(--color-surface) 85%, transparent);
     backdrop-filter: blur(4px);
 }
 
-.site-layout:has(.home-hero) > header:has(.portfolio-navbar__panel.is-open) {
-    background-color: var(--color-surface);
-    backdrop-filter: none;
-}
-
-.site-layout:has(.home-hero) > header:has(.portfolio-navbar__panel.is-open) .portfolio-navbar {
+.site-layout > header .portfolio-navbar.is-menu-open {
     background-color: var(--color-surface);
 }
 
 @media (min-width: 1280px) {
-    .site-layout:has(.home-hero) { --home-page-inset: clamp(4.8rem, 6vw, 7.5rem); }
+    .site-layout:has(.home-hero),
+    .site-layout:has(.certification-archive),
+    .site-layout:has(.blog-archive),
+    .site-layout:has(.blog-post-detail) { --home-page-inset: clamp(4.8rem, 6vw, 7.5rem); }
 }
 
-.site-main:has(.home-hero) {
+.site-main:has(.home-hero),
+.site-main:has(.certification-archive),
+.site-main:has(.blog-archive),
+.site-main:has(.blog-post-detail) {
     width: min(calc(100% - var(--home-page-inset) - var(--home-page-inset)), 120rem);
 }
 
-.site-layout:has(.home-hero) .portfolio-navbar__content {
+.site-layout:has(.home-hero) .portfolio-navbar__content,
+.site-layout:has(.certification-archive) .portfolio-navbar__content,
+.site-layout:has(.blog-archive) .portfolio-navbar__content,
+.site-layout:has(.blog-post-detail) .portfolio-navbar__content {
     width: min(calc(100% - var(--home-page-inset) - var(--home-page-inset)), 120rem);
 }
 
