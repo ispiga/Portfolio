@@ -273,6 +273,24 @@
   <data name="CertificationsEmpty" xml:space="preserve">
     <value>Aún no hay certificaciones disponibles para mostrar.</value>
   </data>
+  <data name="CertificationViewAll" xml:space="preserve">
+    <value>Ver todas las certificaciones</value>
+  </data>
+  <data name="CertificationArchiveDescription" xml:space="preserve">
+    <value>Consulta todas mis certificaciones y los documentos asociados, ordenados por fecha de obtención.</value>
+  </data>
+  <data name="CertificationArchiveLoading" xml:space="preserve">
+    <value>Cargando certificaciones...</value>
+  </data>
+  <data name="CertificationArchiveLoadFailed" xml:space="preserve">
+    <value>No se pudieron cargar las certificaciones. Inténtalo de nuevo más tarde.</value>
+  </data>
+  <data name="CertificationAttachmentDialog" xml:space="preserve">
+    <value>Visor de documento: {0}</value>
+  </data>
+  <data name="CertificationAttachmentDocument" xml:space="preserve">
+    <value>Documento de certificación: {0}</value>
+  </data>
   <data name="CertificationIssuedOn" xml:space="preserve">
     <value>Obtenida:</value>
   </data>

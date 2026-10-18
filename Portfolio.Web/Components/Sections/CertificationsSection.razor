@@ -7,12 +7,18 @@
     <div class="section-heading"><p class="eyebrow">@Localizer["CertificatesEyebrow"]</p><h2 id="certificates-title">@Localizer["CertificatesTitle"]</h2></div>
     @if (certifications is { Count: > 0 })
     {
-        <div class="card-grid">
-            @foreach (var certification in certifications)
+        <div class="certification-grid certification-grid--home">
+            @foreach (var certification in certifications.Take(6))
             {
                 <CertificationCard Certification="certification" />
             }
         </div>
+        @if (certifications.Count > 6)
+        {
+            <div class="certification-section__catalog-link">
+                <a class="button button--secondary" href="/certifications">@Localizer["CertificationViewAll"]</a>
+            </div>
+        }
     }
     else if (certifications is not null)
     {

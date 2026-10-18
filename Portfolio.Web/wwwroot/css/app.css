@@ -354,6 +354,8 @@ html[data-theme="dark"] {
     column-gap: 0.625rem;
 }
 .project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 30rem), 1fr)); gap: 1rem; }
+.certification-grid { display: grid; gap: 1rem; min-width: 0; }
+.certification-grid--home, .certification-grid--archive { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .surface { color: var(--color-text); }
 .content-card, .area-card, .project-card, .certification-card, .timeline-empty, .contact-form { padding: clamp(1.25rem, 3vw, 2rem); }
 .content-card { display: flex; align-items: center; min-height: 100%; }
@@ -533,7 +535,7 @@ html[data-theme="dark"] {
 .project-section__empty { padding: clamp(1.25rem, 3vw, 2rem); border: 1px solid var(--color-border); border-radius: var(--radius-medium); }
 .tag-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.25rem 0 0; padding: 0; list-style: none; }
 .tag-list li { padding: 0.3rem 0.55rem; border: 1px solid var(--color-border); border-radius: 999px; color: var(--color-text-secondary); font-size: var(--text-small); }
-.certification-card { display: flex; align-items: flex-start; gap: 1rem; }
+.certification-card { display: flex; min-width: 0; align-items: flex-start; gap: 1rem; }
 .certification-card__visual { display: flex; flex: 0 0 auto; flex-direction: column; align-items: center; gap: 0.5rem; width: 5rem; }
 .certification-card__image { width: 5rem; height: 5rem; flex: 0 0 auto; border: 1px solid var(--color-border); border-radius: var(--radius-small); object-fit: cover; background-color: var(--color-background); }
 .certification-card__badge { display: grid; place-items: center; width: 2.5rem; height: 2.5rem; flex: 0 0 auto; border: 1px solid var(--color-primary); border-radius: 50%; color: var(--color-primary); font-size: 1.5rem; }
@@ -546,7 +548,24 @@ html[data-theme="dark"] {
 .certification-card__details { margin-top: 0.75rem; white-space: pre-line; }
 .certification-card__link { display: inline-block; margin-top: 1rem; font-weight: 700; }
 .certification-card__content { flex: 1; min-width: 0; }
-.certification-card__attachments { display: grid; grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr)); gap: 0.75rem; margin-top: 1rem; }
+.certification-card__attachments { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 6.5rem), 1fr)); gap: 0.5rem; margin-top: 1rem; }
+.certification-section__catalog-link { display: flex; justify-content: center; margin-top: 2rem; }
+.certification-archive { min-width: 0; }
+.certification-archive__heading { margin-bottom: 2rem; }
+.certification-archive__heading h1 { overflow-wrap: anywhere; }
+.certification-archive__home-link { margin-top: 2rem; }
+.certification-attachment-preview { width: 100%; min-width: 0; padding: 0.5rem; border: 1px solid var(--color-border); font: inherit; cursor: pointer; }
+.certification-attachment-preview img, .certification-attachment-preview__pdf, .certification-attachment-preview__fallback { height: 7rem; max-height: 7rem; object-fit: contain; }
+.certification-document-dialog { width: min(96vw, 100rem); max-width: none; max-height: 95dvh; padding: 0; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-medium); background-color: var(--color-surface); color: var(--color-text); box-shadow: var(--shadow-surface); }
+body:has(.certification-document-dialog[open]) { overflow: hidden; }
+.certification-document-dialog::backdrop { background-color: color-mix(in srgb, var(--color-background) 82%, transparent); }
+.certification-document-dialog__surface { display: flex; max-height: 95dvh; flex-direction: column; }
+.certification-document-dialog__header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.75rem 1rem; border-bottom: 1px solid var(--color-border); }
+.certification-document-dialog__header h2 { min-width: 0; margin: 0; overflow-wrap: anywhere; font-size: 1.125rem; }
+.certification-document-dialog__header .button { flex: 0 0 auto; }
+.certification-document-dialog__pdf { display: block; width: min(100%, 90rem); height: min(80dvh, 60rem); border: 0; background-color: var(--color-background); }
+.certification-document-dialog__image-container { display: grid; max-height: calc(95dvh - 4.5rem); place-items: center; overflow: auto; padding: clamp(0.5rem, 2vw, 1.5rem); }
+.certification-document-dialog__image { display: block; width: auto; height: auto; max-width: 100%; max-height: calc(95dvh - 7rem); object-fit: contain; }
 .certification-editor__image { display: block; width: min(100%, 12rem); height: auto; max-height: 12rem; margin: 0.75rem 0; object-fit: contain; }
 .admin-image-preview { display: block; width: min(100%, 12rem); height: auto; max-height: 8rem; margin: 0; object-fit: contain; }
 .project-preview-image-row { grid-template-columns: minmax(8rem, 12rem) auto minmax(0, 1fr); }
@@ -585,6 +604,7 @@ html[data-theme="dark"] {
 
 @media (max-width: 72rem) {
     .home-hero { min-height: auto; }
+    .certification-grid--home, .certification-grid--archive { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (min-width: 48rem) and (max-width: 72rem) {
@@ -629,10 +649,18 @@ html[data-theme="dark"] {
     .section-heading--split > p { margin-top: 1rem; }
     .experience-card { grid-template-columns: 1fr; gap: 0.75rem; }
     .project-card { grid-template-columns: 5rem minmax(0, 1fr); gap: 0.75rem; padding: 0.75rem; }
+    .certification-grid--home, .certification-grid--archive { grid-template-columns: minmax(0, 1fr); }
+    .certification-card { gap: 0.75rem; }
     .project-card__links { gap: 0.5rem; margin-top: 1rem; }
     .blog-post-summary--archive { grid-template-columns: minmax(0, 1fr); }
     .blog-post-summary--archive .blog-post-summary__image,
     .blog-post-summary--archive .blog-post-summary__visual { max-height: 15rem; }
+    .certification-document-dialog { width: calc(100vw - 1rem); max-height: calc(100dvh - 1rem); }
+    .certification-document-dialog__surface { max-height: calc(100dvh - 1rem); }
+    .certification-document-dialog__header { padding: 0.5rem 0.75rem; }
+    .certification-document-dialog__pdf { height: 78dvh; }
+    .certification-document-dialog__image-container { max-height: calc(100dvh - 4rem); }
+    .certification-document-dialog__image { max-height: calc(100dvh - 6rem); }
 }
 
 *,
@@ -739,6 +767,10 @@ p {
     width: min(100% - (var(--space-page) * 2), var(--content-width));
     margin-inline: auto;
     padding-block: clamp(2rem, 6vw, 5rem);
+}
+
+.site-main:has(.certification-archive) {
+    width: min(calc(100% - (var(--space-page) * 2)), 120rem);
 }
 
 .site-layout:has(.home-hero) { --home-page-inset: clamp(1rem, 4vw, 4rem); }

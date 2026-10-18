@@ -1,0 +1,70 @@
+@page "/certifications"
+@using Microsoft.Extensions.Localization
+@using Portfolio.Application.Certifications
+@using Portfolio.Web.Components.Sections
+@inject ICertificationQueryService CertificationQueryService
+@inject IStringLocalizer<SharedResource> Localizer
+@inject ILogger<Certifications> Logger
+
+<PageTitle>@Localizer["CertificatesTitle"]</PageTitle>
+
+<section class="certification-archive" aria-labelledby="certification-archive-title">
+    <header class="certification-archive__heading">
+        <p class="eyebrow">@Localizer["CertificatesEyebrow"]</p>
+        <h1 id="certification-archive-title">@Localizer["CertificatesTitle"]</h1>
+        <p>@Localizer["CertificationArchiveDescription"]</p>
+    </header>
+
+    @if (!loaded)
+    {
+        <p class="project-section__empty" role="status">@Localizer["CertificationArchiveLoading"]</p>
+    }
+    else if (loadFailed)
+    {
+        <p class="project-section__empty" role="alert">@Localizer["CertificationArchiveLoadFailed"]</p>
+    }
+    else if (certifications.Count > 0)
+    {
+        <div class="certification-grid certification-grid--archive">
+            @foreach (var certification in certifications)
+            {
+                <CertificationCard Certification="certification" SortAttachmentsByName="true" />
+            }
+        </div>
+    }
+    else
+    {
+        <p class="project-section__empty">@Localizer["CertificationsEmpty"]</p>
+    }
+
+    <a class="button button--secondary certification-archive__home-link" href="/#certificates">@Localizer["BlogBackHome"]</a>
+</section>
+
+@code {
+    private IReadOnlyList<CertificationReadModel> certifications = [];
+    private bool loaded;
+    private bool loadFailed;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var allCertifications = await CertificationQueryService.GetCertificationsAsync();
+            certifications = allCertifications
+                .OrderBy(certification => certification.IssuedOn is null)
+                .ThenByDescending(certification => certification.IssuedOn)
+                .ThenBy(certification => certification.DisplayOrder)
+                .ThenBy(certification => certification.Id)
+                .ToArray();
+        }
+        catch (Exception exception)
+        {
+            loadFailed = true;
+            Logger.LogError(exception, "Unable to load the public certification archive.");
+        }
+        finally
+        {
+            loaded = true;
+        }
+    }
+}

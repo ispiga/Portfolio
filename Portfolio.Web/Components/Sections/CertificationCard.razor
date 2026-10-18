@@ -60,7 +60,7 @@
         @if (Certification.Attachments.Count > 0)
         {
             <section class="certification-card__attachments" aria-label="@Localizer["CertificationPublicAttachments"]">
-                @foreach (var attachment in Certification.Attachments)
+                @foreach (var attachment in Attachments)
                 {
                     <CertificationAttachmentPreview
                         DisplayName="@attachment.DisplayName"
@@ -79,6 +79,15 @@
 
     [Parameter, EditorRequired]
     public CertificationReadModel Certification { get; set; } = null!;
+
+    [Parameter]
+    public bool SortAttachmentsByName { get; set; }
+
+    private IEnumerable<CertificationAttachmentReadModel> Attachments => SortAttachmentsByName
+        ? Certification.Attachments
+            .OrderBy(attachment => attachment.DisplayName, StringComparer.OrdinalIgnoreCase)
+            .ThenBy(attachment => attachment.Id)
+        : Certification.Attachments;
 
     private void ToggleDetails() => detailsExpanded = !detailsExpanded;
 }

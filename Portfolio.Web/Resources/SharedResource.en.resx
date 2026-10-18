@@ -273,6 +273,18 @@
   <data name="CertificationsEmpty" xml:space="preserve">
     <value>There are no certifications available to show yet.</value>
   </data>
+  <data name="CertificationViewAll" xml:space="preserve">
+    <value>View all certifications</value>
+  </data>
+  <data name="CertificationArchiveDescription" xml:space="preserve">
+    <value>Browse all certifications and their related documents, ordered by date earned.</value>
+  </data>
+  <data name="CertificationArchiveLoading" xml:space="preserve">
+    <value>Loading certifications...</value>
+  </data>
+  <data name="CertificationArchiveLoadFailed" xml:space="preserve">
+    <value>Certifications could not be loaded. Please try again later.</value>
+  </data>
   <data name="CertificationIssuedOn" xml:space="preserve">
     <value>Obtained</value>
   </data>
@@ -1379,6 +1391,12 @@
   </data>
   <data name="CertificationAttachmentOpen" xml:space="preserve">
     <value>Open public attachment: {0}</value>
+  </data>
+  <data name="CertificationAttachmentDialog" xml:space="preserve">
+    <value>Document viewer: {0}</value>
+  </data>
+  <data name="CertificationAttachmentDocument" xml:space="preserve">
+    <value>Certification document: {0}</value>
   </data>
   <data name="CertificationPublicAttachments" xml:space="preserve">
     <value>Public certification attachments</value>

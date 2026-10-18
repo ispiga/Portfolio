@@ -520,6 +520,65 @@ public sealed class PersistenceModelTests
         Assert.Equal(3, result.DisplayOrder);
     }
 
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    [InlineData(3)]
+    public void Certification_translation_selector_preserves_all_public_attachments(int publicAttachmentCount)
+    {
+        var certificationId = Guid.NewGuid();
+        var publicAttachments = Enumerable.Range(0, publicAttachmentCount)
+            .Select(index => new CertificationAttachment
+            {
+                Id = Guid.NewGuid(),
+                CertificationId = certificationId,
+                OriginalFileName = $"attachment-{index}.jpg",
+                DisplayName = $"Attachment {index}",
+                StorageKey = $"storage/{index}",
+                ContentType = "image/jpeg",
+                SizeBytes = 100,
+                CreatedAt = DateTimeOffset.UnixEpoch.AddMinutes(index),
+                IsPublic = true
+            })
+            .ToArray();
+        var certification = new Certification
+        {
+            Id = certificationId,
+            Attachments =
+            [
+                .. publicAttachments,
+                new CertificationAttachment
+                {
+                    Id = Guid.NewGuid(),
+                    CertificationId = certificationId,
+                    OriginalFileName = "private.jpg",
+                    DisplayName = "Private attachment",
+                    StorageKey = "storage/private",
+                    ContentType = "image/jpeg",
+                    SizeBytes = 100,
+                    CreatedAt = DateTimeOffset.UnixEpoch,
+                    IsPublic = false
+                }
+            ],
+            Translations =
+            [
+                new CertificationTranslation
+                {
+                    LanguageCode = "es-ES",
+                    Name = "Certificación",
+                    Issuer = "Emisor"
+                }
+            ]
+        };
+
+        var result = CertificationTranslationSelector.Select(certification, "es-ES");
+
+        Assert.NotNull(result);
+        Assert.Equal(publicAttachmentCount, result.Attachments.Count);
+        Assert.Equal(publicAttachments.Select(attachment => attachment.Id), result.Attachments.Select(attachment => attachment.Id));
+        Assert.All(result.Attachments, attachment => Assert.True(attachment.IsPublic));
+    }
+
     [Fact]
     public void Certification_details_and_project_description_are_optional_and_limited_to_one_thousand_characters()
     {
