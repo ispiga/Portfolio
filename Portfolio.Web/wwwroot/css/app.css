@@ -651,6 +651,10 @@ body:has(.certification-document-dialog[open]) { overflow: hidden; }
     .certification-document-dialog__image { max-height: calc(100dvh - 6rem); }
 }
 
+@media (min-width: 28rem) and (max-width: 47.999rem) {
+    .about-skills { column-count: 2; }
+}
+
 *,
 *::before,
 *::after {
