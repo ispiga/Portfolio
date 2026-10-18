@@ -476,7 +476,14 @@ html[data-theme="dark"] {
 .project-card--featured { border: 2px solid var(--color-primary); }
 .project-card__visual { display: grid; place-items: center; width: 100%; aspect-ratio: 1; background-color: var(--color-background); color: var(--color-primary); font-family: var(--font-mono); }
 .project-card__image { display: block; width: 100%; aspect-ratio: 1; border-radius: var(--radius-small); object-fit: cover; background-color: var(--color-background); }
-.blog-home__posts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: 1rem; }
+.blog-home__posts { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; container-type: inline-size; }
+.blog-home__posts > .blog-post-summary { flex: 0 1 100%; }
+@container (min-width: 35rem) {
+    .blog-home__posts > .blog-post-summary { flex-basis: calc((100% - 1rem) / 2); }
+}
+@container (min-width: 53rem) {
+    .blog-home__posts > .blog-post-summary { flex-basis: calc((100% - 2rem) / 3); }
+}
 .blog-home__all { margin-top: 1rem; }
 .blog-home__empty, .blog-archive__empty { padding: clamp(1.25rem, 3vw, 2rem); border: 1px solid var(--color-border); border-radius: var(--radius-medium); }
 .blog-post-summary { display: flex; min-width: 0; overflow: hidden; flex-direction: column; border: 1px solid var(--color-border); border-radius: var(--radius-medium); background-color: var(--color-surface); color: var(--color-text); }
@@ -505,6 +512,7 @@ html[data-theme="dark"] {
 .blog-post-detail__content pre, .blog-post-detail__content table { display: block; max-width: 100%; overflow-x: auto; }
 .blog-post-detail__content blockquote { margin-inline: 0; padding-inline-start: 1rem; border-inline-start: 0.25rem solid var(--color-border); color: var(--color-text-secondary); }
 .blog-post-detail__back { margin-top: 2rem; }
+.blog-post-detail__actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
 .project-card__content { min-width: 0; }
 .project-card__featured { margin-bottom: 0.75rem; color: var(--color-primary); font-size: var(--text-small); font-weight: 700; text-transform: uppercase; }
 .project-card--featured .project-card__featured { display: inline-flex; padding: 0.25rem 0.6rem; border-radius: 999px; background-color: var(--color-primary); color: var(--color-background); }
