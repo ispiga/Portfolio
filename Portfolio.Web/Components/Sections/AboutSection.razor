@@ -11,8 +11,9 @@
     <section class="about-composition" aria-label="@Localizer["AboutAreasLabel"]">
         <div class="surface content-card about-profile">
             <span class="about-pin" aria-hidden="true">
-                <span class="about-pin__head"></span>
-                <span class="about-pin__needle"></span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon" fill="none" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m9 15-6 6M15 6l-1-1 2-2 5 5-2 2-1-1-4.5 4.5c1.5 1.5 1 4-.5 5.5l-8-8c1.5-1.5 4-2 5.5-.5z"></path>
+                </svg>
             </span>
             <p>@(content?.Profile ?? Localizer["AboutProfileEmpty"].Value)</p>
         </div>
