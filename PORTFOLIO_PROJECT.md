@@ -613,6 +613,8 @@ En móvil se utilizará una navegación adaptada, previsiblemente mediante menú
 
 `MainLayout.razor` usa `header`, `main`, `footer` y `@Body`; `NavMenu.razor` implementa la navbar con `PortfolioBrandImage` y la marca `ISMAELPI`; `PortfolioFooter.razor` muestra identidad, año y derechos reservados; y `ThemeSelector.razor` se integra en la navbar. Los enlaces apuntan provisionalmente a anchors de la Home. En escritorio se muestran horizontalmente y el selector de tema se alinea a la derecha. En móvil, por debajo de `48rem`, el botón usa `aria-expanded`, el panel permanece oculto hasta abrirlo y se cierra al seleccionar un enlace.
 
+En las páginas públicas Home, archivo de certificaciones, archivo del Blog y detalle de artículo, `site-main` y el contenido de la navbar reutilizan `.portfolio-shell`: anchura máxima de `120rem` y márgenes laterales fluidos. El inset usa `clamp(1rem, 4vw, 4rem)` y, desde `1280px`, `clamp(4.8rem, 6vw, 7.5rem)`. Esta ampliación se activa solo para esas rutas; no se debe ensanchar el resto de páginas públicas ni asumir que el ancho de Home es exclusivo de la portada.
+
 ### Navbar sticky y translúcida del Home
 
 La navbar pública también aparece en páginas del Blog, por lo que el sticky y el efecto de scroll son opt-in para la Home: el `header` exterior de `MainLayout.razor` usa `position: sticky` únicamente cuando el layout contiene `.home-hero`. El fondo debe aplicarse a ese `header`, que ocupa toda la superficie sticky; el fondo del `nav` interior es transparente solo en Home para permitir que se vea el estado del contenedor. En el resto de páginas se conserva el fondo opaco normal del `nav`.
@@ -718,7 +720,7 @@ Las rutas administrativas deben seguir siendo utilizables en móvil sin desborda
 
 El Home será la principal carta de presentación del portfolio.
 
-La Home usa el `site-main` común de `MainLayout.razor`; su anchura máxima de `120rem` y su margen interior lateral responsive se limitan a la portada. No se debe ensanchar el resto de páginas públicas para ajustar la alineación del Home.
+La Home usa el `site-main` común de `MainLayout.razor`. Su shell ancho y márgenes laterales responsive también se comparten con el archivo público de certificaciones y el archivo/detalle del Blog, según se describe en la implementación de la navbar; no deben extenderse a otras rutas públicas para ajustar su alineación.
 
 Estructura prevista:
 
@@ -800,6 +802,7 @@ Se mostrarán visualmente las principales áreas tecnológicas. Los grupos y sus
 
 - El perfil y las skills se presentan en zonas independientes: en escritorio el perfil ocupa la columna izquierda y los grupos la derecha; en anchos reducidos se apilan, manteniendo primero el perfil.
 - Los grupos se muestran con CSS Columns para conservar tarjetas de altura natural y compactar visualmente contenidos variables. Cada tarjeta evita fragmentarse entre columnas, mantiene el orden de origen administrado en el DOM y conserva una anchura máxima aproximada de `12.5rem`; los detalles responsive y las separaciones se definen en `Portfolio.Web/wwwroot/css/app.css`.
+- En móvil, los grupos usan una columna por debajo de `28rem` y dos columnas desde `28rem` hasta `47.999rem`, donde el ancho disponible permite mantener tarjetas legibles. Por encima de ese rango se conservan los breakpoints existentes de tablet y escritorio; no se debe cambiar la distribución de escritorio para ajustar el modo móvil.
 - No se debe sustituir esta distribución por Grid de filas uniformes, añadir posiciones basadas en categorías ni recuperar un algoritmo masonry en JavaScript sin un cambio explícito de requisitos.
 - Cada grupo admite un color de fondo opcional `#RRGGBB`, editable desde administración con un selector visual y un campo hexadecimal sincronizados. «Restablecer» elimina la asignación y devuelve la tarjeta al degradado basado en los tokens semánticos del tema. El valor `#20314A` que se muestra inicialmente en ambos controles es solo una muestra del selector y no se guarda ni aplica si no se elige explícitamente un color.
 - Un color asignado tiñe el degradado de fondo y el borde decorativo de esa tarjeta, pero no se propaga a las etiquetas de skills: estas conservan el color semántico de superficie del tema. Se mantienen las sombras, la silueta y el recorte diagonal inferior derecho de `18px` con su pseudoelemento `::before`; no se añade una línea SVG ni un segundo pseudoelemento.
@@ -878,7 +881,9 @@ Se utiliza:
 
 Esto permite demostrar variedad de diseño UI.
 
-La Home muestra las certificaciones mediante tarjetas en una rejilla responsive. Cada tarjeta puede mostrar el nombre y emisor traducidos, la fecha de obtención en formato mes y año (conservando la fecha completa en los datos), el ID de credencial opcional, detalles localizados opcionales de hasta 1.000 caracteres colapsados tras «Ver detalles», la imagen local si existe, las horas opcionales y el enlace de credencial si está configurado. Las horas aparecen en la columna de la imagen, debajo de ella cuando existe. Si no hay imagen, el signo «+» es decorativo, no interactivo. También puede mostrar adjuntos públicos: miniaturas para imágenes y vista previa de la primera página para documentos PDF, identificados por su nombre para mostrar. En administración se puede cambiar el nombre para mostrar de cada adjunto sin alterar su nombre de archivo original ni su almacenamiento.
+La Home muestra hasta seis certificaciones mediante tarjetas en una rejilla responsive y conserva el orden manual devuelto por la consulta; si hay más, ofrece el enlace «Ver todas las certificaciones» a `/certifications`. El catálogo muestra todas las certificaciones, ordenadas por fecha de obtención descendente, con las fechas nulas al final y orden manual/identificador como desempate. Home y catálogo reutilizan la misma tarjeta y comparten sus breakpoints de rejilla (tres columnas en escritorio, dos en pantallas medianas y una en móvil), así como la disposición adaptable de los adjuntos; no se fuerza una fila con desplazamiento horizontal en el catálogo. Cada tarjeta puede mostrar el nombre y emisor traducidos, la fecha de obtención en formato mes y año (conservando la fecha completa en los datos), el ID de credencial opcional, detalles localizados opcionales de hasta 1.000 caracteres colapsados tras «Ver detalles», la imagen local si existe, las horas opcionales y el enlace de credencial si está configurado. Las horas aparecen en la columna de la imagen, debajo de ella cuando existe. Si no hay imagen, el signo «+» es decorativo, no interactivo. También puede mostrar adjuntos públicos: miniaturas para imágenes y vista previa de la primera página para documentos PDF, identificados por su nombre para mostrar. En administración se puede cambiar el nombre para mostrar de cada adjunto sin alterar su nombre de archivo original ni su almacenamiento.
+
+El enlace «Volver al inicio» del catálogo apunta a `/#certificates`, utilizando la navegación mejorada de Blazor y el desplazamiento suave global. El destino es la sección de certificaciones de Home; este comportamiento no promete un aterrizaje instantáneo sin animación.
 
 Actualmente no existe una ruta pública de detalle ni un `slug` de certificación. Una futura ruta de detalle requerirá una decisión específica de alcance y un modelo ampliado si fuese necesario.
 
