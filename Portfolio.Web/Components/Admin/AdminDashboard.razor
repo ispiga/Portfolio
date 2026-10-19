@@ -13,7 +13,6 @@
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="admin-dashboard">
     <header class="admin-dashboard__heading">
         <MudText Typo="Typo.h1" Tag="@("h1")">@Localizer["AdminDashboardTitle"]</MudText>
-        <MudText Typo="Typo.body1">@Localizer["AdminWelcome", userName]</MudText>
     </header>
 
     <section aria-labelledby="admin-identity-title" class="admin-dashboard__section">
@@ -44,13 +43,6 @@
         </MudGrid>
     </section>
 
-    <section aria-labelledby="admin-content-status-title" class="admin-dashboard__section">
-        <MudText Typo="Typo.h2" Tag="@("h2")" id="admin-content-status-title">@Localizer["AdminContentSummaryTitle"]</MudText>
-        <MudPaper Elevation="1" Class="pa-5">
-            <MudText Typo="Typo.body1">@Localizer["AdminContentSummary"]</MudText>
-        </MudPaper>
-    </section>
-
     <MudButton Href="/" Color="Color.Primary" Variant="Variant.Filled">@Localizer["AdminPublicSiteAction"]</MudButton>
 </MudContainer>
 
@@ -59,13 +51,14 @@
 
     private static readonly AdminModule[] Modules =
     [
-        new("AdminExperiences", "AdminExperiencesDescription", "/admin/experiences", true, "ExperienceManageAction"),
-        new("AdminProjects", "AdminProjectsDescription", "/admin/projects", true, "ProjectManageAction"),
-        new("AdminCertifications", "AdminCertificationsDescription", "/admin/certifications", true, "CertificationManageAction"),
-        new("AdminBlog", "AdminBlogDescription", "/admin/blog", true, "BlogPostManageAction"),
+        new("AdminVisualIdentity", "AdminVisualIdentityDescription", "/admin/visual-identity", true, "VisualIdentityManageAction"),
         new("AdminHero", "AdminHeroDescription", "/admin/hero", true, "HeroManageAction"),
         new("AdminAbout", "AdminAboutDescription", "/admin/about", true, "AboutManageAction"),
-        new("AdminVisualIdentity", "AdminVisualIdentityDescription", "/admin/visual-identity", true, "VisualIdentityManageAction")
+        new("AdminExperiences", "AdminExperiencesDescription", "/admin/experiences", true, "ExperienceManageAction"),
+        new("AdminCertifications", "AdminCertificationsDescription", "/admin/certifications", true, "CertificationManageAction"),
+        new("AdminProjects", "AdminProjectsDescription", "/admin/projects", true, "ProjectManageAction"), 
+        new("AdminBlog", "AdminBlogDescription", "/admin/blog", true, "BlogPostManageAction")
+         
     ];
 
     protected override async Task OnInitializedAsync()

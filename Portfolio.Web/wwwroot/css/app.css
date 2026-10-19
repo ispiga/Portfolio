@@ -355,7 +355,7 @@ html[data-theme="dark"] {
     column-count: 2;
     column-gap: 0.625rem;
 }
-.project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 30rem), 1fr)); gap: 1rem; }
+.project-grid { display: flex; flex-wrap: wrap; justify-content: center; align-items: stretch; gap: 1rem; }
 .certification-grid { display: grid; gap: 1rem; min-width: 0; }
 .certification-grid--home, .certification-grid--archive { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .surface { color: var(--color-text); }
@@ -474,7 +474,7 @@ html[data-theme="dark"] {
 .experience-card__description-toggle { margin-top: 0.75rem; }
 .experience-card__date { display: flex; flex-wrap: wrap; align-content: start; gap: 0.35rem; color: var(--color-text-secondary); font-size: var(--text-small); font-weight: 700; }
 .experience-card__company { margin-bottom: 0.75rem !important; color: var(--color-primary); font-weight: 700; }
-.project-card { display: grid; grid-template-columns: min(9rem, 30%) minmax(0, 1fr); min-width: 0; align-items: center; gap: clamp(0.75rem, 2vw, 1.25rem); overflow: hidden; padding: 1rem; }
+.project-card { display: grid; flex: 1 1 24rem; grid-template-columns: min(9rem, 30%) minmax(0, 1fr); min-width: min(100%, 20rem); max-width: 30rem; align-items: center; gap: clamp(0.75rem, 2vw, 1.25rem); overflow: hidden; padding: 1rem; }
 .project-card--featured { border: 2px solid var(--color-primary); }
 .project-card__visual { display: grid; place-items: center; width: 100%; aspect-ratio: 1; background-color: var(--color-background); color: var(--color-primary); font-family: var(--font-mono); }
 .project-card__image { display: block; width: 100%; aspect-ratio: 1; border-radius: var(--radius-small); object-fit: cover; background-color: var(--color-background); }

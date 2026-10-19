@@ -168,12 +168,6 @@
   <data name="HobbyImagePreview" xml:space="preserve">
     <value>Vista ampliada de la imagen de la afición: {0}</value>
   </data>
-  <data name="HobbyDescriptionExpand" xml:space="preserve">
-    <value>Ver más</value>
-  </data>
-  <data name="HobbyDescriptionCollapse" xml:space="preserve">
-    <value>Ver menos</value>
-  </data>
   <data name="AboutGroupBackgroundColor" xml:space="preserve">
     <value>Color de fondo</value>
   </data>
@@ -278,24 +272,6 @@
   </data>
   <data name="CertificationsEmpty" xml:space="preserve">
     <value>Aún no hay certificaciones disponibles para mostrar.</value>
-  </data>
-  <data name="CertificationViewAll" xml:space="preserve">
-    <value>Ver todas las certificaciones</value>
-  </data>
-  <data name="CertificationArchiveDescription" xml:space="preserve">
-    <value>Consulta todas mis certificaciones y los documentos asociados, ordenados por fecha de obtención.</value>
-  </data>
-  <data name="CertificationArchiveLoading" xml:space="preserve">
-    <value>Cargando certificaciones...</value>
-  </data>
-  <data name="CertificationArchiveLoadFailed" xml:space="preserve">
-    <value>No se pudieron cargar las certificaciones. Inténtalo de nuevo más tarde.</value>
-  </data>
-  <data name="CertificationAttachmentDialog" xml:space="preserve">
-    <value>Visor de documento: {0}</value>
-  </data>
-  <data name="CertificationAttachmentDocument" xml:space="preserve">
-    <value>Documento de certificación: {0}</value>
   </data>
   <data name="CertificationIssuedOn" xml:space="preserve">
     <value>Obtenida:</value>
@@ -471,9 +447,6 @@
   <data name="AdminLogout" xml:space="preserve">
     <value>Cerrar sesión</value>
   </data>
-  <data name="AdminWelcome" xml:space="preserve">
-    <value>Sesión iniciada como {0}.</value>
-  </data>
   <data name="AdminIdentityTitle" xml:space="preserve">
     <value>Identidad</value>
   </data>
@@ -515,12 +488,6 @@
   </data>
   <data name="AdminOpenModule" xml:space="preserve">
     <value>Próximamente</value>
-  </data>
-  <data name="AdminContentSummaryTitle" xml:space="preserve">
-    <value>Estado del contenido</value>
-  </data>
-  <data name="AdminContentSummary" xml:space="preserve">
-    <value>La administración permite gestionar experiencias, proyectos, certificaciones y artículos del blog.</value>
   </data>
   <data name="AdminPublicSiteAction" xml:space="preserve">
     <value>Ver sitio público</value>
@@ -845,5 +812,29 @@
   </data>
   <data name="VisualIdentityLinkedColorsCannotHaveOverrides" xml:space="preserve">
     <value>Desvincula los colores del logo antes de establecer valores independientes.</value>
+  </data>
+  <data name="CertificationViewAll" xml:space="preserve">
+    <value>Ver todas las certificaciones</value>
+  </data>
+  <data name="CertificationArchiveDescription" xml:space="preserve">
+    <value>Consulta todas mis certificaciones y los documentos asociados, ordenados por fecha de obtención.</value>
+  </data>
+  <data name="CertificationAttachmentDialog" xml:space="preserve">
+    <value>Visor de documento: {0}</value>
+  </data>
+  <data name="CertificationAttachmentDocument" xml:space="preserve">
+    <value>Documento de certificación: {0}</value>
+  </data>
+  <data name="CertificationArchiveLoading" xml:space="preserve">
+    <value>Cargando certificaciones...</value>
+  </data>
+  <data name="CertificationArchiveLoadFailed" xml:space="preserve">
+    <value>No se pudieron cargar las certificaciones. Inténtalo de nuevo más tarde.</value>
+  </data>
+  <data name="HobbyDescriptionExpand" xml:space="preserve">
+    <value>Ver más</value>
+  </data>
+  <data name="HobbyDescriptionCollapse" xml:space="preserve">
+    <value>Ver menos</value>
   </data>
 </root>

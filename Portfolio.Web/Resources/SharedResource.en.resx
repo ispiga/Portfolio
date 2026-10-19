@@ -168,12 +168,6 @@
   <data name="HobbyImagePreview" xml:space="preserve">
     <value>Enlarged hobby image: {0}</value>
   </data>
-  <data name="HobbyDescriptionExpand" xml:space="preserve">
-    <value>Show more</value>
-  </data>
-  <data name="HobbyDescriptionCollapse" xml:space="preserve">
-    <value>Show less</value>
-  </data>
   <data name="AboutGroupBackgroundColor" xml:space="preserve">
     <value>Background color</value>
   </data>
@@ -278,18 +272,6 @@
   </data>
   <data name="CertificationsEmpty" xml:space="preserve">
     <value>There are no certifications available to show yet.</value>
-  </data>
-  <data name="CertificationViewAll" xml:space="preserve">
-    <value>View all certifications</value>
-  </data>
-  <data name="CertificationArchiveDescription" xml:space="preserve">
-    <value>Browse all certifications and their related documents, ordered by date earned.</value>
-  </data>
-  <data name="CertificationArchiveLoading" xml:space="preserve">
-    <value>Loading certifications...</value>
-  </data>
-  <data name="CertificationArchiveLoadFailed" xml:space="preserve">
-    <value>Certifications could not be loaded. Please try again later.</value>
   </data>
   <data name="CertificationIssuedOn" xml:space="preserve">
     <value>Obtained</value>
@@ -465,9 +447,6 @@
   <data name="AdminLogout" xml:space="preserve">
     <value>Sign out</value>
   </data>
-  <data name="AdminWelcome" xml:space="preserve">
-    <value>Signed in as {0}.</value>
-  </data>
   <data name="AdminIdentityTitle" xml:space="preserve">
     <value>Identity</value>
   </data>
@@ -509,12 +488,6 @@
   </data>
   <data name="AdminOpenModule" xml:space="preserve">
     <value>Coming soon</value>
-  </data>
-  <data name="AdminContentSummaryTitle" xml:space="preserve">
-    <value>Content status</value>
-  </data>
-  <data name="AdminContentSummary" xml:space="preserve">
-    <value>Experience, project, certification, and blog content can now be managed here.</value>
   </data>
   <data name="AdminPublicSiteAction" xml:space="preserve">
     <value>View public site</value>
@@ -1398,12 +1371,6 @@
   <data name="CertificationAttachmentOpen" xml:space="preserve">
     <value>Open public attachment: {0}</value>
   </data>
-  <data name="CertificationAttachmentDialog" xml:space="preserve">
-    <value>Document viewer: {0}</value>
-  </data>
-  <data name="CertificationAttachmentDocument" xml:space="preserve">
-    <value>Certification document: {0}</value>
-  </data>
   <data name="CertificationPublicAttachments" xml:space="preserve">
     <value>Public certification attachments</value>
   </data>
@@ -1733,5 +1700,29 @@
   </data>
   <data name="AboutSaveFailed" xml:space="preserve">
     <value>Changes could not be saved. Please try again.</value>
+  </data>
+  <data name="CertificationViewAll" xml:space="preserve">
+    <value>View all certifications</value>
+  </data>
+  <data name="CertificationArchiveDescription" xml:space="preserve">
+    <value>Browse all certifications and their related documents, ordered by date earned.</value>
+  </data>
+  <data name="CertificationAttachmentDialog" xml:space="preserve">
+    <value>Document viewer: {0}</value>
+  </data>
+  <data name="CertificationAttachmentDocument" xml:space="preserve">
+    <value>Certification document: {0}</value>
+  </data>
+  <data name="CertificationArchiveLoading" xml:space="preserve">
+    <value>Loading certifications...</value>
+  </data>
+  <data name="CertificationArchiveLoadFailed" xml:space="preserve">
+    <value>Certifications could not be loaded. Please try again later.</value>
+  </data>
+  <data name="HobbyDescriptionExpand" xml:space="preserve">
+    <value>Show more</value>
+  </data>
+  <data name="HobbyDescriptionCollapse" xml:space="preserve">
+    <value>Show less</value>
   </data>
 </root>
