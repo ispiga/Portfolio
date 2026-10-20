@@ -1261,10 +1261,6 @@ p {
     color: var(--color-text);
 }
 
-.admin-main .mud-paper .admin-module-card__status {
-    color: var(--color-text-secondary);
-}
-
 .admin-main .tox-tinymce { max-width: 100%; }
 
 .admin-dashboard { padding: 0 !important; }
@@ -1284,10 +1280,7 @@ p {
     height: 100%;
 }
 
-.admin-module-card__status {
-    margin-top: auto;
-    color: var(--color-text-secondary);
-}
+.admin-module-card__action { margin-top: auto; }
 
 .admin-login {
     display: grid;

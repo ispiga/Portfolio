@@ -33,8 +33,7 @@
                     <MudPaper Elevation="1" Class="pa-5 admin-module-card">
                         <MudText Typo="Typo.h6" Tag="@("h3")">@Localizer[module.Title]</MudText>
                         <MudText Typo="Typo.body2">@Localizer[module.Description]</MudText>
-                        <MudText Typo="Typo.caption" Class="admin-module-card__status">@Localizer[module.IsAvailable ? "ExperienceModuleAvailable" : "AdminModuleNotAvailable"]</MudText>
-                        <MudButton Href="@module.Path" Disabled="@(!module.IsAvailable)" Variant="Variant.Outlined">
+                        <MudButton Class="admin-module-card__action" Href="@module.Path" Variant="Variant.Outlined">
                             @Localizer[module.Action]
                         </MudButton>
                     </MudPaper>
@@ -51,13 +50,13 @@
 
     private static readonly AdminModule[] Modules =
     [
-        new("AdminVisualIdentity", "AdminVisualIdentityDescription", "/admin/visual-identity", true, "VisualIdentityManageAction"),
-        new("AdminHero", "AdminHeroDescription", "/admin/hero", true, "HeroManageAction"),
-        new("AdminAbout", "AdminAboutDescription", "/admin/about", true, "AboutManageAction"),
-        new("AdminExperiences", "AdminExperiencesDescription", "/admin/experiences", true, "ExperienceManageAction"),
-        new("AdminCertifications", "AdminCertificationsDescription", "/admin/certifications", true, "CertificationManageAction"),
-        new("AdminProjects", "AdminProjectsDescription", "/admin/projects", true, "ProjectManageAction"), 
-        new("AdminBlog", "AdminBlogDescription", "/admin/blog", true, "BlogPostManageAction")
+        new("AdminVisualIdentity", "AdminVisualIdentityDescription", "/admin/visual-identity", "VisualIdentityManageAction"),
+        new("AdminHero", "AdminHeroDescription", "/admin/hero", "HeroManageAction"),
+        new("AdminAbout", "AdminAboutDescription", "/admin/about", "AboutManageAction"),
+        new("AdminExperiences", "AdminExperiencesDescription", "/admin/experiences", "ExperienceManageAction"),
+        new("AdminCertifications", "AdminCertificationsDescription", "/admin/certifications", "CertificationManageAction"),
+        new("AdminProjects", "AdminProjectsDescription", "/admin/projects", "ProjectManageAction"),
+        new("AdminBlog", "AdminBlogDescription", "/admin/blog", "BlogPostManageAction")
          
     ];
 
@@ -67,5 +66,5 @@
         userName = authenticationState.User.Identity?.Name ?? string.Empty;
     }
 
-    private sealed record AdminModule(string Title, string Description, string Path, bool IsAvailable, string Action);
+    private sealed record AdminModule(string Title, string Description, string Path, string Action);
 }

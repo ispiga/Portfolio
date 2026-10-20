@@ -483,12 +483,6 @@
   <data name="AdminBlogDescription" xml:space="preserve">
     <value>Gestión de artículos y publicaciones.</value>
   </data>
-  <data name="AdminModuleNotAvailable" xml:space="preserve">
-    <value>Preparado para una próxima entrega</value>
-  </data>
-  <data name="AdminOpenModule" xml:space="preserve">
-    <value>Próximamente</value>
-  </data>
   <data name="AdminPublicSiteAction" xml:space="preserve">
     <value>Ver sitio público</value>
   </data>
@@ -854,9 +848,6 @@
   </data>
   <data name="Copyright" xml:space="preserve">
     <value>© {0} — Todos los derechos reservados.</value>
-  </data>
-  <data name="ExperienceModuleAvailable" xml:space="preserve">
-    <value>Disponible</value>
   </data>
   <data name="ExperienceManageAction" xml:space="preserve">
     <value>Gestionar experiencias</value>

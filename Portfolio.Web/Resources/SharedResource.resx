@@ -483,12 +483,6 @@
   <data name="AdminBlogDescription" xml:space="preserve">
     <value>Gestión de artículos y publicaciones.</value>
   </data>
-  <data name="AdminModuleNotAvailable" xml:space="preserve">
-    <value>Preparado para una próxima entrega</value>
-  </data>
-  <data name="AdminOpenModule" xml:space="preserve">
-    <value>Próximamente</value>
-  </data>
   <data name="AdminPublicSiteAction" xml:space="preserve">
     <value>Ver sitio público</value>
   </data>
