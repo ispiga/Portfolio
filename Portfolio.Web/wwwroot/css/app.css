@@ -179,6 +179,69 @@ html[data-theme="dark"] {
     font-size: clamp(1.05rem, 2vw, 1.25rem);
 }
 
+.home-hero__actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    width: 100%;
+}
+
+@media (max-width: 480px) {
+    .home-hero__actions {
+        gap: 1rem;
+    }
+
+    .home-hero__socials {
+        gap: 0.5rem;
+    }
+}
+
+.social-links {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.social-links__link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    transition: color 180ms ease,
+                border-color 180ms ease,
+                transform 180ms ease;
+}
+
+.social-links__icon {
+    display: block;
+    width: 1.4rem;
+    height: 1.4rem;
+}
+
+/* Hero: color principal por defecto */
+.home-hero__socials .social-links__link {
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+/* Hero: color de acento al pasar el ratón */
+.home-hero__socials .social-links__link:hover {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+}
+
+/* Hero: indicador de foco accesible */
+.home-hero__socials .social-links__link:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+}
+
 .button {
     display: inline-flex;
     align-items: center;
@@ -840,9 +903,7 @@ p {
 }
 
 .portfolio-footer__brand {
-    display: inline-flex;
-    align-items: center;
-    gap: 0;
+    justify-self: start;
 }
 
 .portfolio-footer__name {
@@ -1050,14 +1111,40 @@ p {
 }
 
 .portfolio-footer__content {
-    flex-wrap: wrap;
-    padding-block: 1.25rem;
-    color: var(--color-footer-text);
-    font-size: var(--text-small);
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.portfolio-footer__socials {
+    justify-self: center;
+}
+
+.portfolio-footer__copyright {
+    justify-self: end;
+    margin: 0;
 }
 
 .portfolio-footer__content p {
     margin: 0;
+}
+
+/* Footer: iconos y bordes siempre blancos, también en hover */
+.portfolio-footer__socials .social-links__link,
+.portfolio-footer__socials .social-links__link:hover,
+.portfolio-footer__socials .social-links__link:focus-visible {
+    color: #fff;
+    border-color: #fff;
+}
+
+.portfolio-footer__socials .social-links__link:hover {
+    transform: translateY(-2px);
+}
+
+.portfolio-footer__socials .social-links__link:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
 }
 
 .visual-identity-editor { display: grid; gap: 1rem; width: min(100%, 80rem); min-width: 0; padding-inline: clamp(0.75rem, 2vw, 1.5rem); }
