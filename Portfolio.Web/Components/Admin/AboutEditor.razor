@@ -180,10 +180,10 @@
                                 <InputFile id="@($"hobby-image-{hobby.Id:N}")" OnChange="@(args => UploadHobbyAsync(hobby, args))" accept=".svg,.jpg,.jpeg,.png" />
                                 <span class="admin-field__hint">@Localizer["HomeImageRules", ImageStorage.MaximumFileSizeBytes / 1024 / 1024]</span>
                             </div>
-                            @if (hobby.IsPersisted)
+                            @if (hobby.PreviewUrl is not null || (hobby.IsPersisted && !string.IsNullOrWhiteSpace(hobby.StorageKey)))
                             {
                                 <div class="home-content-editor-card__preview">
-                                    <img src="@($"/home-content-images/hobby/{hobby.Id:N}")" alt="@hobby.SpanishName" />
+                                    <img src="@(hobby.PreviewUrl ?? $"/home-content-images/hobby/{hobby.Id:N}")" alt="@hobby.SpanishName" />
                                 </div>
                             }
                         </div>
@@ -211,6 +211,7 @@
     private readonly List<(Guid Id, string Key)> pendingImages = [];
     private AboutFormModel model = new();
     private AboutSnapshot? initialSnapshot;
+    private IJSObjectReference? imagePreviewModule;
     private IJSObjectReference? unsavedChangesModule;
     private int nextCreationOrder;
     private int activeUploads;
@@ -347,6 +348,8 @@
             pendingImages.Remove(pending);
             await ImageStorage.DeleteAsync(HomeContentImageKind.Hobby, hobby.Id, pending.Key);
         }
+
+        await RevokeHobbyPreviewAsync(hobby);
     }
 
     private async Task UploadHobbyAsync(HobbyFormModel hobby, InputFileChangeEventArgs args)
@@ -354,8 +357,14 @@
         activeUploads++;
         operationMessage = null;
         var file = args.File;
+        string? preview = null;
+        var previousPreview = hobby.PreviewUrl;
         try
         {
+            preview = await CreatePreviewAsync($"hobby-image-{hobby.Id:N}");
+            hobby.PreviewUrl = preview;
+            await InvokeAsync(StateHasChanged);
+
             await using var stream = file.OpenReadStream(ImageStorage.MaximumFileSizeBytes);
             var result = await ImageStorage.UploadAsync(
                 HomeContentImageKind.Hobby,
@@ -366,6 +375,9 @@
                 stream);
             if (result.Error != HomeContentImageError.None || result.StorageKey is null)
             {
+                await RevokePreviewUrlAsync(preview);
+                preview = null;
+                hobby.PreviewUrl = previousPreview;
                 ShowImageError(result.Error);
                 return;
             }
@@ -376,10 +388,16 @@
                 await ImageStorage.DeleteAsync(HomeContentImageKind.Hobby, hobby.Id, previous.Key);
             }
 
+            if (previousPreview?.StartsWith("blob:", StringComparison.Ordinal) == true)
+            {
+                await RevokePreviewUrlAsync(previousPreview);
+            }
+
             pendingImages.Add((hobby.Id, result.StorageKey));
             hobby.StorageKey = result.StorageKey;
             hobby.ContentType = result.ContentType!;
             hobby.SizeBytes = result.SizeBytes;
+            preview = null;
         }
         catch (IOException)
         {
@@ -387,6 +405,12 @@
         }
         finally
         {
+            if (preview is not null)
+            {
+                await RevokePreviewUrlAsync(preview);
+                hobby.PreviewUrl = previousPreview;
+            }
+
             activeUploads--;
         }
     }
@@ -432,6 +456,11 @@
             {
                 hobby.IsPersisted = true;
                 hobby.HasAssignedDisplayOrder = true;
+                if (hobby.PreviewUrl?.StartsWith("blob:", StringComparison.Ordinal) == true)
+                {
+                    await RevokePreviewUrlAsync(hobby.PreviewUrl);
+                    hobby.PreviewUrl = $"/home-content-images/hobby/{hobby.Id:N}";
+                }
             }
 
             pendingImages.Clear();
@@ -513,11 +542,62 @@
         operationSeverity = Severity.Error;
     }
 
+    private async Task<string> CreatePreviewAsync(string inputId)
+    {
+        imagePreviewModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./js/home-content-image-preview.js");
+        return await imagePreviewModule.InvokeAsync<string>("createPreview", inputId);
+    }
+
+    private async Task RevokeHobbyPreviewAsync(HobbyFormModel hobby)
+    {
+        var previewUrl = hobby.PreviewUrl;
+        if (previewUrl is null)
+        {
+            return;
+        }
+
+        hobby.PreviewUrl = null;
+        if (previewUrl.StartsWith("blob:", StringComparison.Ordinal))
+        {
+            await RevokePreviewUrlAsync(previewUrl);
+        }
+    }
+
+    private async Task RevokePreviewUrlAsync(string previewUrl)
+    {
+        if (imagePreviewModule is not null && previewUrl.StartsWith("blob:", StringComparison.Ordinal))
+        {
+            try
+            {
+                await imagePreviewModule.InvokeVoidAsync("revokePreview", previewUrl);
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+        }
+    }
+
     public async ValueTask DisposeAsync()
     {
         foreach (var pending in pendingImages)
         {
             await ImageStorage.DeleteAsync(HomeContentImageKind.Hobby, pending.Id, pending.Key);
+        }
+
+        foreach (var hobby in model.Hobbies)
+        {
+            await RevokeHobbyPreviewAsync(hobby);
+        }
+
+        if (imagePreviewModule is not null)
+        {
+            try
+            {
+                await imagePreviewModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+            }
         }
 
         if (unsavedChangesModule is not null)
@@ -570,6 +650,7 @@
         public string StorageKey { get; set; } = string.Empty;
         public string ContentType { get; set; } = string.Empty;
         public long SizeBytes { get; set; }
+        public string? PreviewUrl { get; set; }
         public int DisplayOrder { get; set; }
         public bool HasAssignedDisplayOrder { get; set; }
         public int CreationOrder { get; set; }
