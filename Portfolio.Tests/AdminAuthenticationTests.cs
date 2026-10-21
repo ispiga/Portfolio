@@ -2,11 +2,14 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Reflection;
 using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -115,6 +118,18 @@ public sealed class AdminAuthenticationTests : IAsyncLifetime
             context.Response.Headers["Content-Security-Policy"] = "default-src 'none'; sandbox";
             return Results.Content("<svg></svg>", "text/html");
         });
+        var importMapDefinition = new ImportMapDefinition(
+            new Dictionary<string, string> { ["test-module"] = "/test-module.js" },
+            new Dictionary<string, IReadOnlyDictionary<string, string>>(),
+            new Dictionary<string, string>());
+        app.MapGet("/test/csp-import-map", (HttpContext context) =>
+        {
+            context.Response.Headers["Content-Security-Policy"] = "frame-ancestors 'self'";
+            var integrity = ImportMapCspIntegrity.GetIntegrity(context);
+            return Results.Content(
+                $"<script type=\"importmap\" integrity=\"{integrity}\">{importMapDefinition}</script>",
+                "text/html");
+        }).WithMetadata(importMapDefinition);
         app.MapGet("/admin/access-denied", () => Results.Text("denied")).AllowAnonymous();
         app.MapGet("/admin", () => Results.Text("dashboard"))
             .RequireAuthorization(PortfolioAuthorization.AdministratorPolicy);
@@ -147,6 +162,23 @@ public sealed class AdminAuthenticationTests : IAsyncLifetime
 
         Assert.Equal("default-src 'none'; sandbox", Assert.Single(mediaResponse.Headers.GetValues("Content-Security-Policy")));
         Assert.Equal(PortfolioCspReportOnly.Policy, Assert.Single(mediaResponse.Headers.GetValues("Content-Security-Policy-Report-Only")));
+    }
+
+    [Fact]
+    public async Task Import_map_integrity_matches_serialized_definition_and_report_only_policy()
+    {
+        using var response = await SendAsync(new HttpRequestMessage(HttpMethod.Get, "/test/csp-import-map"));
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var body = await response.Content.ReadAsStringAsync();
+        var mapJson = body[(body.IndexOf('>') + 1)..body.LastIndexOf("</script>", StringComparison.Ordinal)];
+        var expectedIntegrity = $"sha256-{Convert.ToBase64String(SHA256.HashData(Encoding.UTF8.GetBytes(mapJson.ReplaceLineEndings("\n"))))}";
+        var reportOnlyPolicy = Assert.Single(response.Headers.GetValues("Content-Security-Policy-Report-Only"));
+
+        Assert.Contains($"integrity=\"{expectedIntegrity}\"", body, StringComparison.Ordinal);
+        Assert.Contains($"'{expectedIntegrity}'", reportOnlyPolicy, StringComparison.Ordinal);
+        Assert.Contains("script-src 'self';", PortfolioCspReportOnly.Policy, StringComparison.Ordinal);
+        Assert.Equal("frame-ancestors 'self'", Assert.Single(response.Headers.GetValues("Content-Security-Policy")));
     }
 
     [Fact]

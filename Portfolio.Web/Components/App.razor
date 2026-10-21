@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 @using System.Globalization
+@using Microsoft.AspNetCore.Http
 @using Portfolio.Application.VisualIdentity
+@using Portfolio.Web.Authentication
 @inject IVisualIdentityQueryService VisualIdentityService
 <html lang="@CultureInfo.CurrentUICulture.Name">
 
@@ -13,7 +15,6 @@
     <link rel="stylesheet" href="@Assets["css/tailwind.css"]" />
     <link rel="stylesheet" href="_content/MudBlazor/MudBlazor.min.css" />
     <link rel="stylesheet" href="@Assets["css/app.css"]" />
-    <link rel="stylesheet" href="@Assets["Portfolio.Web.styles.css"]" />
     @if (identity is not null)
     {
         <style>
@@ -44,7 +45,7 @@
             }
         </style>
     }
-    <ImportMap />
+    <ImportMap integrity="@importMapIntegrity" />
     @if (identity is not null)
     {
         <link rel="icon" type="@identity.FaviconContentType" href="@identity.FaviconUrl" />
@@ -53,7 +54,7 @@
 </head>
 
 <body>
-    <MudThemeProvider />
+    <MudThemeProvider DefaultScrollbar="true" />
     <MudPopoverProvider />
     <MudDialogProvider />
     <MudSnackbarProvider />
@@ -69,10 +70,15 @@
 
 @code {
     private VisualIdentitySettingsModel? identity;
+    private string? importMapIntegrity;
+
+    [CascadingParameter]
+    private HttpContext? HttpContext { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         identity = await VisualIdentityService.GetAsync();
+        importMapIntegrity = ImportMapCspIntegrity.GetIntegrity(HttpContext);
     }
 
     private static string SafeColor(string color, string fallback) =>

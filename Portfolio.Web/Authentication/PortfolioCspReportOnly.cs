@@ -13,7 +13,10 @@ public static class PortfolioCspReportOnly
                 if (context.Response.ContentType?.StartsWith("text/html", StringComparison.OrdinalIgnoreCase) == true
                     && !context.Response.Headers.ContainsKey("Content-Security-Policy-Report-Only"))
                 {
-                    context.Response.Headers.Append("Content-Security-Policy-Report-Only", Policy);
+                    var integrity = ImportMapCspIntegrity.GetIntegrity(context);
+                    context.Response.Headers.Append(
+                        "Content-Security-Policy-Report-Only",
+                        ImportMapCspIntegrity.GetReportOnlyPolicy(integrity));
                 }
 
                 return Task.CompletedTask;
