@@ -26,7 +26,7 @@
 
     @if (loadFailed)
     {
-        <MudAlert Severity="Severity.Error" Role="alert">@Localizer["BlogPostNotFound"]</MudAlert>
+        <MudAlert Severity="Severity.Error" role="alert">@Localizer["BlogPostNotFound"]</MudAlert>
     }
     else if (!loaded)
     {
@@ -66,7 +66,7 @@
                 <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["BlogPostSpanish"]</MudText>
                 @if (!TranslationIsFilled(model.SpanishTitle, model.SpanishSlug, model.SpanishExcerpt, model.SpanishContent))
                 {
-                    <MudAlert Severity="Severity.Warning" Role="status">@Localizer["BlogPostTranslationMissingSpanish"]</MudAlert>
+                    <MudAlert Severity="Severity.Warning" role="status">@Localizer["BlogPostTranslationMissingSpanish"]</MudAlert>
                 }
                 <div class="admin-field">
                     <label for="blog-title-es">@Localizer["BlogPostTitle"]</label>
@@ -101,7 +101,7 @@
                 <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["BlogPostEnglish"]</MudText>
                 @if (!TranslationIsFilled(model.EnglishTitle, model.EnglishSlug, model.EnglishExcerpt, model.EnglishContent))
                 {
-                    <MudAlert Severity="Severity.Warning" Role="status">@Localizer["BlogPostTranslationMissingEnglish"]</MudAlert>
+                    <MudAlert Severity="Severity.Warning" role="status">@Localizer["BlogPostTranslationMissingEnglish"]</MudAlert>
                 }
                 <div class="admin-field">
                     <label for="blog-title-en">@Localizer["BlogPostTitle"]</label>
@@ -134,11 +134,11 @@
 
             @if (saveError is not null)
             {
-                <MudAlert Severity="Severity.Error" Role="alert">@saveError</MudAlert>
+                <MudAlert Severity="Severity.Error" role="alert">@saveError</MudAlert>
             }
             @if (saveSuccess is not null)
             {
-                <MudAlert Severity="Severity.Success" Role="status">@saveSuccess</MudAlert>
+                <MudAlert Severity="Severity.Success" role="status">@saveSuccess</MudAlert>
             }
             <div class="experience-admin-actions">
                 <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Disabled="saving">
@@ -186,7 +186,7 @@
                 </div>
                 @if (pendingImageDelete is { } imageToDelete)
                 {
-                    <MudAlert Severity="Severity.Warning" Role="alert" Class="mt-4">
+                    <MudAlert Severity="Severity.Warning" role="alert" Class="mt-4">
                         @Localizer["BlogImageDeleteConfirmation"]
                         <MudButton OnClick="@(() => DeleteImageAsync(imageToDelete))" Color="Color.Error" Variant="Variant.Filled">@Localizer["Delete"]</MudButton>
                         <MudButton OnClick="CancelImageDelete" Variant="Variant.Outlined">@Localizer["Cancel"]</MudButton>
@@ -194,7 +194,7 @@
                 }
                 @if (imageMessage is not null)
                 {
-                    <MudAlert Severity="@imageSeverity" Class="mt-4" Role="status">@imageMessage</MudAlert>
+                    <MudAlert Severity="@imageSeverity" Class="mt-4" role="status">@imageMessage</MudAlert>
                 }
             </MudPaper>
         }
@@ -281,12 +281,12 @@
         model.SpanishTitle = details.Spanish.Title;
         model.SpanishSlug = details.Spanish.Slug;
         model.SpanishExcerpt = details.Spanish.Excerpt;
-        model.SpanishContent = ToAdminImageUrls(details.Spanish.Content);
+        model.SpanishContent = details.Spanish.Content;
         model.SpanishImageAlt = details.Spanish.FeaturedImageAlt ?? string.Empty;
         model.EnglishTitle = details.English.Title;
         model.EnglishSlug = details.English.Slug;
         model.EnglishExcerpt = details.English.Excerpt;
-        model.EnglishContent = ToAdminImageUrls(details.English.Content);
+        model.EnglishContent = details.English.Content;
         model.EnglishImageAlt = details.English.FeaturedImageAlt ?? string.Empty;
         images = await ImageService.GetImagesAsync(details.Id);
         initialSnapshot = CaptureSnapshot();
@@ -356,9 +356,6 @@
         && !string.IsNullOrWhiteSpace(slug)
         && !string.IsNullOrWhiteSpace(excerpt)
         && !string.IsNullOrWhiteSpace(content);
-
-    private static string ToAdminImageUrls(string content) =>
-        content.Replace("/blog-post-images/", "/admin/blog-post-images/", StringComparison.OrdinalIgnoreCase);
 
     private static string ToPublicImageUrls(string content) =>
         content.Replace("/admin/blog-post-images/", "/blog-post-images/", StringComparison.OrdinalIgnoreCase);

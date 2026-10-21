@@ -12,7 +12,8 @@ public static class AdminAuthenticationEndpoints
     public static IEndpointRouteBuilder MapAdminAuthentication(this IEndpointRouteBuilder endpoints)
     {
         endpoints.MapPost("/admin/login/submit", LoginAsync)
-            .AllowAnonymous();
+            .AllowAnonymous()
+            .RequireRateLimiting(PortfolioRateLimiting.AdminLoginPolicy);
 
         endpoints.MapPost("/admin/logout", LogoutAsync)
             .RequireAuthorization(PortfolioAuthorization.AdministratorPolicy);

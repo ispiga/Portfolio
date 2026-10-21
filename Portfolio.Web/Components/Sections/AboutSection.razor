@@ -82,9 +82,10 @@
 @if (expandedHobbyImageUrl is not null)
 {
     <div class="hobby-image-lightbox"
+         @ref="lightboxElement"
          role="dialog"
          aria-modal="true"
-         aria-label="@Localizer["HobbyImagePreview", expandedHobbyName]"
+         aria-label="@Localizer["HobbyImagePreview", expandedHobbyName ?? string.Empty]"
          tabindex="-1"
          @onclick="CloseHobbyImage"
          @onkeydown="HandleLightboxKeyDown">
@@ -104,12 +105,15 @@
     private string? expandedHobbyImageUrl;
     private string? expandedHobbyName;
     private ElementReference lightboxCloseButton;
+    private ElementReference lightboxElement;
     private ElementReference aboutElement;
     private IJSObjectReference? hobbyDescriptionModule;
+    private IJSObjectReference? lightboxModule;
     private DotNetObjectReference<AboutSection>? objectReference;
     private readonly HashSet<Guid> expandedHobbyDescriptions = [];
     private readonly HashSet<Guid> truncatedHobbyDescriptions = [];
     private bool focusLightboxCloseButton;
+    private bool restoreLightboxFocus;
     private bool disposed;
 
     protected override async Task OnInitializedAsync() => content = await AboutQueryService.GetAsync();
@@ -119,7 +123,32 @@
         if (focusLightboxCloseButton)
         {
             focusLightboxCloseButton = false;
-            await lightboxCloseButton.FocusAsync();
+            try
+            {
+                await lightboxCloseButton.FocusAsync();
+                if (lightboxModule is not null)
+                {
+                    await lightboxModule.InvokeVoidAsync("activate", lightboxElement);
+                }
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+        }
+
+        if (restoreLightboxFocus)
+        {
+            restoreLightboxFocus = false;
+            if (lightboxModule is not null)
+            {
+                try
+                {
+                    await lightboxModule.InvokeVoidAsync("deactivate");
+                }
+                catch (JSDisconnectedException)
+                {
+                }
+            }
         }
 
         if (!firstRender)
@@ -174,23 +203,42 @@
         disposed = true;
         objectReference?.Dispose();
 
-        if (hobbyDescriptionModule is null)
+        if (hobbyDescriptionModule is not null)
         {
-            return;
+            try
+            {
+                await hobbyDescriptionModule.InvokeVoidAsync("stopObservingDescriptions", aboutElement);
+                await hobbyDescriptionModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+            }
         }
 
+        if (lightboxModule is not null)
+        {
+            try
+            {
+                await lightboxModule.InvokeVoidAsync("deactivate");
+                await lightboxModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+        }
+    }
+
+    private async Task OpenHobbyImage(string imageUrl, string name)
+    {
         try
         {
-            await hobbyDescriptionModule.InvokeVoidAsync("stopObservingDescriptions", aboutElement);
-            await hobbyDescriptionModule.DisposeAsync();
+            lightboxModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./js/hobby-image-lightbox.js");
+            await lightboxModule.InvokeVoidAsync("rememberFocus");
         }
         catch (JSDisconnectedException)
         {
         }
-    }
 
-    private void OpenHobbyImage(string imageUrl, string name)
-    {
         expandedHobbyImageUrl = imageUrl;
         expandedHobbyName = name;
         focusLightboxCloseButton = true;
@@ -198,6 +246,7 @@
 
     private void CloseHobbyImage()
     {
+        restoreLightboxFocus = expandedHobbyImageUrl is not null;
         expandedHobbyImageUrl = null;
         expandedHobbyName = null;
     }

@@ -252,9 +252,6 @@
   <data name="ProjectStatusPlaceholder" xml:space="preserve">
     <value>Próximamente</value>
   </data>
-  <data name="ProjectVisualPlaceholder" xml:space="preserve">
-    <value>Vista previa de proyecto</value>
-  </data>
   <data name="ProjectFeatured" xml:space="preserve">
     <value>Proyecto destacado</value>
   </data>
@@ -366,6 +363,9 @@
   <data name="ContactValidationError" xml:space="preserve">
     <value>Revisa los campos indicados antes de enviar el formulario.</value>
   </data>
+  <data name="ContactRateLimited" xml:space="preserve">
+    <value>Has enviado varios mensajes recientemente. Espera unos minutos antes de volver a intentarlo.</value>
+  </data>
   <data name="ContactRequired" xml:space="preserve">
     <value>Este campo es obligatorio.</value>
   </data>
@@ -437,6 +437,9 @@
   </data>
   <data name="AdminLoginFailed" xml:space="preserve">
     <value>No se pudo iniciar sesión. Comprueba las credenciales e inténtalo de nuevo.</value>
+  </data>
+  <data name="AdminLoginRateLimited" xml:space="preserve">
+    <value>Se han realizado demasiados intentos. Espera antes de volver a intentarlo.</value>
   </data>
   <data name="AdminValidationSummary" xml:space="preserve">
     <value>Revisa los campos indicados antes de continuar.</value>
@@ -806,6 +809,30 @@
   </data>
   <data name="VisualIdentityLinkedColorsCannotHaveOverrides" xml:space="preserve">
     <value>Desvincula los colores del logo antes de establecer valores independientes.</value>
+  </data>
+  <data name="CertificationViewAll" xml:space="preserve">
+    <value>Ver todas las certificaciones</value>
+  </data>
+  <data name="CertificationArchiveDescription" xml:space="preserve">
+    <value>Consulta todas mis certificaciones y los documentos asociados, ordenados por fecha de obtención.</value>
+  </data>
+  <data name="CertificationAttachmentDialog" xml:space="preserve">
+    <value>Visor de documento: {0}</value>
+  </data>
+  <data name="CertificationAttachmentDocument" xml:space="preserve">
+    <value>Documento de certificación: {0}</value>
+  </data>
+  <data name="CertificationArchiveLoading" xml:space="preserve">
+    <value>Cargando certificaciones...</value>
+  </data>
+  <data name="CertificationArchiveLoadFailed" xml:space="preserve">
+    <value>No se pudieron cargar las certificaciones. Inténtalo de nuevo más tarde.</value>
+  </data>
+  <data name="HobbyDescriptionExpand" xml:space="preserve">
+    <value>Ver más</value>
+  </data>
+  <data name="HobbyDescriptionCollapse" xml:space="preserve">
+    <value>Ver menos</value>
   </data>
   <data name="PortfolioName" xml:space="preserve">
     <value>Portfolio</value>
@@ -1692,28 +1719,13 @@
   <data name="AboutSaveFailed" xml:space="preserve">
     <value>No se han podido guardar los cambios. Inténtalo de nuevo.</value>
   </data>
-  <data name="CertificationViewAll" xml:space="preserve">
-    <value>Ver todas las certificaciones</value>
+  <data name="SocialLinksLabel" xml:space="preserve">
+    <value>Perfiles sociales</value>
   </data>
-  <data name="CertificationArchiveDescription" xml:space="preserve">
-    <value>Consulta todas mis certificaciones y los documentos asociados, ordenados por fecha de obtención.</value>
+  <data name="LinkedInProfileLinkLabel" xml:space="preserve">
+    <value>Visitar mi perfil de LinkedIn</value>
   </data>
-  <data name="CertificationAttachmentDialog" xml:space="preserve">
-    <value>Visor de documento: {0}</value>
-  </data>
-  <data name="CertificationAttachmentDocument" xml:space="preserve">
-    <value>Documento de certificación: {0}</value>
-  </data>
-  <data name="CertificationArchiveLoading" xml:space="preserve">
-    <value>Cargando certificaciones...</value>
-  </data>
-  <data name="CertificationArchiveLoadFailed" xml:space="preserve">
-    <value>No se pudieron cargar las certificaciones. Inténtalo de nuevo más tarde.</value>
-  </data>
-  <data name="HobbyDescriptionExpand" xml:space="preserve">
-    <value>Ver más</value>
-  </data>
-  <data name="HobbyDescriptionCollapse" xml:space="preserve">
-    <value>Ver menos</value>
+  <data name="GitHubRepositoriesLinkLabel" xml:space="preserve">
+    <value>Ver mis repositorios en GitHub</value>
   </data>
 </root>

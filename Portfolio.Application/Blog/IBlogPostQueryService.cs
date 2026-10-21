@@ -1,5 +1,6 @@
 namespace Portfolio.Application.Blog;
 
+// Returned Content is sanitized before it can reach the public MarkupString renderer.
 public interface IBlogPostQueryService
 {
     Task<IReadOnlyList<BlogPostReadModel>> GetHomePostsAsync(

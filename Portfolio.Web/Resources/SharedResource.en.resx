@@ -252,9 +252,6 @@
   <data name="ProjectStatusPlaceholder" xml:space="preserve">
     <value>Coming soon</value>
   </data>
-  <data name="ProjectVisualPlaceholder" xml:space="preserve">
-    <value>Project preview</value>
-  </data>
   <data name="ProjectFeatured" xml:space="preserve">
     <value>Featured project</value>
   </data>
@@ -366,6 +363,9 @@
   <data name="ContactValidationError" xml:space="preserve">
     <value>Review the indicated fields before sending the form.</value>
   </data>
+  <data name="ContactRateLimited" xml:space="preserve">
+    <value>You've sent several messages recently. Please wait a few minutes before trying again.</value>
+  </data>
   <data name="ContactRequired" xml:space="preserve">
     <value>This field is required.</value>
   </data>
@@ -437,6 +437,9 @@
   </data>
   <data name="AdminLoginFailed" xml:space="preserve">
     <value>Sign-in failed. Check your credentials and try again.</value>
+  </data>
+  <data name="AdminLoginRateLimited" xml:space="preserve">
+    <value>Too many attempts have been made. Please wait before trying again.</value>
   </data>
   <data name="AdminValidationSummary" xml:space="preserve">
     <value>Review the indicated fields before continuing.</value>
@@ -806,6 +809,30 @@
   </data>
   <data name="VisualIdentityLinkedColorsCannotHaveOverrides" xml:space="preserve">
     <value>Unlink the logo colors before setting independent values.</value>
+  </data>
+  <data name="CertificationViewAll" xml:space="preserve">
+    <value>View all certifications</value>
+  </data>
+  <data name="CertificationArchiveDescription" xml:space="preserve">
+    <value>Browse all certifications and their related documents, ordered by date earned.</value>
+  </data>
+  <data name="CertificationAttachmentDialog" xml:space="preserve">
+    <value>Document viewer: {0}</value>
+  </data>
+  <data name="CertificationAttachmentDocument" xml:space="preserve">
+    <value>Certification document: {0}</value>
+  </data>
+  <data name="CertificationArchiveLoading" xml:space="preserve">
+    <value>Loading certifications...</value>
+  </data>
+  <data name="CertificationArchiveLoadFailed" xml:space="preserve">
+    <value>Certifications could not be loaded. Please try again later.</value>
+  </data>
+  <data name="HobbyDescriptionExpand" xml:space="preserve">
+    <value>Show more</value>
+  </data>
+  <data name="HobbyDescriptionCollapse" xml:space="preserve">
+    <value>Show less</value>
   </data>
   <data name="PortfolioName" xml:space="preserve">
     <value>Portfolio</value>
@@ -1692,28 +1719,13 @@
   <data name="AboutSaveFailed" xml:space="preserve">
     <value>Changes could not be saved. Please try again.</value>
   </data>
-  <data name="CertificationViewAll" xml:space="preserve">
-    <value>View all certifications</value>
+  <data name="SocialLinksLabel" xml:space="preserve">
+    <value>Social profiles</value>
   </data>
-  <data name="CertificationArchiveDescription" xml:space="preserve">
-    <value>Browse all certifications and their related documents, ordered by date earned.</value>
+  <data name="LinkedInProfileLinkLabel" xml:space="preserve">
+    <value>Visit my LinkedIn profile</value>
   </data>
-  <data name="CertificationAttachmentDialog" xml:space="preserve">
-    <value>Document viewer: {0}</value>
-  </data>
-  <data name="CertificationAttachmentDocument" xml:space="preserve">
-    <value>Certification document: {0}</value>
-  </data>
-  <data name="CertificationArchiveLoading" xml:space="preserve">
-    <value>Loading certifications...</value>
-  </data>
-  <data name="CertificationArchiveLoadFailed" xml:space="preserve">
-    <value>Certifications could not be loaded. Please try again later.</value>
-  </data>
-  <data name="HobbyDescriptionExpand" xml:space="preserve">
-    <value>Show more</value>
-  </data>
-  <data name="HobbyDescriptionCollapse" xml:space="preserve">
-    <value>Show less</value>
+  <data name="GitHubRepositoriesLinkLabel" xml:space="preserve">
+    <value>View my GitHub repositories</value>
   </data>
 </root>

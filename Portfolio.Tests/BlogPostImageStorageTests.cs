@@ -160,7 +160,10 @@ public sealed class BlogPostImageStorageTests : IDisposable
         var postDirectory = Path.Combine(root, "blog-images", "posts", blogPostId.ToString("N"));
         Assert.True(Directory.Exists(postDirectory));
 
-        var result = await new Portfolio.Infrastructure.Services.BlogPostAdministrationService(factory, service)
+        var result = await new Portfolio.Infrastructure.Services.BlogPostAdministrationService(
+                factory,
+                new Portfolio.Infrastructure.Services.BlogPostContentSanitizer(),
+                service)
             .DeleteAsync(blogPostId);
 
         Assert.Equal(BlogPostDeleteResult.Deleted, result);

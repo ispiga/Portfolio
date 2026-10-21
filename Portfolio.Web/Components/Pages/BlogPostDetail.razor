@@ -10,6 +10,10 @@
 
 @if (post is not null)
 {
+    <HeadContent>
+        <meta name="description" content="@post.Excerpt" />
+    </HeadContent>
+
     <article class="blog-post-detail" aria-labelledby="blog-post-title">
         <header class="blog-post-detail__header">
             @if (post.IsFeatured)

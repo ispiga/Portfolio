@@ -3,6 +3,11 @@
 @using Portfolio.Web.Components.Sections
 @inject IStringLocalizer<SharedResource> Localizer
 
+<PageTitle>@Localizer["HomeTitle"]</PageTitle>
+<HeadContent>
+    <meta name="description" content="@Localizer["HeroDescription"]" />
+</HeadContent>
+
 <HeroSection />
 
 <AboutSection />

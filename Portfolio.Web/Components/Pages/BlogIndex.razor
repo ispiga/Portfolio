@@ -5,6 +5,9 @@
 @inject IStringLocalizer<SharedResource> Localizer
 
 <PageTitle>@Localizer["BlogArchiveTitle"]</PageTitle>
+<HeadContent>
+    <meta name="description" content="@Localizer["BlogArchiveDescription"]" />
+</HeadContent>
 
 <section class="blog-archive" aria-labelledby="blog-archive-title">
     <header class="blog-archive__heading">

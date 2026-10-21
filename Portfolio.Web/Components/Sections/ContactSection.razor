@@ -2,11 +2,12 @@
 @using Portfolio.Application.Contact
 @using Portfolio.Web.Components.Shared
 @inject IStringLocalizer<SharedResource> Localizer
-@inject IContactService ContactService
+@inject IJSRuntime JS
 
 <section id="contact" class="home-section" aria-labelledby="contact-title">
     <div class="section-heading"><p class="eyebrow">@Localizer["ContactEyebrow"]</p><h2 id="contact-title">@Localizer["ContactTitle"]</h2><p>@Localizer["ContactIntro"]</p></div>
     <EditForm Model="@model" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" class="surface contact-form">
+        <AntiforgeryToken />
         <LocalizedDataAnnotationsValidator />
         <p class="form-note">@Localizer["ContactFormNote"]</p>
         <div class="form-grid">
@@ -57,16 +58,22 @@
 
         try
         {
-            var result = await ContactService.SubmitAsync(model);
-            statusMessage = result switch
+            var response = await JS.InvokeAsync<ContactSubmissionResponse>("portfolioContact.submit", model);
+            if (response.StatusCode == 429)
             {
-                ContactSubmissionResult.Sent => Localizer["ContactSuccess"].Value,
-                ContactSubmissionResult.Rejected => Localizer["ContactError"].Value,
-                ContactSubmissionResult.Invalid => Localizer["ContactValidationError"].Value,
+                statusMessage = Localizer["ContactRateLimited"].Value;
+                return;
+            }
+
+            statusMessage = response.Result switch
+            {
+                "sent" when response.StatusCode is >= 200 and < 300 => Localizer["ContactSuccess"].Value,
+                "rejected" => Localizer["ContactError"].Value,
+                "invalid" => Localizer["ContactValidationError"].Value,
                 _ => Localizer["ContactError"].Value
             };
 
-            if (result == ContactSubmissionResult.Sent)
+            if (response.Result == "sent" && response.StatusCode is >= 200 and < 300)
             {
                 model = new ContactRequest();
             }
@@ -81,4 +88,6 @@
     {
         statusMessage = Localizer["ContactValidationError"].Value;
     }
+
+    private sealed record ContactSubmissionResponse(int StatusCode, string? Result);
 }

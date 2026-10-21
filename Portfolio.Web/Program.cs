@@ -23,6 +23,7 @@ if (builder.Environment.IsDevelopment())
 builder.Services.AddLocalization();
 builder.Services.AddPortfolioPersistence(builder.Configuration);
 builder.Services.AddPortfolioIdentity();
+builder.Services.AddRateLimiter(options => PortfolioRateLimiting.Configure(options));
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddMudServices();
 builder.Services.AddSingleton<AdminSessionActivityStore>();
@@ -56,6 +57,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 app.UseHttpsRedirection();
+app.UsePortfolioCspReportOnly();
 
 var supportedCultures = new[] { "es-ES", "en-US" };
 var localizationOptions = new RequestLocalizationOptions()
@@ -63,8 +65,10 @@ var localizationOptions = new RequestLocalizationOptions()
     .AddSupportedCultures(supportedCultures)
     .AddSupportedUICultures(supportedCultures);
 app.UseRequestLocalization(localizationOptions);
+app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 
 app.Use(async (context, next) =>
 {
@@ -93,36 +97,13 @@ app.Use(async (context, next) =>
     await next();
 });
 
-app.MapGet("/culture/set", (HttpContext context, string culture, string? redirectUri) =>
-{
-    if (!supportedCultures.Contains(culture, StringComparer.OrdinalIgnoreCase))
-    {
-        return Results.BadRequest();
-    }
-
-    context.Response.Cookies.Append(
-        CookieRequestCultureProvider.DefaultCookieName,
-        CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
-        new CookieOptions
-        {
-            IsEssential = true,
-            SameSite = SameSiteMode.Lax,
-            Expires = DateTimeOffset.UtcNow.AddYears(1)
-        });
-
-    var localRedirectUri = redirectUri is not null
-        && redirectUri.StartsWith("/", StringComparison.Ordinal)
-        && !redirectUri.StartsWith("//", StringComparison.Ordinal)
-        ? redirectUri
-        : "/";
-
-    return Results.LocalRedirect(localRedirectUri);
-});
+app.MapCultureSettingEndpoint(supportedCultures);
 
 app.UseAntiforgery();
 
 app.MapStaticAssets();
 app.MapAdminAuthentication();
+app.MapContactSubmissionEndpoint();
 app.MapExperienceAttachmentEndpoints();
 app.MapProjectPreviewImageEndpoints();
 app.MapCertificationMediaEndpoints();

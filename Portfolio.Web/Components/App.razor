@@ -1,7 +1,8 @@
 <!DOCTYPE html>
+@using System.Globalization
 @using Portfolio.Application.VisualIdentity
 @inject IVisualIdentityQueryService VisualIdentityService
-<html lang="es">
+<html lang="@CultureInfo.CurrentUICulture.Name">
 
 <head>
     <meta charset="utf-8" />
@@ -59,6 +60,8 @@
     <Routes />
     <ReconnectModal />
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+    <script src="@Assets["js/contact-submission.js"]"></script>
+    <script src="@Assets["js/admin-login.js"]"></script>
     <script src="@Assets["_framework/blazor.web.js"]"></script>
 </body>
 

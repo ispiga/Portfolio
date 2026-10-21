@@ -52,6 +52,7 @@ public static class DependencyInjection
         services.AddScoped<ICertificationMediaService, CertificationMediaStorageService>();
         services.AddScoped<IBlogPostQueryService, BlogPostQueryService>();
         services.AddScoped<IBlogPostAdministrationService, BlogPostAdministrationService>();
+        services.AddSingleton<IBlogPostContentSanitizer, BlogPostContentSanitizer>();
         services.AddOptions<BlogPostImageStorageOptions>()
             .Bind(configuration.GetSection(BlogPostImageStorageOptions.SectionName))
             .ValidateDataAnnotations()
@@ -143,6 +144,12 @@ public static class DependencyInjection
         return services.AddIdentityCore<PortfolioUser>(options =>
             {
                 options.User.RequireUniqueEmail = true;
+                options.Password.RequiredLength = 12;
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequiredUniqueChars = 1;
                 options.Lockout.AllowedForNewUsers = true;
                 options.Lockout.MaxFailedAccessAttempts = 5;
                 options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);

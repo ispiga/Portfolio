@@ -6,7 +6,8 @@ using Portfolio.Domain.Entities;
 namespace Portfolio.Infrastructure.Services;
 
 public sealed class BlogPostQueryService(
-    IDbContextFactory<PortfolioDbContext> dbContextFactory) : IBlogPostQueryService
+    IDbContextFactory<PortfolioDbContext> dbContextFactory,
+    IBlogPostContentSanitizer contentSanitizer) : IBlogPostQueryService
 {
     public async Task<IReadOnlyList<BlogPostReadModel>> GetHomePostsAsync(
         int maximumCount = 3,
@@ -22,10 +23,10 @@ public sealed class BlogPostQueryService(
             .Include(blogPost => blogPost.Translations)
             .ToListAsync(cancellationToken);
 
-        return BlogPostTranslationSelector.SelectHomePosts(
+        return Sanitize(BlogPostTranslationSelector.SelectHomePosts(
             blogPosts,
             CultureInfo.CurrentUICulture.Name,
-            maximumCount);
+            maximumCount));
     }
 
     public async Task<IReadOnlyList<BlogPostReadModel>> GetPublishedPostsAsync(
@@ -36,9 +37,9 @@ public sealed class BlogPostQueryService(
             .Include(blogPost => blogPost.Translations)
             .ToListAsync(cancellationToken);
 
-        return BlogPostTranslationSelector.SelectPublishedPosts(
+        return Sanitize(BlogPostTranslationSelector.SelectPublishedPosts(
             blogPosts,
-            CultureInfo.CurrentUICulture.Name);
+            CultureInfo.CurrentUICulture.Name));
     }
 
     public async Task<BlogPostReadModel?> GetPublishedPostBySlugAsync(
@@ -69,12 +70,19 @@ public sealed class BlogPostQueryService(
             .Include(blogPost => blogPost.Translations)
             .ToListAsync(cancellationToken);
 
-        return BlogPostTranslationSelector.SelectBySlug(blogPosts, slug, cultureName);
+        var post = BlogPostTranslationSelector.SelectBySlug(blogPosts, slug, cultureName);
+        return post is null ? null : Sanitize(post);
     }
 
     public async Task<BlogPostReadModel?> GetFeaturedPostAsync(
         CancellationToken cancellationToken = default) =>
         (await GetHomePostsAsync(1, cancellationToken)).FirstOrDefault();
+
+    private IReadOnlyList<BlogPostReadModel> Sanitize(IReadOnlyList<BlogPostReadModel> posts) =>
+        posts.Select(Sanitize).ToArray();
+
+    private BlogPostReadModel Sanitize(BlogPostReadModel post) =>
+        post with { Content = contentSanitizer.Sanitize(post.Content) };
 
     private static IQueryable<BlogPost> GetPublicPosts(PortfolioDbContext context)
     {

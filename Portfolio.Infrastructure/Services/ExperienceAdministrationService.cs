@@ -64,13 +64,15 @@ public sealed class ExperienceAdministrationService(
         Experience experience;
         if (request.Id is { } id)
         {
-            experience = await context.Experiences
+            var existingExperience = await context.Experiences
                 .Include(candidate => candidate.Translations)
-                .SingleOrDefaultAsync(candidate => candidate.Id == id, cancellationToken)!;
-            if (experience is null)
+                .SingleOrDefaultAsync(candidate => candidate.Id == id, cancellationToken);
+            if (existingExperience is null)
             {
                 return new(false, null, [new(nameof(request.Id), "ExperienceNotFound")]);
             }
+
+            experience = existingExperience;
         }
         else
         {

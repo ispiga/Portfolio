@@ -25,7 +25,7 @@
 
     @if (loadFailed)
     {
-        <MudAlert Severity="Severity.Error" Role="alert">@Localizer["ExperienceNotFound"]</MudAlert>
+        <MudAlert Severity="Severity.Error" role="alert">@Localizer["ExperienceNotFound"]</MudAlert>
     }
     else if (!loaded)
     {
@@ -60,7 +60,7 @@
                 <MudText Typo="Typo.h2" Tag="@("h2")" id="experience-spanish-heading">@Localizer["ExperienceSpanish"]</MudText>
                 @if (!HasSpanishTranslation)
                 {
-                    <MudAlert Severity="Severity.Warning" Role="status">@Localizer["ExperienceTranslationMissingSpanish"]</MudAlert>
+                    <MudAlert Severity="Severity.Warning" role="status">@Localizer["ExperienceTranslationMissingSpanish"]</MudAlert>
                 }
                 <div class="admin-field">
                     <label for="experience-role-es">@Localizer["ExperienceRole"]</label>
@@ -83,7 +83,7 @@
                 <MudText Typo="Typo.h2" Tag="@("h2")" id="experience-english-heading">@Localizer["ExperienceEnglish"]</MudText>
                 @if (!HasEnglishTranslation)
                 {
-                    <MudAlert Severity="Severity.Warning" Role="status">@Localizer["ExperienceTranslationMissingEnglish"]</MudAlert>
+                    <MudAlert Severity="Severity.Warning" role="status">@Localizer["ExperienceTranslationMissingEnglish"]</MudAlert>
                 }
                 <div class="admin-field">
                     <label for="experience-role-en">@Localizer["ExperienceRole"]</label>
@@ -104,11 +104,11 @@
 
             @if (saveError is not null)
             {
-                <MudAlert Severity="Severity.Error" Role="alert">@saveError</MudAlert>
+                <MudAlert Severity="Severity.Error" role="alert">@saveError</MudAlert>
             }
             @if (saveSuccess is not null)
             {
-                <MudAlert Severity="Severity.Success" Role="status">@saveSuccess</MudAlert>
+                <MudAlert Severity="Severity.Success" role="status">@saveSuccess</MudAlert>
             }
             <div class="experience-admin-actions">
                 <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Disabled="saving">
@@ -178,7 +178,7 @@
                 }
                 @if (pendingDeleteAttachment is { } attachmentToDelete)
                 {
-                    <MudAlert Severity="Severity.Warning" Class="mt-3" Role="alert">
+                    <MudAlert Severity="Severity.Warning" Class="mt-3" role="alert">
                         @Localizer["ExperienceAttachmentDeleteConfirmation", attachmentToDelete.DisplayName]
                         <MudButton OnClick="ConfirmDeleteAttachmentAsync" Color="Color.Error" Variant="Variant.Filled">@Localizer["Delete"]</MudButton>
                         <MudButton OnClick="CancelDeleteAttachment" Variant="Variant.Outlined">@Localizer["Cancel"]</MudButton>
@@ -186,7 +186,7 @@
                 }
                 @if (pendingPublicAttachment is not null)
                 {
-                    <MudAlert Severity="Severity.Warning" Class="mt-3" Role="alert">
+                    <MudAlert Severity="Severity.Warning" Class="mt-3" role="alert">
                         @Localizer["ExperienceAttachmentPublishConfirmation", pendingPublicAttachment.DisplayName]
                         <MudButton OnClick="ConfirmPublishAttachmentAsync" Color="Color.Warning" Variant="Variant.Filled">@Localizer["ExperienceAttachmentPublish"]</MudButton>
                         <MudButton OnClick="CancelPublishAttachment" Variant="Variant.Outlined">@Localizer["Cancel"]</MudButton>
@@ -194,7 +194,7 @@
                 }            
                 @if (attachmentMessage is not null)
                 {
-                    <MudAlert Severity="@attachmentSeverity" Role="status">@attachmentMessage</MudAlert>
+                    <MudAlert Severity="@attachmentSeverity" role="status">@attachmentMessage</MudAlert>
                 }
             </MudPaper>
         }

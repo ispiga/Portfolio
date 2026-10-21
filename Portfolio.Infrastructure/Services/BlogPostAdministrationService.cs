@@ -6,6 +6,7 @@ namespace Portfolio.Infrastructure.Services;
 
 public sealed class BlogPostAdministrationService(
     IDbContextFactory<PortfolioDbContext> dbContextFactory,
+    IBlogPostContentSanitizer contentSanitizer,
     IBlogPostImageService? imageService = null) : IBlogPostAdministrationService
 {
     public async Task<IReadOnlyList<BlogPostAdminListItem>> GetBlogPostsAsync(
@@ -41,7 +42,7 @@ public sealed class BlogPostAdministrationService(
             .AsNoTracking()
             .Include(candidate => candidate.Translations)
             .SingleOrDefaultAsync(candidate => candidate.Id == id, cancellationToken);
-        return post is null ? null : ToDetails(post);
+        return post is null ? null : ToDetails(post, contentSanitizer);
     }
 
     public async Task<BlogPostSaveResult> SaveAsync(
@@ -109,8 +110,8 @@ public sealed class BlogPostAdministrationService(
 
         post.EditorialStatus = request.EditorialStatus;
         post.IsFeatured = request.IsFeatured;
-        UpdateTranslation(post, "es-ES", request.Spanish);
-        UpdateTranslation(post, "en-US", request.English);
+        UpdateTranslation(post, "es-ES", request.Spanish, contentSanitizer);
+        UpdateTranslation(post, "en-US", request.English, contentSanitizer);
 
         await context.SaveChangesAsync(cancellationToken);
         return new(true, post.Id, []);
@@ -146,7 +147,7 @@ public sealed class BlogPostAdministrationService(
         return BlogPostDeleteResult.Deleted;
     }
 
-    private static BlogPostAdminDetails ToDetails(BlogPost post)
+    private static BlogPostAdminDetails ToDetails(BlogPost post, IBlogPostContentSanitizer contentSanitizer)
     {
         var spanish = FindTranslation(post, "es-ES");
         var english = FindTranslation(post, "en-US");
@@ -156,8 +157,8 @@ public sealed class BlogPostAdministrationService(
             post.PublishedOn,
             post.IsFeatured,
             post.FeaturedImagePath,
-            ToInput(spanish),
-            ToInput(english),
+            ToInput(spanish, contentSanitizer),
+            ToInput(english, contentSanitizer),
             IsComplete(spanish),
             IsComplete(english));
     }
@@ -172,17 +173,20 @@ public sealed class BlogPostAdministrationService(
         && !string.IsNullOrWhiteSpace(translation.Excerpt)
         && !string.IsNullOrWhiteSpace(translation.Content);
 
-    private static BlogPostTranslationInput ToInput(BlogPostTranslation? translation) => new(
+    private static BlogPostTranslationInput ToInput(
+        BlogPostTranslation? translation,
+        IBlogPostContentSanitizer contentSanitizer) => new(
         translation?.Title ?? string.Empty,
         translation?.Slug ?? string.Empty,
         translation?.Excerpt ?? string.Empty,
-        translation?.Content ?? string.Empty,
+        contentSanitizer.SanitizeForAdministration(translation?.Content),
         translation?.FeaturedImageAlt);
 
     private static void UpdateTranslation(
         BlogPost post,
         string languageCode,
-        BlogPostTranslationInput input)
+        BlogPostTranslationInput input,
+        IBlogPostContentSanitizer contentSanitizer)
     {
         var translation = FindTranslation(post, languageCode);
         if (IsEmpty(input))
@@ -208,7 +212,7 @@ public sealed class BlogPostAdministrationService(
         translation.Title = input.Title.Trim();
         translation.Slug = input.Slug.Trim();
         translation.Excerpt = input.Excerpt.Trim();
-        translation.Content = input.Content.Trim();
+        translation.Content = contentSanitizer.Sanitize(input.Content.Trim());
         translation.FeaturedImageAlt = NormalizeOptional(input.FeaturedImageAlt);
     }
 

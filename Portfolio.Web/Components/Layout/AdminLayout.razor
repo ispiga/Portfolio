@@ -8,6 +8,9 @@
 
 <AuthorizeView Policy="@PortfolioAuthorization.AdministratorPolicy">
 <Authorized>
+<HeadContent>
+    <meta name="robots" content="noindex, nofollow" />
+</HeadContent>
 <div class="admin-layout">
     <header class="admin-header">
                 <NavLink class="portfolio-logo" href="/admin" Match="NavLinkMatch.All" data-unsaved-navigation>

@@ -142,7 +142,7 @@
 
             @if (operationMessage is not null)
             {
-                <MudAlert Severity="@operationSeverity" Role="@(operationSeverity == Severity.Error ? "alert" : "status")" Class="mb-4">
+                <MudAlert Severity="@operationSeverity" role="@(operationSeverity == Severity.Error ? "alert" : "status")" Class="mb-4">
                     @operationMessage
                 </MudAlert>
             }

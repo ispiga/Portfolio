@@ -49,8 +49,8 @@
             @if (!logoColorsLinkedToPalette)
             {
                 <div class="visual-identity-colors visual-identity-colors--logo">
-                    @ColorEditor("visual-logo-start", "VisualIdentityLogoStartColor", logoColorStartOverride, SetLogoStartColor)
-                    @ColorEditor("visual-logo-end", "VisualIdentityLogoEndColor", logoColorEndOverride, SetLogoEndColor)
+                    @ColorEditor("visual-logo-start", "VisualIdentityLogoStartColor", logoColorStartOverride ?? string.Empty, SetLogoStartColor)
+                    @ColorEditor("visual-logo-end", "VisualIdentityLogoEndColor", logoColorEndOverride ?? string.Empty, SetLogoEndColor)
                 </div>
             }
             @if (settings is { MainLogoSupportsRecoloring: false })

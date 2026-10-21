@@ -444,7 +444,9 @@ public sealed class HomeContentImageStorageTests : IDisposable
 
         Assert.Null(await service.OpenPublicReadAsync(HomeContentImageKind.HeroProfile, Guid.NewGuid()));
         await service.DeleteAsync(HomeContentImageKind.HeroProfile, id, uploaded.StorageKey);
-        Assert.False(File.Exists(Path.Combine(root, "App_Data", "HomeContentImages", "HeroProfiles", id.ToString("N"), Path.GetFileName(uploaded.StorageKey))));
+        var storedFileName = Path.GetFileName(uploaded.StorageKey)
+            ?? throw new InvalidOperationException("The uploaded image must have a storage filename.");
+        Assert.False(File.Exists(Path.Combine(root, "App_Data", "HomeContentImages", "HeroProfiles", id.ToString("N"), storedFileName)));
     }
 
     [Fact]

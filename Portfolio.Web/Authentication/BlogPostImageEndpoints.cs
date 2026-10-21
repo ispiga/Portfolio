@@ -103,7 +103,8 @@ public static class BlogPostImageEndpoints
 
                 return Results.Ok(new { location = $"/admin/blog-post-images/{result.Image.Id}" });
             })
-            .RequireAuthorization(PortfolioAuthorization.AdministratorPolicy);
+            .RequireAuthorization(PortfolioAuthorization.AdministratorPolicy)
+            .RequireRateLimiting(PortfolioRateLimiting.BlogImageUploadPolicy);
 
         return endpoints;
     }

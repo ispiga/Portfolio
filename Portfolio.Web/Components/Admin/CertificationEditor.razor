@@ -24,7 +24,7 @@
 
     @if (loadFailed)
     {
-        <MudAlert Severity="Severity.Error" Role="alert">@Localizer["CertificationNotFound"]</MudAlert>
+        <MudAlert Severity="Severity.Error" role="alert">@Localizer["CertificationNotFound"]</MudAlert>
     }
     else if (!loaded)
     {
@@ -68,7 +68,7 @@
                 <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["CertificationSpanish"]</MudText>
                 @if (!TranslationIsFilled(model.SpanishName, model.SpanishIssuer))
                 {
-                    <MudAlert Severity="Severity.Warning" Role="status">@Localizer["CertificationTranslationMissingSpanish"]</MudAlert>
+                    <MudAlert Severity="Severity.Warning" role="status">@Localizer["CertificationTranslationMissingSpanish"]</MudAlert>
                 }
                 <div class="admin-field">
                     <label for="certification-name-es">@Localizer["CertificationName"]</label>
@@ -91,7 +91,7 @@
                 <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["CertificationEnglish"]</MudText>
                 @if (!TranslationIsFilled(model.EnglishName, model.EnglishIssuer))
                 {
-                    <MudAlert Severity="Severity.Warning" Role="status">@Localizer["CertificationTranslationMissingEnglish"]</MudAlert>
+                    <MudAlert Severity="Severity.Warning" role="status">@Localizer["CertificationTranslationMissingEnglish"]</MudAlert>
                 }
                 <div class="admin-field">
                     <label for="certification-name-en">@Localizer["CertificationName"]</label>
@@ -112,11 +112,11 @@
 
             @if (saveError is not null)
             {
-                <MudAlert Severity="Severity.Error" Role="alert">@saveError</MudAlert>
+                <MudAlert Severity="Severity.Error" role="alert">@saveError</MudAlert>
             }
             @if (saveSuccess is not null)
             {
-                <MudAlert Severity="Severity.Success" Role="status">@saveSuccess</MudAlert>
+                <MudAlert Severity="Severity.Success" role="status">@saveSuccess</MudAlert>
             }
             <div class="experience-admin-actions">
                 <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Disabled="saving">
@@ -150,7 +150,7 @@
                 }
                 @if (pendingCardImageDelete)
                 {
-                    <MudAlert Severity="Severity.Warning" Role="alert">
+                    <MudAlert Severity="Severity.Warning" role="alert">
                         @Localizer["CertificationImageDeleteConfirmation"]
                         <MudButton OnClick="DeleteCardImageAsync" Color="Color.Error" Variant="Variant.Filled">@Localizer["Delete"]</MudButton>
                         <MudButton OnClick="CancelCardImageDelete" Variant="Variant.Outlined">@Localizer["Cancel"]</MudButton>
@@ -158,14 +158,14 @@
                 }
                 @if (imageMessage is not null)
                 {
-                    <MudAlert Severity="@imageSeverity" Role="status">@imageMessage</MudAlert>
+                    <MudAlert Severity="@imageSeverity" role="status">@imageMessage</MudAlert>
                 }
             </MudPaper>
 
             <MudPaper Elevation="1" Class="pa-5 mt-6">
                 <MudText Typo="Typo.h2" Tag="@("h2")">@Localizer["CertificationAttachments"]</MudText>
                 <MudText Typo="Typo.body2">@Localizer["CertificationAttachmentRules", MediaService.MaximumFileSizeBytes / 1024 / 1024]</MudText>
-                <MudAlert Severity="Severity.Warning" Role="note">@Localizer["CertificationPublicFilesWarning"]</MudAlert>
+                <MudAlert Severity="Severity.Warning" role="note">@Localizer["CertificationPublicFilesWarning"]</MudAlert>
                 <div class="admin-field">
                     <label for="certification-attachment-upload">@Localizer["CertificationAttachmentUpload"]</label>
                     <InputFile @key="attachmentInputVersion" id="certification-attachment-upload" class="certification-media-upload" OnChange="UploadAttachmentAsync" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png" data-ignore-unsaved-changes />
@@ -214,7 +214,7 @@
                 }
                 @if (pendingPublicAttachment is not null)
                 {
-                    <MudAlert Severity="Severity.Warning" Class="mt-4" Role="alert">
+                    <MudAlert Severity="Severity.Warning" Class="mt-4" role="alert">
                         @Localizer["CertificationAttachmentPublishConfirmation", pendingPublicAttachment.DisplayName]
                         <MudButton OnClick="ConfirmPublishAttachmentAsync" Color="Color.Warning" Variant="Variant.Filled">@Localizer["CertificationAttachmentPublish"]</MudButton>
                         <MudButton OnClick="CancelPublishAttachment" Variant="Variant.Outlined">@Localizer["Cancel"]</MudButton>
@@ -222,7 +222,7 @@
                 }
                 @if (pendingAttachmentDelete is { } pendingAttachment)
                 {
-                    <MudAlert Severity="Severity.Warning" Role="alert" Class="mt-4">
+                    <MudAlert Severity="Severity.Warning" role="alert" Class="mt-4">
                         @Localizer["CertificationAttachmentDeleteConfirmation"]
                         <MudButton OnClick="@(() => DeleteAttachmentAsync(pendingAttachment))" Color="Color.Error" Variant="Variant.Filled">@Localizer["Delete"]</MudButton>
                         <MudButton OnClick="CancelAttachmentDelete" Variant="Variant.Outlined">@Localizer["Cancel"]</MudButton>
@@ -230,7 +230,7 @@
                 }
                 @if (attachmentMessage is not null)
                 {
-                    <MudAlert Severity="@attachmentSeverity" Class="mt-4" Role="status">@attachmentMessage</MudAlert>
+                    <MudAlert Severity="@attachmentSeverity" Class="mt-4" role="status">@attachmentMessage</MudAlert>
                 }
             </MudPaper>
         }

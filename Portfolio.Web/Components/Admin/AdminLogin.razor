@@ -6,6 +6,9 @@
 @inject IStringLocalizer<SharedResource> Localizer
 
 <PageTitle>@Localizer["AdminLoginTitle"]</PageTitle>
+<HeadContent>
+    <meta name="robots" content="noindex, nofollow" />
+</HeadContent>
 
 <main class="admin-login" id="main-content" tabindex="-1">
     <section class="admin-login__card surface" aria-labelledby="admin-login-title">   
@@ -29,7 +32,9 @@
             <p class="admin-message" role="status">@Localizer["AdminLoggedOut"]</p>
         }
 
-        <form action="/admin/login/submit" method="post" class="admin-login__form">
+        <p id="admin-login-rate-limit" class="admin-message admin-message--error" role="alert" tabindex="-1" hidden>@Localizer["AdminLoginRateLimited"]</p>
+
+        <form action="/admin/login/submit" method="post" class="admin-login__form" data-admin-login>
             <AntiforgeryToken />
             <input type="hidden" name="ReturnUrl" value="@ReturnUrl" />
 

@@ -18,7 +18,7 @@ public sealed class BlogPostAdministrationTests
     public async Task Create_draft_with_missing_translation_and_update_state_and_translations()
     {
         var factory = CreateFactory();
-        var service = new BlogPostAdministrationService(factory);
+        var service = CreateAdministrationService(factory);
         var created = await service.SaveAsync(ValidRequest() with
         {
             EditorialStatus = BlogPostEditorialStatus.Draft,
@@ -58,7 +58,7 @@ public sealed class BlogPostAdministrationTests
     public async Task Ready_to_publish_requires_complete_spanish_but_draft_can_be_incomplete()
     {
         var factory = CreateFactory();
-        var service = new BlogPostAdministrationService(factory);
+        var service = CreateAdministrationService(factory);
         var draft = await service.SaveAsync(ValidRequest() with
         {
             EditorialStatus = BlogPostEditorialStatus.Draft,
@@ -80,7 +80,7 @@ public sealed class BlogPostAdministrationTests
     [Fact]
     public async Task Duplicate_slugs_are_rejected_per_language_and_translation_limits_are_validated()
     {
-        var service = new BlogPostAdministrationService(CreateFactory());
+        var service = CreateAdministrationService(CreateFactory());
         var first = await service.SaveAsync(ValidRequest());
         var duplicate = await service.SaveAsync(ValidRequest() with
         {
@@ -113,7 +113,7 @@ public sealed class BlogPostAdministrationTests
             await context.SaveChangesAsync();
         }
 
-        var post = await new BlogPostQueryService(factory).GetFeaturedPostAsync();
+        var post = await CreateQueryService(factory).GetFeaturedPostAsync();
         Assert.NotNull(post);
         Assert.Equal(spanishOnly.Id, post.Id);
 
@@ -121,7 +121,7 @@ public sealed class BlogPostAdministrationTests
         try
         {
             System.Globalization.CultureInfo.CurrentUICulture = System.Globalization.CultureInfo.GetCultureInfo("en-US");
-            post = await new BlogPostQueryService(factory).GetFeaturedPostAsync();
+            post = await CreateQueryService(factory).GetFeaturedPostAsync();
             Assert.NotNull(post);
             Assert.Equal("Artículo", post.Title);
         }
@@ -145,7 +145,7 @@ public sealed class BlogPostAdministrationTests
             await context.SaveChangesAsync();
         }
 
-        var posts = await new BlogPostQueryService(factory).GetHomePostsAsync();
+        var posts = await CreateQueryService(factory).GetHomePostsAsync();
 
         Assert.Collection(posts,
             post => Assert.Equal(featuredNew.Id, post.Id),
@@ -167,7 +167,7 @@ public sealed class BlogPostAdministrationTests
             await context.SaveChangesAsync();
         }
 
-        var posts = await new BlogPostQueryService(factory).GetPublishedPostsAsync();
+        var posts = await CreateQueryService(factory).GetPublishedPostsAsync();
 
         Assert.Collection(posts,
             post => Assert.Equal(recent.Id, post.Id),
@@ -219,7 +219,7 @@ public sealed class BlogPostAdministrationTests
         try
         {
             System.Globalization.CultureInfo.CurrentUICulture = System.Globalization.CultureInfo.GetCultureInfo("en-US");
-            var service = new BlogPostQueryService(factory);
+            var service = CreateQueryService(factory);
 
             var englishPost = await service.GetPublishedPostBySlugAsync("translated-article");
             var spanishFallback = await service.GetPublishedPostBySlugAsync("articulo-espanol");
@@ -238,10 +238,32 @@ public sealed class BlogPostAdministrationTests
     }
 
     [Fact]
+    public async Task Admin_details_sanitize_existing_unsafe_content_before_loading_editor()
+    {
+        var factory = CreateFactory();
+        var post = ValidPost(Guid.NewGuid(), DateTimeOffset.UtcNow, BlogPostEditorialStatus.Draft, isFeatured: false);
+        post.Translations.Single().Content = "<p onerror=\"alert(1)\">Draft</p><img src=\"/blog-post-images/11111111-1111-1111-1111-111111111111\">";
+        await using (var context = factory.CreateDbContext())
+        {
+            context.BlogPosts.Add(post);
+            await context.SaveChangesAsync();
+        }
+
+        var details = await CreateAdministrationService(factory).GetBlogPostAsync(post.Id);
+
+        Assert.NotNull(details);
+        Assert.DoesNotContain("onerror", details.Spanish.Content, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("Draft", details.Spanish.Content);
+        Assert.Contains("/admin/blog-post-images/11111111-1111-1111-1111-111111111111", details.Spanish.Content);
+        await using var check = factory.CreateDbContext();
+        Assert.Contains("onerror", (await check.BlogPostTranslations.SingleAsync()).Content);
+    }
+
+    [Fact]
     public async Task Delete_requires_images_to_be_removed_first_and_cleans_translations()
     {
         var factory = CreateFactory();
-        var service = new BlogPostAdministrationService(factory);
+        var service = CreateAdministrationService(factory);
         var created = await service.SaveAsync(ValidRequest());
         var postId = created.BlogPostId!.Value;
         await using (var context = factory.CreateDbContext())
@@ -290,6 +312,14 @@ public sealed class BlogPostAdministrationTests
         new("Article", "article", "Excerpt", "<p>Content</p>"));
 
     private static BlogPostTranslationInput EmptyTranslation() => new("", "", "", "");
+
+    private static BlogPostAdministrationService CreateAdministrationService(
+        IDbContextFactory<PortfolioDbContext> factory) =>
+        new(factory, new BlogPostContentSanitizer());
+
+    private static BlogPostQueryService CreateQueryService(
+        IDbContextFactory<PortfolioDbContext> factory) =>
+        new(factory, new BlogPostContentSanitizer());
 
     private static BlogPost ValidPost(Guid id, DateTimeOffset publishedOn, BlogPostEditorialStatus status, bool isFeatured) => new()
     {
