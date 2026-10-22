@@ -1,3 +1,5 @@
+using System.Text;
+using Microsoft.AspNetCore.Mvc;
 using Portfolio.Application.VisualIdentity;
 using Portfolio.Infrastructure.Identity;
 
@@ -5,8 +7,44 @@ namespace Portfolio.Web.Authentication;
 
 public static class VisualIdentityEndpoints
 {
+    public static string ThemeStylesheetUrl(Guid assetVersion) =>
+        $"/visual-identity/theme/{assetVersion:N}.css";
+
     public static IEndpointRouteBuilder MapVisualIdentityEndpoints(this IEndpointRouteBuilder endpoints)
     {
+        endpoints.MapGet("/visual-identity/theme/{assetVersion:guid}.css", async (
+                Guid assetVersion,
+                HttpContext context,
+                [FromServices] IVisualIdentityQueryService visualIdentity,
+                CancellationToken cancellationToken) =>
+            {
+                context.Response.Headers.CacheControl = "no-store";
+                var identity = await visualIdentity.GetAsync(cancellationToken);
+                if (identity.AssetVersion != assetVersion)
+                {
+                    return Results.Redirect(ThemeStylesheetUrl(identity.AssetVersion));
+                }
+
+                var primaryColor = SafeColor(identity.PrimaryColor, VisualIdentityValidator.DefaultPrimaryColor);
+                var secondaryColor = SafeColor(identity.SecondaryColor, VisualIdentityValidator.DefaultSecondaryColor);
+                var accentColor = SafeColor(identity.AccentColor, VisualIdentityValidator.DefaultAccentColor);
+                var css = $$"""
+                    html:root {
+                        --color-primary: {{primaryColor}};
+                        --color-secondary: {{secondaryColor}};
+                        --color-accent: {{accentColor}};
+                        --color-primary-contrast: {{VisualIdentityValidator.ContrastingTextColor(primaryColor)}};
+                        --color-secondary-contrast: {{VisualIdentityValidator.ContrastingTextColor(secondaryColor)}};
+                        --color-accent-contrast: {{VisualIdentityValidator.ContrastingTextColor(accentColor)}};
+                    }
+                    """;
+
+                context.Response.Headers.CacheControl = "public, max-age=31536000, immutable";
+                context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+                return Results.Text(css, "text/css; charset=utf-8", Encoding.UTF8);
+            })
+            .AllowAnonymous();
+
         endpoints.MapGet("/visual-identity/assets/{kind}/{assetVersion:guid}", async (
                 string kind,
                 Guid assetVersion,
@@ -93,4 +131,7 @@ public static class VisualIdentityEndpoints
 
         return endpoints;
     }
+
+    private static string SafeColor(string color, string fallback) =>
+        VisualIdentityValidator.IsHexColor(color) ? color : fallback;
 }

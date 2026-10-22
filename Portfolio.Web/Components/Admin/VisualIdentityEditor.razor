@@ -7,6 +7,7 @@
 @using Microsoft.JSInterop
 @using Portfolio.Application.VisualIdentity
 @using Portfolio.Infrastructure.Identity
+@using Portfolio.Web.Authentication
 @inject IVisualIdentityAdministrationService VisualIdentityService
 @inject IStringLocalizer<SharedResource> Localizer
 @inject IDialogService DialogService
@@ -168,6 +169,8 @@
     private bool isLoading = true;
     private bool isSaving;
     private VisualIdentitySnapshot? initialSnapshot;
+    private Guid? stylesheetAssetVersion;
+    private IJSObjectReference? themeStylesheetModule;
     private IJSObjectReference? unsavedChangesModule;
     private bool unsavedChangesModuleInitialized;
     private bool beforeUnloadEnabled;
@@ -176,6 +179,7 @@
     protected override async Task OnInitializedAsync()
     {
         await LoadAsync();
+        stylesheetAssetVersion = settings?.AssetVersion;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -288,9 +292,11 @@
                 return;
             }
 
-            statusSeverity = Severity.Success;
-            statusMessage = Localizer["VisualIdentitySaved"];
+            var previousAssetVersion = stylesheetAssetVersion;
             await LoadAsync();
+            var assetsUpdated = await UpdateThemeStylesheetAsync(previousAssetVersion, settings);
+            statusSeverity = assetsUpdated ? Severity.Success : Severity.Warning;
+            statusMessage = Localizer[assetsUpdated ? "VisualIdentitySaved" : "VisualIdentitySavedStylesheetUpdateFailed"];
             await DisableUnsavedChangesProtectionAsync();
         }
         catch
@@ -416,6 +422,35 @@
         initialSnapshot = CaptureSnapshot();
     }
 
+    private async Task<bool> UpdateThemeStylesheetAsync(Guid? previousAssetVersion, VisualIdentitySettingsModel? currentSettings)
+    {
+        var currentAssetVersion = currentSettings?.AssetVersion;
+        if (currentAssetVersion is null || currentAssetVersion == previousAssetVersion)
+        {
+            return true;
+        }
+
+        try
+        {
+            themeStylesheetModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./js/visual-identity-theme.js");
+            var updated = await themeStylesheetModule.InvokeAsync<bool>(
+                "updateStylesheet",
+                VisualIdentityEndpoints.ThemeStylesheetUrl(currentAssetVersion.Value),
+                currentSettings!.MainLogoUrl,
+                currentSettings.FooterLogoUrl);
+            if (updated)
+            {
+                stylesheetAssetVersion = currentAssetVersion;
+            }
+
+            return updated;
+        }
+        catch (JSException)
+        {
+            return false;
+        }
+    }
+
     private async Task RefreshSettingsAsync()
     {
         settings = await VisualIdentityService.GetAsync();
@@ -440,16 +475,19 @@
 
     public async ValueTask DisposeAsync()
     {
-        if (unsavedChangesModule is null)
-        {
-            return;
-        }
-
         try
         {
-            await unsavedChangesModule.InvokeVoidAsync("setEnabled", false);
-            await unsavedChangesModule.InvokeVoidAsync("dispose");
-            await unsavedChangesModule.DisposeAsync();
+            if (themeStylesheetModule is not null)
+            {
+                await themeStylesheetModule.DisposeAsync();
+            }
+
+            if (unsavedChangesModule is not null)
+            {
+                await unsavedChangesModule.InvokeVoidAsync("setEnabled", false);
+                await unsavedChangesModule.InvokeVoidAsync("dispose");
+                await unsavedChangesModule.DisposeAsync();
+            }
         }
         catch (JSDisconnectedException)
         {

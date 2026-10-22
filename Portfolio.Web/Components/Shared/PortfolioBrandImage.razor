@@ -3,7 +3,7 @@
 
 @if (imageUrl is not null)
 {
-    <img class="@Class" src="@imageUrl" alt="@AlternativeText" />
+    <img class="@Class" src="@imageUrl" data-visual-identity-asset="@AssetName" alt="@AlternativeText" />
 }
 
 @code {
@@ -17,6 +17,12 @@
     public string Class { get; set; } = "portfolio-logo__mark";
 
     private string? imageUrl;
+    private string AssetName => Kind switch
+    {
+        VisualIdentityAssetKind.MainLogo => "mainlogo",
+        VisualIdentityAssetKind.FooterLogo => "footerlogo",
+        _ => string.Empty
+    };
 
     protected override async Task OnInitializedAsync()
     {

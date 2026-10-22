@@ -47,6 +47,12 @@
 }
 
 .mud-theme-provider {
+    --mud-palette-primary: var(--color-primary) !important;
+    --mud-palette-primary-text: var(--color-primary-contrast) !important;
+    --mud-palette-secondary: var(--color-secondary) !important;
+    --mud-palette-secondary-text: var(--color-secondary-contrast) !important;
+    --mud-palette-tertiary: var(--color-accent) !important;
+    --mud-palette-tertiary-text: var(--color-accent-contrast) !important;
     --mud-palette-background: var(--color-background) !important;
     --mud-palette-background-gray: var(--color-background) !important;
     --mud-palette-surface: var(--color-surface) !important;

@@ -14,28 +14,11 @@
     <script src="@Assets["js/theme.js"]"></script>
     <link rel="stylesheet" href="@Assets["css/tailwind.css"]" />
     <link rel="stylesheet" href="_content/MudBlazor/MudBlazor.min.css" />
-    <link rel="stylesheet" href="@Assets["css/app.css"]" />
     @if (identity is not null)
     {
-        <style>
-            :root {
-                --color-primary: @SafeColor(identity.PrimaryColor, VisualIdentityValidator.DefaultPrimaryColor);
-                --color-secondary: @SafeColor(identity.SecondaryColor, VisualIdentityValidator.DefaultSecondaryColor);
-                --color-accent: @SafeColor(identity.AccentColor, VisualIdentityValidator.DefaultAccentColor);
-                --color-primary-contrast: @VisualIdentityValidator.ContrastingTextColor(identity.PrimaryColor);
-                --color-secondary-contrast: @VisualIdentityValidator.ContrastingTextColor(identity.SecondaryColor);
-                --color-accent-contrast: @VisualIdentityValidator.ContrastingTextColor(identity.AccentColor);
-            }
-            .mud-theme-provider {
-                --mud-palette-primary: var(--color-primary) !important;
-                --mud-palette-primary-text: var(--color-primary-contrast) !important;
-                --mud-palette-secondary: var(--color-secondary) !important;
-                --mud-palette-secondary-text: var(--color-secondary-contrast) !important;
-                --mud-palette-tertiary: var(--color-accent) !important;
-                --mud-palette-tertiary-text: var(--color-accent-contrast) !important;
-            }
-        </style>
+        <link id="visual-identity-theme-stylesheet" rel="stylesheet" href="@VisualIdentityEndpoints.ThemeStylesheetUrl(identity.AssetVersion)" />
     }
+    <link rel="stylesheet" href="@Assets["css/app.css"]" />
     <ImportMap integrity="@importMapIntegrity" />
     @if (identity is not null)
     {
@@ -71,8 +54,5 @@
         identity = await VisualIdentityService.GetAsync();
         importMapIntegrity = ImportMapCspIntegrity.GetIntegrity(HttpContext);
     }
-
-    private static string SafeColor(string color, string fallback) =>
-        VisualIdentityValidator.IsHexColor(color) ? color : fallback;
 
 }

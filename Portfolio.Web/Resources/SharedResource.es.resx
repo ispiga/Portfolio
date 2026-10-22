@@ -777,6 +777,9 @@
   <data name="VisualIdentitySaved" xml:space="preserve">
     <value>Los colores de identidad visual se han guardado.</value>
   </data>
+  <data name="VisualIdentitySavedStylesheetUpdateFailed" xml:space="preserve">
+    <value>La identidad visual se ha guardado, pero no se pudo actualizar su aspecto ahora. Recarga la página para aplicar los cambios.</value>
+  </data>
   <data name="VisualIdentityUnsavedChangesTitle" xml:space="preserve">
     <value>Cambios sin guardar</value>
   </data>
