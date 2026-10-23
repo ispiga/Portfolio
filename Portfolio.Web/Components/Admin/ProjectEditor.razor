@@ -6,6 +6,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.Extensions.Localization
+@using Microsoft.Extensions.Logging
 @using Microsoft.JSInterop
 @using Portfolio.Application.Projects
 @using Portfolio.Infrastructure.Identity
@@ -14,6 +15,7 @@
 @inject IStringLocalizer<SharedResource> Localizer
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
+@inject ILogger<ProjectEditor> Logger
 
 <PageTitle>@Localizer[IsNew ? "ProjectCreate" : "ProjectEdit"]</PageTitle>
 
@@ -185,6 +187,9 @@
     private IJSObjectReference? unsavedChangesModule;
     private bool unsavedChangesModuleInitialized;
     private bool beforeUnloadEnabled;
+    private readonly CancellationTokenSource jsLifetimeCancellation = new();
+    private readonly SemaphoreSlim jsModuleLock = new(1, 1);
+    private bool disposed;
     private long previewImageVersion;
     private string? spanishSlugDisplay;
     private string? englishSlugDisplay;
@@ -199,29 +204,68 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!loaded || loadFailed)
+        if (!loaded || loadFailed || disposed)
         {
             return;
         }
 
-        unsavedChangesModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./js/experience-unsaved-changes.js?v=11");
-        if (!unsavedChangesModuleInitialized)
+        try
         {
-            await unsavedChangesModule.InvokeVoidAsync(
-                "initialize",
-                "project-edit-form",
-                Localizer["ProjectUnsavedChangesTitle"].Value,
-                Localizer["ProjectUnsavedChangesConfirmation"].Value,
-                Localizer["StayOnPage"].Value,
-                Localizer["DiscardChanges"].Value,
-                "#project-preview-upload[data-ignore-unsaved-changes]");
-            unsavedChangesModuleInitialized = true;
+            await jsModuleLock.WaitAsync(jsLifetimeCancellation.Token);
+        }
+        catch (OperationCanceledException exception) when (disposed)
+        {
+            Logger.LogDebug(exception, "Project editor JS initialization was canceled while waiting for the module lock.");
+            return;
         }
 
-        if (beforeUnloadEnabled != HasUnsavedChanges)
+        try
         {
-            beforeUnloadEnabled = HasUnsavedChanges;
-            await unsavedChangesModule.InvokeVoidAsync("setEnabled", beforeUnloadEnabled);
+            if (disposed)
+            {
+                return;
+            }
+
+            unsavedChangesModule ??= await JS.InvokeAsync<IJSObjectReference>(
+                "import",
+                jsLifetimeCancellation.Token,
+                "./js/experience-unsaved-changes.js?v=11");
+            if (disposed)
+            {
+                return;
+            }
+
+            if (!unsavedChangesModuleInitialized)
+            {
+                await unsavedChangesModule.InvokeVoidAsync(
+                    "initialize",
+                    jsLifetimeCancellation.Token,
+                    "project-edit-form",
+                    Localizer["ProjectUnsavedChangesTitle"].Value,
+                    Localizer["ProjectUnsavedChangesConfirmation"].Value,
+                    Localizer["StayOnPage"].Value,
+                    Localizer["DiscardChanges"].Value,
+                    "#project-preview-upload[data-ignore-unsaved-changes]");
+                unsavedChangesModuleInitialized = true;
+            }
+
+            if (beforeUnloadEnabled != HasUnsavedChanges)
+            {
+                beforeUnloadEnabled = HasUnsavedChanges;
+                await unsavedChangesModule.InvokeVoidAsync("setEnabled", jsLifetimeCancellation.Token, beforeUnloadEnabled);
+            }
+        }
+        catch (JSDisconnectedException exception) when (disposed)
+        {
+            Logger.LogDebug(exception, "Project editor JS initialization ended after component disposal.");
+        }
+        catch (OperationCanceledException exception) when (disposed)
+        {
+            Logger.LogDebug(exception, "Project editor JS initialization was canceled during component disposal.");
+        }
+        finally
+        {
+            jsModuleLock.Release();
         }
     }
 
@@ -325,27 +369,93 @@
     private async Task DisableUnsavedChangesProtectionAsync()
     {
         beforeUnloadEnabled = false;
-        if (unsavedChangesModule is not null)
+        try
         {
-            await unsavedChangesModule.InvokeVoidAsync("setEnabled", false);
+            await jsModuleLock.WaitAsync(jsLifetimeCancellation.Token);
         }
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        if (unsavedChangesModule is null)
+        catch (OperationCanceledException exception) when (disposed)
         {
+            Logger.LogDebug(exception, "Project editor JS protection update was canceled during component disposal.");
             return;
         }
 
         try
         {
-            await unsavedChangesModule.InvokeVoidAsync("setEnabled", false);
-            await unsavedChangesModule.InvokeVoidAsync("dispose");
-            await unsavedChangesModule.DisposeAsync();
+            if (!disposed && unsavedChangesModule is not null)
+            {
+                await unsavedChangesModule.InvokeVoidAsync("setEnabled", jsLifetimeCancellation.Token, false);
+            }
         }
-        catch (JSDisconnectedException)
+        catch (JSDisconnectedException exception) when (disposed)
         {
+            Logger.LogDebug(exception, "Project editor JS protection update ended after component disposal.");
+        }
+        catch (OperationCanceledException exception) when (disposed)
+        {
+            Logger.LogDebug(exception, "Project editor JS protection update was canceled during component disposal.");
+        }
+        finally
+        {
+            jsModuleLock.Release();
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        disposed = true;
+        jsLifetimeCancellation.Cancel();
+        await jsModuleLock.WaitAsync();
+        try
+        {
+            var module = unsavedChangesModule;
+            unsavedChangesModule = null;
+            if (module is null)
+            {
+                return;
+            }
+
+            var cleanupErrors = new List<Exception>();
+            await TryInvokeLifecycleInteropAsync(cleanupErrors, () => module.InvokeVoidAsync("setEnabled", false), "setEnabled");
+            await TryInvokeLifecycleInteropAsync(cleanupErrors, () => module.InvokeVoidAsync("dispose"), "dispose");
+            await TryInvokeLifecycleInteropAsync(cleanupErrors, module.DisposeAsync, "module.DisposeAsync");
+
+            if (cleanupErrors.Count == 1)
+            {
+                System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(cleanupErrors[0]).Throw();
+            }
+
+            if (cleanupErrors.Count > 1)
+            {
+                throw new AggregateException("Project editor JavaScript cleanup failed.", cleanupErrors);
+            }
+        }
+        finally
+        {
+            jsModuleLock.Release();
+            jsLifetimeCancellation.Dispose();
+        }
+    }
+
+    private async ValueTask TryInvokeLifecycleInteropAsync(
+        List<Exception> cleanupErrors,
+        Func<ValueTask> operation,
+        string operationName)
+    {
+        try
+        {
+            await operation();
+        }
+        catch (JSDisconnectedException exception)
+        {
+            Logger.LogDebug(exception, "Project editor JS {Operation} could not complete because the circuit disconnected.", operationName);
+        }
+        catch (OperationCanceledException exception) when (disposed)
+        {
+            Logger.LogDebug(exception, "Project editor JS {Operation} was canceled during component disposal.", operationName);
+        }
+        catch (Exception exception)
+        {
+            cleanupErrors.Add(exception);
         }
     }
 

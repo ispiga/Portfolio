@@ -1,6 +1,9 @@
 @using Microsoft.Extensions.Localization
+@using Microsoft.Extensions.Logging
+@implements IAsyncDisposable
 @inject IStringLocalizer<SharedResource> Localizer
 @inject IJSRuntime JS
+@inject ILogger<ThemeSelector> Logger
 
 <div class="theme-selector">
     <label class="visually-hidden" for="theme-select">@Localizer["Theme"]</label>
@@ -13,19 +16,104 @@
 
 @code {
     private string selectedTheme = "system";
+    private readonly CancellationTokenSource jsLifetimeCancellation = new();
+    private readonly SemaphoreSlim jsCallLock = new(1, 1);
+    private bool disposed;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (!firstRender || disposed)
         {
-            selectedTheme = await JS.InvokeAsync<string>("portfolioTheme.get");
+            return;
+        }
+
+        try
+        {
+            await jsCallLock.WaitAsync(jsLifetimeCancellation.Token);
+        }
+        catch (OperationCanceledException exception) when (disposed)
+        {
+            Logger.LogDebug(exception, "Theme initialization was canceled while waiting for the JS call lock.");
+            return;
+        }
+
+        try
+        {
+            if (disposed)
+            {
+                return;
+            }
+
+            selectedTheme = await JS.InvokeAsync<string>("portfolioTheme.get", jsLifetimeCancellation.Token);
+        }
+        catch (JSDisconnectedException exception) when (disposed)
+        {
+            Logger.LogDebug(exception, "Theme initialization ended after the selector was disposed.");
+            return;
+        }
+        catch (OperationCanceledException exception) when (disposed)
+        {
+            Logger.LogDebug(exception, "Theme initialization was canceled during selector disposal.");
+            return;
+        }
+        finally
+        {
+            jsCallLock.Release();
+        }
+
+        if (!disposed)
+        {
             StateHasChanged();
         }
     }
 
     private async Task OnThemeChanged(ChangeEventArgs args)
     {
+        if (disposed)
+        {
+            return;
+        }
+
         var theme = args.Value?.ToString() ?? "system";
-        selectedTheme = await JS.InvokeAsync<string>("portfolioTheme.set", theme);
+        try
+        {
+            await jsCallLock.WaitAsync(jsLifetimeCancellation.Token);
+        }
+        catch (OperationCanceledException exception) when (disposed)
+        {
+            Logger.LogDebug(exception, "Theme update was canceled while waiting for the JS call lock.");
+            return;
+        }
+
+        try
+        {
+            if (disposed)
+            {
+                return;
+            }
+
+            selectedTheme = await JS.InvokeAsync<string>("portfolioTheme.set", jsLifetimeCancellation.Token, theme);
+        }
+        catch (JSDisconnectedException exception) when (disposed)
+        {
+            Logger.LogDebug(exception, "Theme update ended after the selector was disposed.");
+        }
+        catch (OperationCanceledException exception) when (disposed)
+        {
+            Logger.LogDebug(exception, "Theme update was canceled during selector disposal.");
+        }
+        finally
+        {
+            jsCallLock.Release();
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        disposed = true;
+        jsLifetimeCancellation.Cancel();
+        await jsCallLock.WaitAsync();
+        jsCallLock.Release();
+        jsLifetimeCancellation.Dispose();
     }
 }

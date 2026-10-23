@@ -8,6 +8,24 @@ document.addEventListener("submit", async event => {
 
     const submitButton = form.querySelector('button[type="submit"]');
     const rateLimitMessage = document.getElementById("admin-login-rate-limit");
+    const requestErrorMessage = document.getElementById("admin-login-request-error");
+
+    const showRequestError = () => {
+        if (requestErrorMessage) {
+            requestErrorMessage.hidden = false;
+            requestErrorMessage.focus();
+        }
+        if (submitButton) {
+            submitButton.disabled = false;
+        }
+    };
+
+    const formData = new FormData(form);
+    if (!formData.has("__RequestVerificationToken")) {
+        window.location.assign("/admin/login?error=antiforgery");
+        return;
+    }
+
     if (submitButton) {
         submitButton.disabled = true;
     }
@@ -15,7 +33,7 @@ document.addEventListener("submit", async event => {
     try {
         const response = await fetch(form.action, {
             method: form.method,
-            body: new FormData(form),
+            body: formData,
             credentials: "same-origin"
         });
 
@@ -35,12 +53,18 @@ document.addEventListener("submit", async event => {
             return;
         }
 
-        const contentType = response.headers.get("Content-Type") ?? "text/plain;charset=utf-8";
-        const responseDocument = new Blob([await response.blob()], { type: contentType });
-        window.location.assign(URL.createObjectURL(responseDocument));
-    } catch {
-        if (submitButton) {
-            submitButton.disabled = false;
+        if (response.status === 400) {
+            window.location.assign("/admin/login?error=antiforgery");
+            return;
         }
+
+        if (response.status === 401) {
+            window.location.assign("/admin/login?error=session-expired");
+            return;
+        }
+
+        showRequestError();
+    } catch {
+        showRequestError();
     }
 });

@@ -2,18 +2,26 @@
 @implements IAsyncDisposable
 @inject IJSRuntime JSRuntime
 @inject IStringLocalizer<SharedResource> Localizer
+@inject ILogger<ExperienceAttachmentPreview> Logger
 
 <a class="experience-attachment-preview" href="@ContentUrl" target="_blank" rel="noopener noreferrer" aria-label="@Localizer["ExperienceAttachmentOpen", DisplayName]">
     @if (ContentType == "application/pdf")
     {
-        @if (previewFailed)
-        {
-            <span class="experience-attachment-preview__fallback" aria-hidden="true">PDF</span>
-        }
-        else
-        {
+        <div class="pdf-preview-frame" aria-busy="@previewLoading">
             <canvas @ref="pdfCanvas" class="experience-attachment-preview__pdf" aria-hidden="true"></canvas>
-        }
+            @if (previewLoading)
+            {
+                <span class="pdf-preview-state" role="status">@Localizer["PdfPreviewLoading"]</span>
+            }
+            else if (previewFailed)
+            {
+                <span class="pdf-preview-state pdf-preview-state--error" role="alert">@Localizer["PdfPreviewFailed"]</span>
+            }
+            else if (!previewLoaded)
+            {
+                <span class="pdf-preview-state" aria-hidden="true">PDF</span>
+            }
+        </div>
         <span class="experience-attachment-preview__label">PDF</span>
     }
     else
@@ -35,39 +43,165 @@
 
     private ElementReference pdfCanvas;
     private IJSObjectReference? pdfModule;
+    private DotNetObjectReference<ExperienceAttachmentPreview>? dotNetReference;
     private bool previewFailed;
+    private bool previewLoading;
+    private bool previewLoaded;
+    private bool disposed;
+    private int disposalStarted;
+    private readonly CancellationTokenSource componentLifetime = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && ContentType == "application/pdf")
+        if (!firstRender || ContentType != "application/pdf" || disposed)
         {
-            try
-            {
-                pdfModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/experience-pdf-preview.js");
-                await pdfModule.InvokeVoidAsync("renderFirstPage", ContentUrl, pdfCanvas);
-            }
-            catch (JSException)
-            {
-                previewFailed = true;
-                StateHasChanged();
-            }
+            return;
+        }
+
+        var cancellationToken = componentLifetime.Token;
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+
+        try
+        {
+            dotNetReference = DotNetObjectReference.Create(this);
+            pdfModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", cancellationToken, "./js/experience-pdf-preview.js");
+            await pdfModule.InvokeVoidAsync("observeFirstPage", cancellationToken, ContentUrl, pdfCanvas, dotNetReference);
+        }
+        catch (OperationCanceledException exception) when (cancellationToken.IsCancellationRequested)
+        {
+            Logger.LogDebug(exception,
+                "Interop de vista previa de experiencia cancelada porque el componente se estaba eliminando. Duración: {ElapsedMilliseconds} ms.",
+                stopwatch.ElapsedMilliseconds);
+        }
+        catch (JSDisconnectedException exception)
+        {
+            Logger.LogDebug(exception,
+                "El circuito se desconectó durante la inicialización de la vista previa de experiencia. Duración: {ElapsedMilliseconds} ms.",
+                stopwatch.ElapsedMilliseconds);
+        }
+        catch (OperationCanceledException exception)
+        {
+            Logger.LogWarning(exception,
+                "La interop de vista previa de experiencia se canceló sin que el componente se estuviera eliminando. Duración: {ElapsedMilliseconds} ms.",
+                stopwatch.ElapsedMilliseconds);
+            MarkPreviewFailed();
+        }
+        catch (JSException exception)
+        {
+            Logger.LogWarning(exception, "No se pudo inicializar la vista previa de experiencia.");
+            MarkPreviewFailed();
         }
     }
 
+    private void MarkPreviewFailed()
+    {
+        if (disposed)
+        {
+            return;
+        }
+
+        previewFailed = true;
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public Task OnPdfPreviewLoading() => InvokeAsync(() =>
+    {
+        if (disposed)
+        {
+            return;
+        }
+
+        previewLoading = true;
+        previewFailed = false;
+        previewLoaded = false;
+        StateHasChanged();
+    });
+
+    [JSInvokable]
+    public Task OnPdfPreviewLoaded() => InvokeAsync(() =>
+    {
+        if (disposed)
+        {
+            return;
+        }
+
+        previewLoading = false;
+        previewLoaded = true;
+        StateHasChanged();
+    });
+
+    [JSInvokable]
+    public Task OnPdfPreviewFailed(string errorType) => InvokeAsync(() =>
+    {
+        if (disposed)
+        {
+            return;
+        }
+
+        Logger.LogWarning("Falló la vista previa PDF de una experiencia. Tipo de error JS: {ErrorType}.", errorType);
+        previewLoading = false;
+        previewFailed = true;
+        StateHasChanged();
+    });
+
     public async ValueTask DisposeAsync()
     {
+        if (Interlocked.Exchange(ref disposalStarted, 1) != 0)
+        {
+            return;
+        }
+
+        disposed = true;
+        componentLifetime.Cancel();
+
         if (pdfModule is null)
         {
+            dotNetReference?.Dispose();
+            componentLifetime.Dispose();
             return;
         }
 
         try
         {
-            await pdfModule.InvokeVoidAsync("disposePreview", pdfCanvas);
-            await pdfModule.DisposeAsync();
+            try
+            {
+                await pdfModule.InvokeVoidAsync("disposePreview", pdfCanvas);
+            }
+            catch (JSDisconnectedException exception)
+            {
+                Logger.LogDebug(exception, "No se pudo limpiar la vista previa PDF de experiencia: el circuito ya estaba desconectado.");
+            }
+            catch (OperationCanceledException exception)
+            {
+                Logger.LogDebug(exception, "La limpieza de la vista previa PDF de experiencia se canceló durante la eliminación del componente.");
+            }
+            catch (JSException exception)
+            {
+                Logger.LogWarning(exception, "Falló la limpieza de la vista previa PDF de experiencia.");
+            }
+
+            try
+            {
+                await pdfModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException exception)
+            {
+                Logger.LogDebug(exception, "No se pudo liberar el módulo PDF de experiencia: el circuito ya estaba desconectado.");
+            }
+            catch (OperationCanceledException exception)
+            {
+                Logger.LogDebug(exception, "La liberación del módulo PDF de experiencia se canceló durante la eliminación del componente.");
+            }
+            catch (JSException exception)
+            {
+                Logger.LogWarning(exception, "Falló la liberación del módulo PDF de experiencia.");
+            }
         }
-        catch (JSDisconnectedException)
+        finally
         {
+            dotNetReference?.Dispose();
+            componentLifetime.Dispose();
         }
     }
 }

@@ -120,6 +120,12 @@
   <data name="HomeTitle" xml:space="preserve">
     <value>Portfolio</value>
   </data>
+  <data name="PdfPreviewLoading" xml:space="preserve">
+    <value>Loading PDF preview…</value>
+  </data>
+  <data name="PdfPreviewFailed" xml:space="preserve">
+    <value>The PDF preview could not be loaded.</value>
+  </data>
   <data name="HomeDescription" xml:space="preserve">
     <value>Application under construction</value>
   </data>
@@ -437,6 +443,15 @@
   </data>
   <data name="AdminLoginFailed" xml:space="preserve">
     <value>Sign-in failed. Check your credentials and try again.</value>
+  </data>
+  <data name="AdminLoginAntiforgeryFailed" xml:space="preserve">
+    <value>The sign-in form has expired or is no longer valid. Reload this page and try again.</value>
+  </data>
+  <data name="AdminLoginSessionExpired" xml:space="preserve">
+    <value>Your session has expired. Please sign in again.</value>
+  </data>
+  <data name="AdminLoginRequestFailed" xml:space="preserve">
+    <value>The request could not be completed. Check your connection and try again.</value>
   </data>
   <data name="AdminLoginRateLimited" xml:space="preserve">
     <value>Too many attempts have been made. Please wait before trying again.</value>

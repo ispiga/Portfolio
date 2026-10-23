@@ -120,6 +120,12 @@
   <data name="HomeTitle" xml:space="preserve">
     <value>Portfolio</value>
   </data>
+  <data name="PdfPreviewLoading" xml:space="preserve">
+    <value>Loading PDF preview…</value>
+  </data>
+  <data name="PdfPreviewFailed" xml:space="preserve">
+    <value>The PDF preview could not be loaded.</value>
+  </data>
   <data name="HomeDescription" xml:space="preserve">
     <value>Aplicación en construcción</value>
   </data>
@@ -437,6 +443,15 @@
   </data>
   <data name="AdminLoginFailed" xml:space="preserve">
     <value>No se pudo iniciar sesión. Comprueba las credenciales e inténtalo de nuevo.</value>
+  </data>
+  <data name="AdminLoginAntiforgeryFailed" xml:space="preserve">
+    <value>El formulario de inicio de sesión ha caducado o ya no es válido. Recarga esta página e inténtalo de nuevo.</value>
+  </data>
+  <data name="AdminLoginSessionExpired" xml:space="preserve">
+    <value>La sesión ha caducado. Vuelve a iniciar sesión.</value>
+  </data>
+  <data name="AdminLoginRequestFailed" xml:space="preserve">
+    <value>No se pudo completar la solicitud. Comprueba tu conexión e inténtalo de nuevo.</value>
   </data>
   <data name="AdminLoginRateLimited" xml:space="preserve">
     <value>Se han realizado demasiados intentos. Espera antes de volver a intentarlo.</value>

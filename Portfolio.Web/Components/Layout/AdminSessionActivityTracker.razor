@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IJSRuntime JS
+@inject ILogger<AdminSessionActivityTracker> Logger
 
 <form id="admin-session-activity-form" action="/admin/session/activity" method="post" hidden>
     <AntiforgeryToken />
@@ -31,18 +32,65 @@
 
     public async ValueTask DisposeAsync()
     {
-        if (module is null)
+        var currentModule = module;
+        if (currentModule is null)
         {
             return;
         }
 
         try
         {
-            await module.InvokeVoidAsync("stopMonitoring");
-            await module.DisposeAsync();
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+
+            try
+            {
+                await currentModule.InvokeVoidAsync("stopMonitoring");
+            }
+            catch (JSDisconnectedException ex)
+            {
+                Logger.LogDebug(
+                    ex,
+                    "JS interop {Operation} no pudo completarse: el circuito está desconectado. Duración: {ElapsedMilliseconds} ms.",
+                    "stopMonitoring",
+                    stopwatch.ElapsedMilliseconds);
+            }
+            catch (TaskCanceledException ex)
+            {
+                Logger.LogWarning(
+                    ex,
+                    "JS interop {Operation} se canceló durante la disposición. Duración: {ElapsedMilliseconds} ms. Token cancelable: {CanBeCanceled}; cancelado: {IsCancellationRequested}.",
+                    "stopMonitoring",
+                    stopwatch.ElapsedMilliseconds,
+                    ex.CancellationToken.CanBeCanceled,
+                    ex.CancellationToken.IsCancellationRequested);
+            }
         }
-        catch (JSDisconnectedException)
+        finally
         {
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+
+            try
+            {
+                await currentModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException ex)
+            {
+                Logger.LogDebug(
+                    ex,
+                    "JS interop {Operation} no pudo completarse: el circuito está desconectado. Duración: {ElapsedMilliseconds} ms.",
+                    "module.DisposeAsync",
+                    stopwatch.ElapsedMilliseconds);
+            }
+            catch (TaskCanceledException ex)
+            {
+                Logger.LogWarning(
+                    ex,
+                    "JS interop {Operation} se canceló durante la disposición. Duración: {ElapsedMilliseconds} ms. Token cancelable: {CanBeCanceled}; cancelado: {IsCancellationRequested}.",
+                    "module.DisposeAsync",
+                    stopwatch.ElapsedMilliseconds,
+                    ex.CancellationToken.CanBeCanceled,
+                    ex.CancellationToken.IsCancellationRequested);
+            }
         }
     }
 }

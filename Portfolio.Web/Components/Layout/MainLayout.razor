@@ -3,12 +3,15 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.Extensions.Localization
+@using Microsoft.Extensions.Logging
+@using Microsoft.JSInterop
 @using Portfolio.Web.Authentication
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject AdminSessionExpirationState ExpirationState
 @inject IStringLocalizer<SharedResource> Localizer
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
+@inject ILogger<MainLayout> Logger
 
 <div class="site-layout">
     <header @ref="navbarHeader">
@@ -35,6 +38,9 @@
     private ElementReference navbarHeader;
     private IJSObjectReference? navbarScrollModule;
     private bool showExpirationDialog;
+    private readonly CancellationTokenSource jsLifetimeCancellation = new();
+    private readonly SemaphoreSlim jsModuleLock = new(1, 1);
+    private bool disposed;
 
     protected override async Task OnInitializedAsync()
     {
@@ -65,13 +71,55 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!firstRender)
+        if (!firstRender || disposed)
         {
             return;
         }
 
-        navbarScrollModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/home-navbar-scroll.js");
-        await navbarScrollModule.InvokeVoidAsync("setNavbarScrollTracking", navbarHeader, true);
+        try
+        {
+            await jsModuleLock.WaitAsync(jsLifetimeCancellation.Token);
+        }
+        catch (OperationCanceledException exception) when (disposed)
+        {
+            Logger.LogDebug(exception, "Navbar JS initialization was canceled while waiting for the module lock.");
+            return;
+        }
+
+        try
+        {
+            if (disposed)
+            {
+                return;
+            }
+
+            navbarScrollModule = await JS.InvokeAsync<IJSObjectReference>(
+                "import",
+                jsLifetimeCancellation.Token,
+                "./js/home-navbar-scroll.js");
+            if (disposed)
+            {
+                return;
+            }
+
+            await navbarScrollModule.InvokeVoidAsync(
+                "setNavbarScrollTracking",
+                jsLifetimeCancellation.Token,
+                navbarHeader,
+                true);
+        }
+        catch (JSDisconnectedException exception) when (disposed)
+        {
+            Logger.LogDebug(exception, "Navbar JS initialization ended after layout disposal.");
+        }
+        catch (OperationCanceledException exception) when (disposed)
+        {
+            Logger.LogDebug(exception, "Navbar JS initialization was canceled during layout disposal.");
+        }
+        finally
+        {
+            jsModuleLock.Release();
+        }
     }
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs args)
@@ -88,21 +136,62 @@
 
     public async ValueTask DisposeAsync()
     {
+        disposed = true;
+        jsLifetimeCancellation.Cancel();
         ExpirationState.Expired -= OnSessionExpired;
         Navigation.LocationChanged -= OnLocationChanged;
 
-        if (navbarScrollModule is null)
-        {
-            return;
-        }
-
+        await jsModuleLock.WaitAsync();
         try
         {
-            await navbarScrollModule.InvokeVoidAsync("dispose", navbarHeader);
-            await navbarScrollModule.DisposeAsync();
+            var module = navbarScrollModule;
+            navbarScrollModule = null;
+            if (module is null)
+            {
+                return;
+            }
+
+            var cleanupErrors = new List<Exception>();
+            await TryInvokeLifecycleInteropAsync(cleanupErrors, () => module.InvokeVoidAsync("dispose", navbarHeader), "dispose");
+            await TryInvokeLifecycleInteropAsync(cleanupErrors, module.DisposeAsync, "module.DisposeAsync");
+
+            if (cleanupErrors.Count == 1)
+            {
+                System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(cleanupErrors[0]).Throw();
+            }
+
+            if (cleanupErrors.Count > 1)
+            {
+                throw new AggregateException("Navbar JavaScript cleanup failed.", cleanupErrors);
+            }
         }
-        catch (JSDisconnectedException)
+        finally
         {
+            jsModuleLock.Release();
+            jsLifetimeCancellation.Dispose();
+        }
+    }
+
+    private async ValueTask TryInvokeLifecycleInteropAsync(
+        List<Exception> cleanupErrors,
+        Func<ValueTask> operation,
+        string operationName)
+    {
+        try
+        {
+            await operation();
+        }
+        catch (JSDisconnectedException exception)
+        {
+            Logger.LogDebug(exception, "Navbar JS {Operation} could not complete because the circuit disconnected.", operationName);
+        }
+        catch (OperationCanceledException exception) when (disposed)
+        {
+            Logger.LogDebug(exception, "Navbar JS {Operation} was canceled during layout disposal.", operationName);
+        }
+        catch (Exception exception)
+        {
+            cleanupErrors.Add(exception);
         }
     }
 }

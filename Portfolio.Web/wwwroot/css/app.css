@@ -96,6 +96,41 @@
     gap: 0.75rem;
 }
 
+.pdf-preview-frame {
+    position: relative;
+    display: grid;
+    width: 100%;
+    min-height: 14rem;
+    aspect-ratio: 0.707;
+    place-items: center;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-small);
+    background: var(--color-background);
+}
+
+.pdf-preview-frame > canvas {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.pdf-preview-state {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: grid;
+    padding: 1rem;
+    place-items: center;
+    color: var(--color-text-secondary);
+    background: var(--color-surface);
+    text-align: center;
+    font-size: var(--text-small);
+}
+
+.pdf-preview-state--error {
+    color: var(--color-error);
+}
+
 html[data-theme="dark"] {
     color-scheme: dark;
     --color-background: var(--theme-dark-background);

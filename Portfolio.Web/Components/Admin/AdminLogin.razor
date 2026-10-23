@@ -27,12 +27,21 @@
         {
             <p class="admin-message admin-message--error" role="alert">@Localizer["AdminValidationSummary"]</p>
         }
+        else if (Error == "antiforgery")
+        {
+            <p class="admin-message admin-message--error" role="alert">@Localizer["AdminLoginAntiforgeryFailed"]</p>
+        }
+        else if (Error == "session-expired")
+        {
+            <p class="admin-message admin-message--error" role="alert">@Localizer["AdminLoginSessionExpired"]</p>
+        }
         else if (LoggedOut == "true")
         {
             <p class="admin-message" role="status">@Localizer["AdminLoggedOut"]</p>
         }
 
         <p id="admin-login-rate-limit" class="admin-message admin-message--error" role="alert" tabindex="-1" hidden>@Localizer["AdminLoginRateLimited"]</p>
+        <p id="admin-login-request-error" class="admin-message admin-message--error" role="alert" tabindex="-1" hidden>@Localizer["AdminLoginRequestFailed"]</p>
 
         <form action="/admin/login/submit" method="post" class="admin-login__form" data-admin-login>
             <AntiforgeryToken />

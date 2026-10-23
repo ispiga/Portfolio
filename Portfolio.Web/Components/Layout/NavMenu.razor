@@ -1,11 +1,13 @@
 @using Microsoft.Extensions.Localization
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.Extensions.Logging
 @using Portfolio.Infrastructure.Identity
 @implements IAsyncDisposable
 @inject IStringLocalizer<SharedResource> Localizer
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
+@inject ILogger<NavMenu> Logger
 
 <nav class="portfolio-navbar @(isMenuOpen ? "is-menu-open" : string.Empty)" aria-label="@Localizer["MainNavigation"]">
     <div class="portfolio-shell portfolio-navbar__content">
@@ -63,19 +65,45 @@
     private IJSObjectReference? scrollModule;
     private string? pendingSectionId;
     private bool pendingScrollToTop;
+    private readonly CancellationTokenSource jsLifetimeCancellation = new();
+    private readonly SemaphoreSlim jsModuleLock = new(1, 1);
+    private bool disposed;
 
     protected override void OnInitialized() => Navigation.LocationChanged += OnLocationChanged;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (disposed)
+        {
+            return;
+        }
+
         try
         {
-            if (firstRender)
+            await jsModuleLock.WaitAsync(jsLifetimeCancellation.Token);
+        }
+        catch (OperationCanceledException exception) when (disposed)
+        {
+            Logger.LogDebug(exception, "NavMenu JS initialization was canceled while waiting for the module lock.");
+            return;
+        }
+
+        try
+        {
+            if (disposed)
             {
-                scrollModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/home-navbar-scroll.js");
+                return;
             }
 
-            if (scrollModule is null)
+            if (firstRender)
+            {
+                scrollModule = await JS.InvokeAsync<IJSObjectReference>(
+                    "import",
+                    jsLifetimeCancellation.Token,
+                    "./js/home-navbar-scroll.js");
+            }
+
+            if (disposed || scrollModule is null)
             {
                 return;
             }
@@ -83,16 +111,25 @@
             if (pendingSectionId is { } sectionId)
             {
                 pendingSectionId = null;
-                await scrollModule.InvokeVoidAsync("scrollToSection", sectionId);
+                await scrollModule.InvokeVoidAsync("scrollToSection", jsLifetimeCancellation.Token, sectionId);
             }
             else if (pendingScrollToTop)
             {
                 pendingScrollToTop = false;
-                await scrollModule.InvokeVoidAsync("scrollToTop");
+                await scrollModule.InvokeVoidAsync("scrollToTop", jsLifetimeCancellation.Token);
             }
         }
-        catch (JSDisconnectedException)
+        catch (JSDisconnectedException exception) when (disposed)
         {
+            Logger.LogDebug(exception, "NavMenu JS operation ended after component disposal.");
+        }
+        catch (OperationCanceledException exception) when (disposed)
+        {
+            Logger.LogDebug(exception, "NavMenu JS operation was canceled during component disposal.");
+        }
+        finally
+        {
+            jsModuleLock.Release();
         }
     }
 
@@ -144,8 +181,18 @@
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs args)
     {
+        if (disposed)
+        {
+            return;
+        }
+
         _ = InvokeAsync(() =>
         {
+            if (disposed)
+            {
+                return;
+            }
+
             activeSection = null;
             CloseMenu();
             StateHasChanged();
@@ -184,19 +231,37 @@
 
     public async ValueTask DisposeAsync()
     {
+        disposed = true;
+        jsLifetimeCancellation.Cancel();
         Navigation.LocationChanged -= OnLocationChanged;
 
-        if (scrollModule is null)
-        {
-            return;
-        }
-
+        await jsModuleLock.WaitAsync();
         try
         {
-            await scrollModule.DisposeAsync();
+            var module = scrollModule;
+            scrollModule = null;
+            if (module is null)
+            {
+                return;
+            }
+
+            try
+            {
+                await module.DisposeAsync();
+            }
+            catch (JSDisconnectedException exception)
+            {
+                Logger.LogDebug(exception, "NavMenu JS module could not be released because the circuit disconnected.");
+            }
+            catch (OperationCanceledException exception)
+            {
+                Logger.LogDebug(exception, "NavMenu JS module release was canceled during component disposal.");
+            }
         }
-        catch (JSDisconnectedException)
+        finally
         {
+            jsModuleLock.Release();
+            jsLifetimeCancellation.Dispose();
         }
     }
 }

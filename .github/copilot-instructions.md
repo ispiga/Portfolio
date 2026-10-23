@@ -2,7 +2,8 @@
 
 ## Project context
 
-- Consult `Portfolio\PORTFOLIO_PROJECT.md` when the task depends on project architecture, technology choices, conventions, routes, UX decisions or other project-level requirements. Treat `Portfolio\PORTFOLIO_PROJECT.md` as the source of truth for project decisions.
+- Consult `PORTFOLIO_PROJECT.md` at the repository root when the task depends on project architecture, technology choices, conventions, routes, UX decisions or other project-level requirements. Treat it as the source of truth for project decisions.
+- Consult `docs/SECURITY_AUDIT.md` before changing security-sensitive behavior; keep documented SEC findings, implemented controls, validation scope and pending recommendations synchronized with code. Do not present static review or local tests as a penetration test or production verification.
 - Do not introduce alternatives that conflict with the project specification without identifying the conflict first.
 - Keep changes focused on the requested task. Do not modify unrelated projects, files or architecture.
 
@@ -43,11 +44,16 @@
 - Do not duplicate theme or `localStorage` logic in C#.
 - Do not create a second theme API.
 - Keep public and admin layouts aligned with the shared semantic theme tokens, including MudBlazor surfaces and typography.
+- Keep `ThemeSelector` interop on the existing `portfolioTheme` API and coordinate asynchronous calls with component disposal; do not duplicate theme/localStorage state or convert expected teardown handling into blanket exception suppression. `LanguageSelector` changes culture through the existing full-document `/culture/set` navigation, not a second JS localization API.
 
 ## Administration and Identity
 
 - Do not add public user registration. Provision the initial administrator through `Portfolio.AdminProvisioning`; keep web Identity services for sign-in, sign-out and authorization only.
-- Preserve the 15-minute administrator inactivity timeout, renew it only on authenticated activity, and keep HTTP cookie expiry validation and Blazor circuit revalidation aligned.
+- Preserve the current administrator inactivity timeout configured by `AdminSession.Duration`, renew it only on authenticated activity, and keep HTTP cookie expiry validation and Blazor circuit revalidation aligned.
+- The current workspace temporarily configures `AdminSession.Duration` to 3 minutes for testing, despite two authentication tests and older documentation expecting 15 minutes. Do not change the timeout or authentication policy unless explicitly requested; report/update the mismatch deliberately rather than hiding it or weakening session checks.
+- Keep login, logout and session-activity antiforgery validation enabled. The login form must render `<AntiforgeryToken />`, submit it with the same-origin cookie, and rejection must not be bypassed. Keep `admin-login.js` handling HTTP statuses explicitly; never render arbitrary response bodies as `blob:` documents. On an antiforgery rejection, obtain a fresh login document/token rather than reusing stale form state. Keep session-expiry 401 distinct from antiforgery 400.
+- For Interactive Server JS interop, prevent calls after component disposal, cancel pending initialization where the component lifetime ends, and serialize use/disposal of a shared module reference when those operations can race. Catch only expected disconnect/cancellation during teardown, log it at an appropriate level, and allow active-component failures and unexpected cleanup errors to surface. Attempt remaining cleanup independently without dropping earlier unexpected errors. Do not disable debugger exception breaks as a workaround.
+- Keep PDF previews lazy and locally vendored through the existing PDF.js modules. Preserve observer registration/removal, request/render cancellation, shared-document consumer accounting and cleanup on component disposal; provide localized loading/failure states. Do not eager-load every PDF or suppress active-component rendering failures.
 - Keep logout as an antiforgery-protected POST and expose it in both public and admin navigation when the administrator is authenticated; do not display the admin email in the public navbar.
 - Keep theme and language selectors available in both layouts and accessible when their visible labels are omitted.
 - Keep the administration shell and all admin routes responsive at mobile widths without horizontal overflow. Reuse `wwwroot/css/app.css`, retain usable touch targets, and let MudBlazor tables, form controls, attachment previews and action buttons adapt to narrow screens.
@@ -82,5 +88,5 @@
 
 - Prefer simple solutions over unnecessary abstractions or patterns.
 - Reuse existing components, services, styles and utilities before creating new ones.
-- Before introducing a new dependency, library or architectural pattern, verify that it is consistent with `Portfolio\PORTFOLIO_PROJECT.md`.
+- Before introducing a new dependency, library or architectural pattern, verify that it is consistent with the root `PORTFOLIO_PROJECT.md`.
 - Do not change established project decisions unless the task explicitly requires it.
