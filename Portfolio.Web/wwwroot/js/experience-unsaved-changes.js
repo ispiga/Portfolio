@@ -1,4 +1,4 @@
-let enabled = false;
+const unsavedChangesStateKey = "__portfolioAdminUnsavedChanges";
 let form;
 let dialog;
 let pendingAction;
@@ -7,8 +7,13 @@ let ignoredChangeSelector;
 
 const logoutFormIds = new Set(["admin-header-logout-form", "public-navbar-logout-form"]);
 
+function getUnsavedChangesState() {
+    window[unsavedChangesStateKey] ??= { enabled: false };
+    return window[unsavedChangesStateKey];
+}
+
 function beforeUnload(event) {
-    if (!enabled) {
+    if (!getUnsavedChangesState().enabled) {
         return;
     }
 
@@ -77,7 +82,7 @@ function showDialog(action, title, message, stayText, discardText) {
 }
 
 function confirmInternalAction(event) {
-    if (!enabled || event.button !== undefined && event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+    if (!getUnsavedChangesState().enabled || event.button !== undefined && event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
         return;
     }
 
@@ -120,16 +125,21 @@ export function initialize(formId, title, message, stayText, discardText, ignore
 
 export function setEnabled(value) {
     const shouldEnable = Boolean(value);
-    if (enabled === shouldEnable) {
+    const state = getUnsavedChangesState();
+    if (state.enabled === shouldEnable) {
         return;
     }
 
-    enabled = shouldEnable;
-    if (enabled) {
+    state.enabled = shouldEnable;
+    if (state.enabled) {
         window.addEventListener("beforeunload", beforeUnload);
     } else {
         window.removeEventListener("beforeunload", beforeUnload);
     }
+}
+
+export function hasUnsavedChanges() {
+    return getUnsavedChangesState().enabled;
 }
 
 export function dispose() {

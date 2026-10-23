@@ -450,6 +450,12 @@
   <data name="AdminLoginSessionExpired" xml:space="preserve">
     <value>La sesión ha caducado. Vuelve a iniciar sesión.</value>
   </data>
+  <data name="AdminSessionExpiredAccessMessage" xml:space="preserve">
+    <value>Sesión de administrador expirada.</value>
+  </data>
+  <data name="AdminSessionExpiredWithUnsavedChangesMessage" xml:space="preserve">
+    <value>Sesión de administrador expirada con cambios sin guardar.</value>
+  </data>
   <data name="AdminLoginRequestFailed" xml:space="preserve">
     <value>No se pudo completar la solicitud. Comprueba tu conexión e inténtalo de nuevo.</value>
   </data>

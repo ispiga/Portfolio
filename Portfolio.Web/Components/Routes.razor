@@ -1,14 +1,17 @@
 @rendermode InteractiveServer
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.Extensions.Localization
+@using Portfolio.Web.Authentication
 @using Portfolio.Web.Components.Admin
 @inject IStringLocalizer<SharedResource> Localizer
+@inject AdminSessionExpirationState ExpirationState
+@inject NavigationManager Navigation
 
 <Router AppAssembly="typeof(Program).Assembly" NotFoundPage="typeof(Pages.NotFound)">
     <Found Context="routeData">
         <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)">
             <NotAuthorized Context="authenticationState">
-                <section class="content-card" aria-labelledby="authorization-message">
+                <section class="content-card authorization-card" aria-labelledby="authorization-message">
                     @if (authenticationState.User.Identity?.IsAuthenticated == true)
                     {
                         <h1 id="authorization-message">@Localizer["AdminAccessDeniedTitle"]</h1>
@@ -18,11 +21,22 @@
                     {
                         <AdminLoginRedirect />
                         <h1 id="authorization-message">@Localizer["AdminLoginRequiredTitle"]</h1>
-                        <p>@Localizer["AdminLoginRequiredMessage"]</p>
-                        <a href="/admin/login" class="button button--primary">@Localizer["AdminLoginLink"]</a>
+                        @if (ExpirationState.IsExpired)
+                        {
+                            <p>@Localizer[ExpirationState.HasUnsavedChanges ? "AdminSessionExpiredWithUnsavedChangesMessage" : "AdminSessionExpiredAccessMessage"]</p>
+                        }
+                        else
+                        {
+                            <p>@Localizer["AdminLoginRequiredMessage"]</p>
+                        }
+                        <a href="/admin/login" class="button button--primary" @onclick="OpenAdminLogin" @onclick:preventDefault="true">@Localizer["AdminLoginLink"]</a>
                     }
                 </section>
             </NotAuthorized>
         </AuthorizeRouteView>
     </Found>
 </Router>
+
+@code {
+    private void OpenAdminLogin() => Navigation.NavigateTo("/admin/login", forceLoad: true, replace: true);
+}

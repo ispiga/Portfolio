@@ -4,6 +4,7 @@
 @inject IStringLocalizer<SharedResource> Localizer
 @inject IAboutQueryService AboutQueryService
 @inject IJSRuntime JS
+@inject ILogger<AboutSection> Logger
 
 <section @ref="aboutElement" id="about" class="home-section" aria-labelledby="about-title">
     <div class="section-heading">
@@ -114,56 +115,92 @@
     private readonly HashSet<Guid> truncatedHobbyDescriptions = [];
     private bool focusLightboxCloseButton;
     private bool restoreLightboxFocus;
+    private readonly CancellationTokenSource jsLifetimeCancellation = new();
+    private readonly SemaphoreSlim jsModuleLock = new(1, 1);
     private bool disposed;
 
     protected override async Task OnInitializedAsync() => content = await AboutQueryService.GetAsync();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (focusLightboxCloseButton)
-        {
-            focusLightboxCloseButton = false;
-            try
-            {
-                await lightboxCloseButton.FocusAsync();
-                if (lightboxModule is not null)
-                {
-                    await lightboxModule.InvokeVoidAsync("activate", lightboxElement);
-                }
-            }
-            catch (JSDisconnectedException)
-            {
-            }
-        }
-
-        if (restoreLightboxFocus)
-        {
-            restoreLightboxFocus = false;
-            if (lightboxModule is not null)
-            {
-                try
-                {
-                    await lightboxModule.InvokeVoidAsync("deactivate");
-                }
-                catch (JSDisconnectedException)
-                {
-                }
-            }
-        }
-
-        if (!firstRender)
+        if (disposed)
         {
             return;
         }
 
         try
         {
-            hobbyDescriptionModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/about-hobby-descriptions.js");
-            objectReference = DotNetObjectReference.Create(this);
-            await hobbyDescriptionModule.InvokeVoidAsync("observeDescriptions", aboutElement, objectReference);
+            await jsModuleLock.WaitAsync(jsLifetimeCancellation.Token);
         }
-        catch (JSDisconnectedException)
+        catch (OperationCanceledException exception) when (disposed)
         {
+            Logger.LogDebug(exception, "About section JS initialization was canceled while waiting for the module lock.");
+            return;
+        }
+
+        try
+        {
+            if (disposed)
+            {
+                return;
+            }
+
+            if (focusLightboxCloseButton)
+            {
+                focusLightboxCloseButton = false;
+                await lightboxCloseButton.FocusAsync();
+                if (disposed)
+                {
+                    return;
+                }
+
+                if (lightboxModule is not null)
+                {
+                    await lightboxModule.InvokeVoidAsync("activate", jsLifetimeCancellation.Token, lightboxElement);
+                }
+            }
+
+            if (restoreLightboxFocus)
+            {
+                restoreLightboxFocus = false;
+                if (lightboxModule is not null)
+                {
+                    await lightboxModule.InvokeVoidAsync("deactivate", jsLifetimeCancellation.Token);
+                }
+            }
+
+            if (!firstRender || disposed)
+            {
+                return;
+            }
+
+            hobbyDescriptionModule = await JS.InvokeAsync<IJSObjectReference>(
+                "import",
+                jsLifetimeCancellation.Token,
+                "./js/about-hobby-descriptions.js");
+            if (disposed)
+            {
+                return;
+            }
+
+            objectReference = DotNetObjectReference.Create(this);
+            await hobbyDescriptionModule.InvokeVoidAsync(
+                "observeDescriptions",
+                jsLifetimeCancellation.Token,
+                aboutElement,
+                objectReference);
+        }
+        catch (JSDisconnectedException exception) when (disposed)
+        {
+            Logger.LogDebug(exception, "About section JS initialization ended after component disposal.");
+        }
+        catch (OperationCanceledException exception) when (disposed)
+        {
+            Logger.LogDebug(exception, "About section JS initialization was canceled during component disposal.");
+        }
+        finally
+        {
+            jsModuleLock.Release();
         }
     }
 
@@ -200,48 +237,137 @@
 
     public async ValueTask DisposeAsync()
     {
-        disposed = true;
-        objectReference?.Dispose();
-
-        if (hobbyDescriptionModule is not null)
+        if (disposed)
         {
-            try
-            {
-                await hobbyDescriptionModule.InvokeVoidAsync("stopObservingDescriptions", aboutElement);
-                await hobbyDescriptionModule.DisposeAsync();
-            }
-            catch (JSDisconnectedException)
-            {
-            }
+            return;
         }
 
-        if (lightboxModule is not null)
+        disposed = true;
+        jsLifetimeCancellation.Cancel();
+        await jsModuleLock.WaitAsync();
+        try
         {
-            try
+            var cleanupErrors = new List<Exception>();
+            var currentHobbyDescriptionModule = hobbyDescriptionModule;
+            hobbyDescriptionModule = null;
+            if (currentHobbyDescriptionModule is not null)
             {
-                await lightboxModule.InvokeVoidAsync("deactivate");
-                await lightboxModule.DisposeAsync();
+                await TryInvokeLifecycleInteropAsync(
+                    cleanupErrors,
+                    () => currentHobbyDescriptionModule.InvokeVoidAsync("stopObservingDescriptions", aboutElement),
+                    "stopObservingDescriptions");
+                await TryInvokeLifecycleInteropAsync(cleanupErrors, currentHobbyDescriptionModule.DisposeAsync, "hobbyDescriptionModule.DisposeAsync");
             }
-            catch (JSDisconnectedException)
+
+            var currentLightboxModule = lightboxModule;
+            lightboxModule = null;
+            if (currentLightboxModule is not null)
             {
+                await TryInvokeLifecycleInteropAsync(cleanupErrors, () => currentLightboxModule.InvokeVoidAsync("deactivate"), "deactivate");
+                await TryInvokeLifecycleInteropAsync(cleanupErrors, currentLightboxModule.DisposeAsync, "lightboxModule.DisposeAsync");
             }
+
+            objectReference?.Dispose();
+            objectReference = null;
+
+            if (cleanupErrors.Count == 1)
+            {
+                System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(cleanupErrors[0]).Throw();
+            }
+
+            if (cleanupErrors.Count > 1)
+            {
+                throw new AggregateException("About section JavaScript cleanup failed.", cleanupErrors);
+            }
+        }
+        finally
+        {
+            jsModuleLock.Release();
+            jsLifetimeCancellation.Dispose();
         }
     }
 
     private async Task OpenHobbyImage(string imageUrl, string name)
     {
+        if (disposed)
+        {
+            return;
+        }
+
         try
         {
-            lightboxModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./js/hobby-image-lightbox.js");
-            await lightboxModule.InvokeVoidAsync("rememberFocus");
+            await jsModuleLock.WaitAsync(jsLifetimeCancellation.Token);
         }
-        catch (JSDisconnectedException)
+        catch (OperationCanceledException exception) when (disposed)
         {
+            Logger.LogDebug(exception, "About image lightbox initialization was canceled while waiting for the module lock.");
+            return;
+        }
+
+        try
+        {
+            if (disposed)
+            {
+                return;
+            }
+
+            lightboxModule ??= await JS.InvokeAsync<IJSObjectReference>(
+                "import",
+                jsLifetimeCancellation.Token,
+                "./js/hobby-image-lightbox.js");
+            if (disposed)
+            {
+                return;
+            }
+
+            await lightboxModule.InvokeVoidAsync("rememberFocus", jsLifetimeCancellation.Token);
+        }
+        catch (JSDisconnectedException exception) when (disposed)
+        {
+            Logger.LogDebug(exception, "About image lightbox initialization ended after component disposal.");
+            return;
+        }
+        catch (OperationCanceledException exception) when (disposed)
+        {
+            Logger.LogDebug(exception, "About image lightbox initialization was canceled during component disposal.");
+            return;
+        }
+        finally
+        {
+            jsModuleLock.Release();
+        }
+
+        if (disposed)
+        {
+            return;
         }
 
         expandedHobbyImageUrl = imageUrl;
         expandedHobbyName = name;
         focusLightboxCloseButton = true;
+    }
+
+    private async ValueTask TryInvokeLifecycleInteropAsync(
+        List<Exception> cleanupErrors,
+        Func<ValueTask> operation,
+        string operationName)
+    {
+        try
+        {
+            await operation();
+        }
+        catch (JSDisconnectedException exception)
+        {
+            Logger.LogDebug(exception, "About section JS {Operation} could not complete because the circuit disconnected.", operationName);
+        }
+        catch (OperationCanceledException exception) when (disposed)
+        {
+            Logger.LogDebug(exception, "About section JS {Operation} was canceled during component disposal.", operationName);
+        }
+        catch (Exception exception)
+        {
+            cleanupErrors.Add(exception);
+        }
     }
 
     private void CloseHobbyImage()

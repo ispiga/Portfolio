@@ -1,3 +1,5 @@
+import { hasUnsavedChanges } from "./experience-unsaved-changes.js";
+
 let form;
 let lastActivity = 0;
 let submitTimer;
@@ -32,6 +34,10 @@ export function startMonitoring(formId) {
     }
 
     activityEvents.forEach(eventName => document.addEventListener(eventName, reportActivity, { passive: true }));
+}
+
+export function hasPendingUnsavedChanges() {
+    return hasUnsavedChanges();
 }
 
 export function stopMonitoring() {

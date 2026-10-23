@@ -1074,6 +1074,12 @@
   <data name="AdminSessionExpiredMessage" xml:space="preserve">
     <value>Tu sesión de administrador ha expirado por inactividad. Si necesitas acceder de nuevo a la administración, inicia sesión otra vez.</value>
   </data>
+  <data name="AdminSessionExpiredAccessMessage" xml:space="preserve">
+    <value>Sesión de administrador expirada.</value>
+  </data>
+  <data name="AdminSessionExpiredWithUnsavedChangesMessage" xml:space="preserve">
+    <value>Sesión de administrador expirada con cambios sin guardar.</value>
+  </data>
   <data name="Close" xml:space="preserve">
     <value>Cerrar</value>
   </data>

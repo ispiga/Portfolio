@@ -715,15 +715,31 @@ public sealed class AdminAuthenticationTests : IAsyncLifetime
     }
 
     [Fact]
-    public void Expiration_state_is_not_marked_by_intentional_sign_out()
+    public async Task Expiration_state_is_marked_only_once()
     {
         var state = new AdminSessionExpirationState();
 
         Assert.False(state.IsExpired);
-        state.MarkExpired();
-        state.MarkExpired();
+        await state.MarkExpiredAsync(CancellationToken.None);
+        await state.MarkExpiredAsync(CancellationToken.None);
 
         Assert.True(state.IsExpired);
+    }
+
+    [Fact]
+    public async Task Expiration_state_captures_unsaved_changes_before_raising_event()
+    {
+        var state = new AdminSessionExpirationState
+        {
+            UnsavedChangesProbe = _ => ValueTask.FromResult(true)
+        };
+        var eventSawUnsavedChanges = false;
+        state.Expired += () => eventSawUnsavedChanges = state.HasUnsavedChanges;
+
+        await state.MarkExpiredAsync(CancellationToken.None);
+
+        Assert.True(state.HasUnsavedChanges);
+        Assert.True(eventSawUnsavedChanges);
     }
 
     [Fact]

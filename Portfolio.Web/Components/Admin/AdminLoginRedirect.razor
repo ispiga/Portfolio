@@ -1,13 +1,15 @@
 @using Microsoft.AspNetCore.Components.Authorization
+@using Portfolio.Web.Authentication
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager Navigation
+@inject AdminSessionExpirationState ExpirationState
 
 @code {
     protected override async Task OnInitializedAsync()
     {
         var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
 
-        if (authenticationState.User.Identity?.IsAuthenticated != true)
+        if (authenticationState.User.Identity?.IsAuthenticated != true && !ExpirationState.IsExpired)
         {
             Navigation.NavigateTo("/admin/login", forceLoad: true, replace: true);
         }

@@ -30,12 +30,13 @@ internal sealed class AdminAuthenticationStateProvider(
         if (AdminSession.TryGetSessionId(principal, out var sessionId)
             && activityStore.HasExpired(sessionId))
         {
-            expirationState.MarkExpired();
+            await expirationState.MarkExpiredAsync(cancellationToken);
             return false;
         }
 
         if (AdminSession.HasExpired(principal, DateTimeOffset.UtcNow, activityStore))
         {
+            await expirationState.MarkExpiredAsync(cancellationToken);
             return false;
         }
 

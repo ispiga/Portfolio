@@ -1,6 +1,8 @@
 @implements IAsyncDisposable
 @using Microsoft.AspNetCore.Components.Authorization
+@using Portfolio.Web.Authentication
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject AdminSessionExpirationState ExpirationState
 @inject IJSRuntime JS
 @inject ILogger<AdminSessionActivityTracker> Logger
 
@@ -10,87 +12,173 @@
 
 @code {
     private IJSObjectReference? module;
+    private readonly CancellationTokenSource jsLifetimeCancellation = new();
+    private readonly SemaphoreSlim jsModuleLock = new(1, 1);
     private bool initialized;
+    private bool disposed;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (initialized)
+        if (!firstRender || initialized || disposed)
         {
             return;
         }
 
         initialized = true;
         var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        if (authenticationState.User.Identity?.IsAuthenticated != true)
-        {
-            return;
-        }
-
-        module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/admin-session-activity.js");
-        await module.InvokeVoidAsync("startMonitoring", "admin-session-activity-form");
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        var currentModule = module;
-        if (currentModule is null)
+        if (disposed || authenticationState.User.Identity?.IsAuthenticated != true)
         {
             return;
         }
 
         try
         {
-            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            await jsModuleLock.WaitAsync(jsLifetimeCancellation.Token);
+        }
+        catch (OperationCanceledException exception) when (disposed)
+        {
+            Logger.LogDebug(exception, "Admin session activity JS initialization was canceled while waiting for the module lock.");
+            return;
+        }
+
+        try
+        {
+            if (disposed)
+            {
+                return;
+            }
+
+            module = await JS.InvokeAsync<IJSObjectReference>(
+                "import",
+                jsLifetimeCancellation.Token,
+                "./js/admin-session-activity.js");
+            if (disposed)
+            {
+                return;
+            }
+
+            await module.InvokeVoidAsync(
+                "startMonitoring",
+                jsLifetimeCancellation.Token,
+                "admin-session-activity-form");
+            if (!disposed)
+            {
+                ExpirationState.UnsavedChangesProbe = HasUnsavedChangesAsync;
+            }
+        }
+        catch (JSDisconnectedException exception) when (disposed)
+        {
+            Logger.LogDebug(exception, "Admin session activity JS initialization ended after component disposal.");
+        }
+        catch (OperationCanceledException exception) when (disposed)
+        {
+            Logger.LogDebug(exception, "Admin session activity JS initialization was canceled during component disposal.");
+        }
+        finally
+        {
+            jsModuleLock.Release();
+        }
+    }
+
+    private async ValueTask<bool> HasUnsavedChangesAsync(CancellationToken cancellationToken)
+    {
+        await jsModuleLock.WaitAsync(cancellationToken);
+        try
+        {
+            if (disposed || module is null)
+            {
+                return false;
+            }
 
             try
             {
-                await currentModule.InvokeVoidAsync("stopMonitoring");
+                return await module.InvokeAsync<bool>("hasPendingUnsavedChanges", cancellationToken);
             }
-            catch (JSDisconnectedException ex)
+            catch (JSDisconnectedException exception) when (disposed)
             {
-                Logger.LogDebug(
-                    ex,
-                    "JS interop {Operation} no pudo completarse: el circuito está desconectado. Duración: {ElapsedMilliseconds} ms.",
-                    "stopMonitoring",
-                    stopwatch.ElapsedMilliseconds);
+                Logger.LogDebug(exception, "Admin session activity probe ended after component disposal.");
+                return false;
             }
-            catch (TaskCanceledException ex)
+            catch (OperationCanceledException exception) when (disposed)
             {
-                Logger.LogWarning(
-                    ex,
-                    "JS interop {Operation} se canceló durante la disposición. Duración: {ElapsedMilliseconds} ms. Token cancelable: {CanBeCanceled}; cancelado: {IsCancellationRequested}.",
-                    "stopMonitoring",
-                    stopwatch.ElapsedMilliseconds,
-                    ex.CancellationToken.CanBeCanceled,
-                    ex.CancellationToken.IsCancellationRequested);
+                Logger.LogDebug(exception, "Admin session activity probe was canceled during component disposal.");
+                return false;
             }
         }
         finally
         {
-            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            jsModuleLock.Release();
+        }
+    }
 
-            try
+    public async ValueTask DisposeAsync()
+    {
+        if (disposed)
+        {
+            return;
+        }
+
+        disposed = true;
+        if (ExpirationState.UnsavedChangesProbe == HasUnsavedChangesAsync)
+        {
+            ExpirationState.UnsavedChangesProbe = null;
+        }
+
+        jsLifetimeCancellation.Cancel();
+        await jsModuleLock.WaitAsync();
+        try
+        {
+            var currentModule = module;
+            module = null;
+            if (currentModule is null)
             {
-                await currentModule.DisposeAsync();
+                return;
             }
-            catch (JSDisconnectedException ex)
+
+            var cleanupErrors = new List<Exception>();
+            await TryInvokeLifecycleInteropAsync(
+                cleanupErrors,
+                () => currentModule.InvokeVoidAsync("stopMonitoring"),
+                "stopMonitoring");
+            await TryInvokeLifecycleInteropAsync(cleanupErrors, currentModule.DisposeAsync, "module.DisposeAsync");
+
+            if (cleanupErrors.Count == 1)
             {
-                Logger.LogDebug(
-                    ex,
-                    "JS interop {Operation} no pudo completarse: el circuito está desconectado. Duración: {ElapsedMilliseconds} ms.",
-                    "module.DisposeAsync",
-                    stopwatch.ElapsedMilliseconds);
+                System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(cleanupErrors[0]).Throw();
             }
-            catch (TaskCanceledException ex)
+
+            if (cleanupErrors.Count > 1)
             {
-                Logger.LogWarning(
-                    ex,
-                    "JS interop {Operation} se canceló durante la disposición. Duración: {ElapsedMilliseconds} ms. Token cancelable: {CanBeCanceled}; cancelado: {IsCancellationRequested}.",
-                    "module.DisposeAsync",
-                    stopwatch.ElapsedMilliseconds,
-                    ex.CancellationToken.CanBeCanceled,
-                    ex.CancellationToken.IsCancellationRequested);
+                throw new AggregateException("Admin session activity JavaScript cleanup failed.", cleanupErrors);
             }
+        }
+        finally
+        {
+            jsModuleLock.Release();
+            jsLifetimeCancellation.Dispose();
+        }
+    }
+
+    private async ValueTask TryInvokeLifecycleInteropAsync(
+        List<Exception> cleanupErrors,
+        Func<ValueTask> operation,
+        string operationName)
+    {
+        try
+        {
+            await operation();
+        }
+        catch (JSDisconnectedException exception)
+        {
+            Logger.LogDebug(exception, "Admin session activity JS {Operation} could not complete because the circuit disconnected.", operationName);
+        }
+        catch (OperationCanceledException exception) when (disposed)
+        {
+            Logger.LogDebug(exception, "Admin session activity JS {Operation} was canceled during component disposal.", operationName);
+        }
+        catch (Exception exception)
+        {
+            cleanupErrors.Add(exception);
         }
     }
 }
