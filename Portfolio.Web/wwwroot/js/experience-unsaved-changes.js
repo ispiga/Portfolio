@@ -104,7 +104,7 @@ function confirmInternalAction(event) {
 
 function confirmLogout(event) {
     const form = event.target;
-    if (!enabled || !(form instanceof HTMLFormElement) || !logoutFormIds.has(form.id)) {
+    if (!getUnsavedChangesState().enabled || !(form instanceof HTMLFormElement) || !logoutFormIds.has(form.id)) {
         return;
     }
 
