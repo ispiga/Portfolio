@@ -11,6 +11,7 @@
 
 - Use .NET 10, Blazor Web App and Razor Components.
 - Use Interactive Server only where interactivity is required.
+- Keep Interactive Server reconnection on Blazor's native runtime: load `/_framework/blazor.web.js` once from `App.razor` and retain its automatic startup. Do not call `Blazor.start()` separately, add a custom reconnect component/script, or create, hide, remove or restyle `components-reconnect-modal` / `components-reconnect-*` unless the project specification explicitly changes. Diagnose the `/_blazor` circuit separately from HTTP resource requests; visible DOM or cached assets do not prove that the circuit is connected.
 - Do not turn the public site into a SPA or duplicate navigation with JavaScript.
 - Preserve the existing project dependency direction and separation of responsibilities.
 - Keep technical identifiers in English. User-facing content is localized.

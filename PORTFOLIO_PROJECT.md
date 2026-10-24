@@ -90,6 +90,8 @@ La aplicación utiliza el modelo **Blazor Web App con Razor Components** y rende
 
 La aplicación usa `MapRazorComponents<App>()` y `AddInteractiveServerRenderMode()`.
 
+La reconexión de Interactive Server y su interfaz se dejan al runtime nativo de Blazor. `Components/App.razor` carga una sola vez `/_framework/blazor.web.js` y conserva su inicio automático; no se invoca `Blazor.start()` manualmente, ni se añade un componente o JavaScript propio para crear o modificar `components-reconnect-modal` o las clases `components-reconnect-*`. No se configura una conexión SignalR paralela para el circuito. Al diagnosticar una interrupción, se debe observar `/_blazor` por separado de las solicitudes HTTP de imágenes y otros recursos: que el DOM siga visible o que un recurso almacenado en caché permanezca mostrado no demuestra que el circuito siga conectado. Las pruebas de navegador deben documentar entorno y resultados observados; una inspección estática no acredita el comportamiento en producción.
+
 ---
 
 # 4. Sistema visual
