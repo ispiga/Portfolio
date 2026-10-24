@@ -685,7 +685,7 @@ public sealed class AdminAuthenticationTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Login_cookie_uses_a_fifteen_minute_inactivity_expiry_and_is_rejected_after_expiration()
+    public async Task Login_cookie_uses_a_thirty_minute_inactivity_expiry_and_is_rejected_after_expiration()
     {
         using var login = await LoginAsync(AdministratorEmail, TestPassword);
         var setCookie = Assert.Single(login.Headers.GetValues("Set-Cookie"));
@@ -702,7 +702,7 @@ public sealed class AdminAuthenticationTests : IAsyncLifetime
         var principal = authenticationTicket!.Principal;
         Assert.False(AdminSession.HasExpired(principal, DateTimeOffset.UtcNow));
         Assert.True(AdminSession.TryGetSessionId(principal, out var sessionId));
-        Assert.Equal(TimeSpan.FromMinutes(15), AdminSession.Duration);
+        Assert.Equal(TimeSpan.FromMinutes(30), AdminSession.Duration);
 
         var expiredIdentity = new ClaimsIdentity(principal.Identity);
         expiredIdentity.RemoveClaim(expiredIdentity.FindFirst(AdminSession.ExpiresAtClaim)!);
@@ -734,10 +734,10 @@ public sealed class AdminAuthenticationTests : IAsyncLifetime
         Assert.True(AdminSession.TryGetSessionId(principal, out var sessionId));
         var store = app.Services.GetRequiredService<AdminSessionActivityStore>();
         var now = DateTimeOffset.UtcNow;
-        store.Start(sessionId, now.AddMinutes(15));
+        store.Start(sessionId, now.AddMinutes(30));
 
         Assert.True(store.TryRenew(sessionId, now.AddSeconds(31), TimeSpan.FromSeconds(30), out var renewedExpiry));
-        Assert.Equal(now.AddSeconds(31).AddMinutes(15), renewedExpiry);
+        Assert.Equal(now.AddSeconds(31).AddMinutes(30), renewedExpiry);
         Assert.False(store.TryRenew(sessionId, now.AddSeconds(40), TimeSpan.FromSeconds(30), out _));
         Assert.False(AdminSession.HasExpired(principal, now.AddSeconds(32), store));
         Assert.True(AdminSession.HasExpired(principal, renewedExpiry, store));
