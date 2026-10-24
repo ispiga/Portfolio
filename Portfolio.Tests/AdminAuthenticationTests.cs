@@ -155,8 +155,29 @@ public sealed class AdminAuthenticationTests : IAsyncLifetime
 
         Assert.Equal(HttpStatusCode.OK, loginResponse.StatusCode);
         Assert.Equal("text/html", loginResponse.Content.Headers.ContentType?.MediaType);
-        Assert.Equal(PortfolioCspReportOnly.Policy, Assert.Single(loginResponse.Headers.GetValues("Content-Security-Policy-Report-Only")));
+        var reportOnlyPolicy = Assert.Single(loginResponse.Headers.GetValues("Content-Security-Policy-Report-Only"));
+        Assert.Equal(PortfolioCspReportOnly.Policy, reportOnlyPolicy);
         Assert.False(loginResponse.Headers.Contains("Content-Security-Policy"));
+
+        var directives = reportOnlyPolicy.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        var directiveNames = directives.Select(directive => directive.Split(' ', 2)[0]).ToArray();
+        Assert.Equal(directiveNames.Length, directiveNames.Distinct(StringComparer.Ordinal).Count());
+        Assert.Contains("default-src 'none'", directives);
+        Assert.Contains("base-uri 'self'", directives);
+        Assert.Contains("object-src 'none'", directives);
+        Assert.Contains("script-src 'self'", directives);
+        Assert.Contains("style-src 'self'", directives);
+        Assert.Contains("style-src-elem 'self'", directives);
+        Assert.Contains("style-src-attr 'none'", directives);
+        Assert.Contains("img-src 'self' blob: data:", directives);
+        Assert.Contains("font-src 'self'", directives);
+        Assert.Contains("connect-src 'self'", directives);
+        Assert.Contains("worker-src 'self'", directives);
+        Assert.Contains("frame-src 'self'", directives);
+        Assert.Contains("form-action 'self'", directives);
+        Assert.Contains("frame-ancestors 'none'", directives);
+        Assert.DoesNotContain("unsafe-inline", reportOnlyPolicy, StringComparison.Ordinal);
+        Assert.DoesNotContain("unsafe-eval", reportOnlyPolicy, StringComparison.Ordinal);
 
         using var mediaResponse = await SendAsync(new HttpRequestMessage(HttpMethod.Get, "/test/csp-media"));
 
@@ -225,12 +246,20 @@ public sealed class AdminAuthenticationTests : IAsyncLifetime
             $"/admin/blog-post-images/{imageId}"));
         Assert.Equal(HttpStatusCode.OK, adminResponse.StatusCode);
         Assert.Equal("no-store", adminResponse.Headers.CacheControl?.ToString());
+        Assert.Equal(
+            "default-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'; sandbox",
+            Assert.Single(adminResponse.Headers.GetValues("Content-Security-Policy")));
+        Assert.False(adminResponse.Headers.Contains("Content-Security-Policy-Report-Only"));
 
         using var publicResponse = await SendAsync(new HttpRequestMessage(
             HttpMethod.Get,
             $"/blog-post-images/{imageId}"));
         Assert.Equal(HttpStatusCode.OK, publicResponse.StatusCode);
         Assert.Equal("nosniff", Assert.Single(publicResponse.Headers.GetValues("X-Content-Type-Options")));
+        Assert.Equal(
+            "default-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'; sandbox",
+            Assert.Single(publicResponse.Headers.GetValues("Content-Security-Policy")));
+        Assert.False(publicResponse.Headers.Contains("Content-Security-Policy-Report-Only"));
     }
 
     [Fact]

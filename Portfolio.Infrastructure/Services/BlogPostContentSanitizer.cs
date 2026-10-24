@@ -17,7 +17,7 @@ public sealed class BlogPostContentSanitizer : IBlogPostContentSanitizer
     ];
 
     private static readonly string[] AllowedCssProperties =
-    ["border-collapse", "text-align", "width"];
+    ["border-collapse", "display", "margin-left", "margin-right", "text-align", "width"];
 
     public string Sanitize(string? content) => Sanitize(content, useAdministrativeImageUrls: false);
 
@@ -121,7 +121,8 @@ public sealed class BlogPostContentSanitizer : IBlogPostContentSanitizer
         if (element.LocalName.Equals("img", StringComparison.OrdinalIgnoreCase)
             && string.IsNullOrWhiteSpace(element.GetAttribute("src")))
         {
-            element.RemoveAttribute("src");
+            element.Parent?.RemoveChild(element);
+            return;
         }
 
         if (!element.LocalName.Equals("a", StringComparison.OrdinalIgnoreCase))

@@ -1,5 +1,6 @@
 const editors = new Map();
 let tinyMceLoadPromise;
+const blogImageMimeType = "application/x-portfolio-blog-image";
 
 function isDarkTheme() {
     const theme = window.portfolioTheme?.get() || "system";
@@ -28,6 +29,58 @@ function loadTinyMce() {
     return tinyMceLoadPromise;
 }
 
+function containsImageFile(event) {
+    const transfer = event.dataTransfer ?? event.clipboardData;
+    return Array.from(transfer?.files ?? []).some(file =>
+        file.type.startsWith("image/") || /\.(jpe?g|png|webp|svg)$/i.test(file.name));
+}
+
+async function uploadImage(entry, blobInfo, progress) {
+    if (entry.disposed) {
+        throw new Error("The editor has been disposed.");
+    }
+
+    if (!entry.blogPostId) {
+        throw new Error(entry.saveArticleFirstMessage);
+    }
+
+    const token = document.querySelector('input[name="__RequestVerificationToken"]');
+    if (!token) {
+        throw new Error("The antiforgery token is unavailable.");
+    }
+
+    progress(10);
+    const formData = new FormData();
+    formData.append(token.name, token.value);
+    formData.append("file", blobInfo.blob(), blobInfo.filename());
+    const response = await fetch(`/admin/blog-post-images/${entry.blogPostId}`, {
+        method: "POST",
+        body: formData,
+        credentials: "same-origin"
+    });
+    const result = await response.json().catch(() => null);
+    if (!response.ok || !result?.location) {
+        throw new Error(result?.error || "Image upload failed.");
+    }
+
+    progress(100);
+    if (entry.disposed) {
+        throw new Error("The editor has been disposed.");
+    }
+
+    setTimeout(() => {
+        if (entry.disposed) {
+            return;
+        }
+
+        entry.dotNetReference.invokeMethodAsync("ImageUploaded").catch(error => {
+            console.error("The uploaded image could not be added to the article image list.", error);
+        });
+    }, 0);
+
+    return result.location;
+}
+
 async function createEditor(entry, content, darkTheme) {
     const editor = await window.tinymce.init({
         target: entry.element,
@@ -40,7 +93,7 @@ async function createEditor(entry, content, darkTheme) {
         language_url: entry.language === "es" ? "/js/vendor/tinymce/langs8/es.js" : undefined,
         menubar: false,
         plugins: "image link lists table code",
-        toolbar: "undo redo | blocks | bold italic underline | bullist numlist | link image table | alignleft aligncenter alignright | removeformat | code",
+        toolbar: `undo redo | blocks | bold italic underline | bullist numlist | link ${entry.blogPostId ? "image " : ""}table | alignleft aligncenter alignright | removeformat | code`,
         toolbar_mode: "sliding",
         width: "100%",
         height: 440,
@@ -48,43 +101,59 @@ async function createEditor(entry, content, darkTheme) {
         promotion: false,
         convert_urls: false,
         automatic_uploads: true,
-        images_upload_handler: async (blobInfo, progress) => {
-            if (entry.disposed) {
-                throw new Error("The editor has been disposed.");
-            }
-
-            if (!entry.blogPostId) {
-                throw new Error(entry.saveArticleFirstMessage);
-            }
-
-            const token = document.querySelector('input[name="__RequestVerificationToken"]');
-            if (!token) {
-                throw new Error("The antiforgery token is unavailable.");
-            }
-
-            progress(10);
-            const formData = new FormData();
-            formData.append(token.name, token.value);
-            formData.append("file", blobInfo.blob(), blobInfo.filename());
-            const response = await fetch(`/admin/blog-post-images/${entry.blogPostId}`, {
-                method: "POST",
-                body: formData,
-                credentials: "same-origin"
-            });
-            const result = await response.json().catch(() => null);
-            if (!response.ok || !result?.location) {
-                throw new Error(result?.error || "Image upload failed.");
-            }
-
-            progress(100);
-            if (entry.disposed) {
-                throw new Error("The editor has been disposed.");
-            }
-            await entry.dotNetReference.invokeMethodAsync("ImageUploaded");
-            return result.location;
+        images_upload_handler: (blobInfo, progress) => {
+            const upload = uploadImage(entry, blobInfo, progress);
+            entry.pendingUploads.add(upload);
+            upload.then(
+                () => entry.pendingUploads.delete(upload),
+                () => entry.pendingUploads.delete(upload));
+            return upload;
         },
         setup: instance => {
-            instance.on("init", () => instance.setContent(content || ""));
+            entry.galleryDragStart ??= event => {
+                const image = event.target.closest?.("img[data-blog-post-image-id]");
+                const imageId = image?.dataset.blogPostImageId;
+                if (!imageId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(imageId)) {
+                    return;
+                }
+
+                event.dataTransfer?.setData(blogImageMimeType, imageId);
+                event.dataTransfer?.setData("text/uri-list", `${location.origin}/admin/blog-post-images/${imageId}`);
+                event.dataTransfer?.setData("text/html", `<img src="/admin/blog-post-images/${imageId}">`);
+                if (event.dataTransfer) {
+                    event.dataTransfer.effectAllowed = "copy";
+                }
+            };
+            document.addEventListener("dragstart", entry.galleryDragStart);
+
+            if (!entry.blogPostId) {
+                instance.on("drop paste", event => {
+                    if (!containsImageFile(event)) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    event.stopPropagation();
+                    instance.notificationManager.open({
+                        text: entry.saveArticleFirstMessage,
+                        type: "warning"
+                    });
+                });
+            }
+
+            instance.on("init", () => {
+                instance.setContent(content || "");
+                instance.getBody().addEventListener("drop", event => {
+                    const imageId = event.dataTransfer?.getData(blogImageMimeType);
+                    if (!imageId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(imageId)) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                    instance.insertContent(`<p><img src="/admin/blog-post-images/${imageId}"></p>`);
+                }, true);
+            });
             instance.on("input change undo redo", async () => {
                 if (entry.disposed) {
                     return;
@@ -182,6 +251,7 @@ export function initialize(id, initialContent, language, blogPostId, dotNetRefer
         saveArticleFirstMessage,
         content: initialContent || "",
         darkTheme: isDarkTheme(),
+        pendingUploads: new Set(),
         generation: 0,
         editor: null,
         disposed: false
@@ -196,15 +266,25 @@ function removeEditor(entry) {
     entry.generation++;
     entry.themeObserver?.disconnect();
     entry.colorScheme?.removeEventListener("change", entry.colorSchemeListener);
+    if (entry.galleryDragStart) {
+        document.removeEventListener("dragstart", entry.galleryDragStart);
+    }
     entry.editor?.remove();
     if (editors.get(entry.id) === entry) {
         editors.delete(entry.id);
     }
 }
 
-export function getContent(id) {
+export async function getContent(id) {
     const entry = editors.get(id);
-    return entry?.editor?.getContent() ?? entry?.content ?? document.getElementById(id)?.value ?? "";
+    if (!entry?.editor) {
+        return entry?.content ?? document.getElementById(id)?.value ?? "";
+    }
+
+    await Promise.all(entry.pendingUploads);
+    await entry.editor.uploadImages();
+    await Promise.all(entry.pendingUploads);
+    return entry.editor.getContent();
 }
 
 export async function dispose(id) {

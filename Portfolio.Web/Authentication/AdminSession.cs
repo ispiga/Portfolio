@@ -11,7 +11,7 @@ public static class AdminSession
     public const string ExpiresAtClaim = "portfolio.admin.session_expires_at";
     public const string SessionIdClaim = "portfolio.admin.session_id";
     public const string ExpirationSignOutItem = "Portfolio.AdminSession.ExpirationSignOut";
-    public static readonly TimeSpan Duration = TimeSpan.FromMinutes(3);
+    public static readonly TimeSpan Duration = TimeSpan.FromMinutes(30);
 
     public static void ConfigureCookie(CookieAuthenticationOptions options)
     {

@@ -61,7 +61,7 @@ public sealed class BlogPostContentSanitizerTests
     {
         const string input = "<h2>Heading</h2><p style=\"text-align: center;\"><strong>Bold</strong> <em>Italic</em> <u>Underlined</u></p>"
             + "<ol><li>One</li></ol><p><a href=\"https://example.org/article\">Link</a></p>"
-            + "<p><img src=\"/blog-post-images/11111111-1111-1111-1111-111111111111\" alt=\"Alt\" width=\"320\" height=\"180\"></p>"
+            + "<p><img src=\"/blog-post-images/11111111-1111-1111-1111-111111111111\" alt=\"Alt\" width=\"320\" height=\"180\" style=\"display: block; margin-left: auto; margin-right: auto;\"></p>"
             + "<table style=\"border-collapse: collapse; width: 100%;\" border=\"1\"><tbody><tr><td style=\"text-align: center;\">Cell</td></tr></tbody></table>";
 
         var sanitizer = new BlogPostContentSanitizer();
@@ -79,6 +79,9 @@ public sealed class BlogPostContentSanitizerTests
         Assert.Contains("alt=\"Alt\"", sanitized);
         Assert.Contains("width=\"320\"", sanitized);
         Assert.Contains("height=\"180\"", sanitized);
+        Assert.Contains("display: block", sanitized);
+        Assert.Contains("margin-left: auto", sanitized);
+        Assert.Contains("margin-right: auto", sanitized);
         Assert.Contains("<table", sanitized);
         Assert.Contains("border=\"1\"", sanitized);
         Assert.Contains("border-collapse: collapse", sanitized);
@@ -104,6 +107,24 @@ public sealed class BlogPostContentSanitizerTests
         Assert.DoesNotContain("href=", sanitizer.Sanitize("<a href=\"//attacker.example/path\">enlace</a>"));
         Assert.DoesNotContain("href=", sanitizer.Sanitize("<a href=\"\\\\attacker.example\\path\">enlace</a>"));
         Assert.DoesNotContain("href=", sanitizer.Sanitize("<a href=\"file:///etc/passwd\">enlace</a>"));
+    }
+
+    [Theory]
+    [InlineData("<p><img src=\"\" alt=\"Vista previa de la imagen del artículo\"></p>")]
+    [InlineData("<p><img src=\"blob:https://localhost/image-id\" alt=\"Vista previa de la imagen del artículo\"></p>")]
+    [InlineData("<p><img src=\"file:///C:/image.png\" alt=\"Vista previa de la imagen del artículo\"></p>")]
+    [InlineData("<p><img src=\"/blog-post-images/not-a-guid\" alt=\"Vista previa de la imagen del artículo\"></p>")]
+    public void Removes_images_without_a_persisted_blog_image_url(string input)
+    {
+        var sanitizer = new BlogPostContentSanitizer();
+
+        var publicContent = sanitizer.Sanitize(input);
+        var adminContent = sanitizer.SanitizeForAdministration(input);
+
+        Assert.DoesNotContain("<img", publicContent, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("<img", adminContent, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("Vista previa de la imagen del artículo", publicContent, StringComparison.Ordinal);
+        Assert.DoesNotContain("Vista previa de la imagen del artículo", adminContent, StringComparison.Ordinal);
     }
 
     [Fact]

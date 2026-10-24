@@ -167,7 +167,8 @@
                         @foreach (var image in images)
                         {
                             <article class="certification-attachment-list__item blog-image-list__item">
-                                <img class="admin-image-preview" src="@($"/admin/blog-post-images/{image.Id}")" alt="@Localizer["BlogImagePreviewAlt"]" />
+                                <img class="admin-image-preview" src="@($"/admin/blog-post-images/{image.Id}")" alt="@Localizer["BlogImagePreviewAlt"]"
+                                     draggable="true" data-blog-post-image-id="@image.Id" />
                                 <span class="certification-attachment-list__size">@(image.SizeBytes / 1024) KB</span>
                                 <div class="certification-attachment-list__controls">
                                     @if (image.IsFeatured)

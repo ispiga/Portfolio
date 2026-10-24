@@ -74,7 +74,7 @@ Esta nota complementa los hallazgos SEC-01–03 anteriores; no representa una nu
 ## Recomendaciones de endurecimiento
 
 1. Mantener SEC-01 bajo revisión cuando se incorporen etiquetas/plugins/formatos nuevos o puntos de salida HTML; añadir pruebas antes de ampliar allowlists. Considerar verificación con contenido anonimizado de producción y un recorrido de renderizado en navegador antes del despliegue.
-2. Evaluar un CSP global compatible con Blazor Server, estilos/scripts y TinyMCE local; desplegarlo primero en modo de informe y probar las rutas reales. No copiar directamente la CSP sandbox de medios como política de toda la aplicación.
+2. Validar integralmente en navegador la CSP global Report-Only descrita abajo antes de considerar enforcement. No copiar directamente la CSP sandbox de medios como política de toda la aplicación.
 3. Antes del despliegue, decidir y verificar la topología del proxy/NAS, configurar proxies reenviados confiables si aplica y evaluar si se necesita una cuota distribuida entre instancias. Los límites actuales son por proceso/IP y no reemplazan controles de tráfico en el gateway.
 4. Repetir el análisis de dependencias/CVE para el grafo completo de la solución y revisar configuración del entorno de despliegue como actividades separadas, sin exponer secretos; la consulta puntual del paquete nuevo no sustituye esas tareas.
 
@@ -87,6 +87,14 @@ Esta nota complementa los hallazgos SEC-01–03 anteriores; no representa una nu
 - La única coincidencia de `MarkupString` encontrada por la búsqueda global estaba en `BlogPostDetail.razor`.
 - Estas comprobaciones describen ese estado del workspace. No deben interpretarse como resultados de un build de producción, un pentest, análisis exhaustivo de dependencias ni garantía de seguridad integral.
 
+## CSP global en modo Report-Only
+
+`Portfolio.Web/Program.cs` registra `UsePortfolioCspReportOnly`; el middleware añade `Content-Security-Policy-Report-Only` solo a respuestas `text/html` y no activa una CSP global de enforcement. La política explícita usa `default-src 'none'`, limita los recursos a los orígenes/directivas declarados, mantiene `object-src 'none'`, `base-uri 'self'`, `form-action 'self'` y `frame-ancestors 'none'`; `img-src` permite `blob:` para previsualizaciones y `data:` para recursos de imagen embebidos en los recursos locales de TinyMCE. No se han añadido `unsafe-inline`, `unsafe-eval` ni orígenes externos a la política global.
+
+`ImportMapCspIntegrity` conserva el hash SHA-256 del import map en `script-src`. Las CSP específicas de las respuestas de imágenes del Blog y SVG de identidad visual permanecen independientes; la política global no se adjunta a esas respuestas no HTML. Las pruebas de `AdminAuthenticationTests` verifican las directivas y su unicidad, la cabecera Report-Only en HTML, la ausencia de enforcement global, el hash del import map y la preservación de la CSP de las imágenes pública y administrativa del Blog.
+
+La validación integral en navegador sigue pendiente. La política está solo en Report-Only y no está lista para enforcement. Se deben revisar las infracciones en DevTools al recorrer rutas públicas y administrativas, incluyendo los estilos inline estáticos/dinámicos identificados, MudBlazor, TinyMCE, la conexión Interactive Server y PDF.js; hay que separar las inyecciones de BrowserLink/Browser Refresh de Development de los recursos de producción. No existe un recolector `report-to`/`report-uri`; los reportes se observan en el navegador. Las pruebas automatizadas de cabeceras no demuestran compatibilidad funcional en runtime.
+
 ## Estado
 
-La auditoría inicial y su seguimiento están documentados; SEC-01, SEC-02 y SEC-03 cuentan con mitigaciones en código y pruebas locales. CSP global sigue pendiente y no se modificó en esta tarea. Los controles descritos corresponden al código inspeccionado en el workspace y pueden diferir de producción; no se verificaron proxy, despliegue ni configuración del NAS. Revisar este informe tras cambios en el editor, sanitizador/allowlist, sinks HTML, middleware, Identity, almacenamiento, dependencias o endpoints públicos, y antes del despliegue en el NAS.
+La auditoría inicial y su seguimiento están documentados; SEC-01, SEC-02 y SEC-03 cuentan con mitigaciones en código y pruebas locales. La CSP global está implementada en modo Report-Only y su validación integral en navegador sigue pendiente; no se activó enforcement. Los controles descritos corresponden al código inspeccionado en el workspace y pueden diferir de producción; no se verificaron proxy, despliegue ni configuración del NAS. Revisar este informe tras cambios en el editor, sanitizador/allowlist, sinks HTML, middleware, Identity, almacenamiento, dependencias o endpoints públicos, y antes del despliegue en el NAS.

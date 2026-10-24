@@ -2,7 +2,7 @@ namespace Portfolio.Web.Authentication;
 
 public static class PortfolioCspReportOnly
 {
-    public const string Policy = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' blob:; font-src 'self'; connect-src 'self'; worker-src 'self'; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'";
+    public const string Policy = "default-src 'none'; base-uri 'self'; object-src 'none'; script-src 'self'; style-src 'self'; style-src-elem 'self'; style-src-attr 'none'; img-src 'self' blob: data:; font-src 'self'; connect-src 'self'; worker-src 'self'; frame-src 'self'; form-action 'self'; frame-ancestors 'none'";
 
     public static IApplicationBuilder UsePortfolioCspReportOnly(this IApplicationBuilder app)
     {

@@ -45,7 +45,7 @@
 
         try
         {
-            module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/blog-tinymce.js?v=5");
+            module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/blog-tinymce.js?v=7");
             if (disposed)
             {
                 await module.DisposeAsync();
